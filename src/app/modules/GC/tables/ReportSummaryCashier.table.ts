@@ -1,0 +1,66 @@
+import { TableHeader } from '~/components/VhpUI/typings';
+export const tableHeaders: TableHeader[] = [
+    {
+        label: 'Departement',
+        field: 'bezeich',
+        name: 'bezeich',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Cash',
+        field: 'cash',
+        name: 'cash',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Room/FO-Bill',
+        field: 'room',
+        name: 'room',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Card',
+        field: 'card',
+        name: 'card',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'City Ledger',
+        field: 'cl',
+        name: 'cl',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Revenue',
+        field: 'revenue',
+        name: 'revenue',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Compilment',
+        field: 'compli',
+        name: 'compli',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'MealCoupon',
+        field: 'mcoupon',
+        name: 'mcoupon',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Outstanding',
+        field: 'gl',
+        name: 'gl',
+        align: 'left',
+        sortable: false,
+    },
+]

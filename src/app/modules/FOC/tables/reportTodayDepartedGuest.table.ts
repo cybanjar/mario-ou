@@ -1,0 +1,95 @@
+import { TableHeader } from '~/components/VhpUI/typings';
+
+export const tableHeaders: TableHeader[] = [
+  {
+    label: 'Room Number',
+    field: 'zinr',
+    name: 'zinr',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Guest Name',
+    field: 'name',
+    name: 'name',
+    sortable: true,
+  },
+  {
+    label: 'Room Rate',
+    field: 'zipreis',
+    name: 'zipreis',
+    sortable: true,
+  },
+  {
+    label: 'Bill Number',
+    field: 'rechnr',
+    name: 'rechnr',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Arrival',
+    field: 'ankunft',
+    name: 'ankunft',
+    sortable: true,
+  },
+  {
+    label: 'Depature',
+    field: 'abreise',
+    name: 'abreise',
+    sortable: true,
+  },
+  {
+    label: 'Depature Time',
+    field: 'cotime',
+    name: 'cotime',
+    sortable: true,
+  },
+  {
+    label: 'Deposit',
+    field: 'deposit',
+    name: 'deposit',
+    sortable: true,
+  },
+  {
+    label: 'Cash',
+    field: 'cash',
+    name: 'cash',
+    sortable: true,
+  },
+  {
+    label: '',
+    field: 's-cc',
+    name: 's-cc',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'City Ledger',
+    field: 'cl',
+    name: 'cl',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Total',
+    field: 'tot',
+    name: 'tot',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Reservation Number',
+    field: 'resnr',
+    name: 'resnr',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Company',
+    field: 'company',
+    name: 'company',
+    align: 'right',
+    sortable: true,
+  },
+];

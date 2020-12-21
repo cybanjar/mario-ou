@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="120px" height="120px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 120 120"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil5 {fill:#FEFEFE}
+    .fil3 {fill:#A98F71}
+    .fil2 {fill:#00AFEF}
+    .fil4 {fill:#0098DA}
+    .fil9 {fill:#F0A71F}
+    .fil1 {fill:#FEFEFE}
+    .fil8 {fill:#FFCB68}
+    .fil7 {fill:#FEFEFE;fill-rule:nonzero}
+    .fil14 {fill:#A98F71;fill-rule:nonzero}
+    .fil12 {fill:#DCAB63;fill-rule:nonzero}
+    .fil10 {fill:#C78F63;fill-rule:nonzero}
+    .fil11 {fill:#F0A71F;fill-rule:nonzero}
+    .fil13 {fill:#FFCB68;fill-rule:nonzero}
+    .fil6 {fill:url(#id0);fill-rule:nonzero}
+   ]]>
+  </style>
+  <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="39.9965" y1="32.3995" x2="39.9965" y2="73.5522">
+   <stop offset="0" style="stop-opacity:1; stop-color:#04870F"/>
+   <stop offset="1" style="stop-opacity:1; stop-color:#1DEB23"/>
+  </linearGradient>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" width="120" height="120"/>
+  <g id="_603758544">
+   <g>
+    <g>
+     <path class="fil1" d="M78 77c-2,0 -3,1 -5,3 -2,3 -2,8 2,10 5,4 13,0 12,-7 -1,-4 -5,-7 -9,-6z"/>
+     <g>
+      <path class="fil2" d="M19 59c-1,0 -13,0 -14,0 -2,0 -2,2 -2,3 0,7 0,13 0,20 0,0 0,0 0,0l2 -1c0,-1 1,-1 1,-1 5,-2 9,-2 13,0 6,3 8,8 7,15l26 0c0,-1 -1,-2 -1,-2 0,-1 0,-2 0,-3 -1,-10 7,-19 18,-19 2,0 4,0 5,1l0 -9 -10 -3c-2,-9 -3,-19 -5,-28 -1,-5 -1,-10 -5,-13 -2,-2 -4,-2 -7,-2 -3,0 -6,0 -9,0 -6,0 -13,0 -19,0l0 42z"/>
+      <path class="fil1" d="M39 25c-2,0 -9,0 -11,0 -1,0 -1,0 -1,0l0 33c0,1 0,1 2,1 2,0 8,0 9,0l3 9 15 0c0,-7 0,-7 -1,-14 0,-4 -1,-8 -2,-12l-2 -16c-1,-2 -5,-1 -10,-1 -4,0 1,0 -2,0z"/>
+      <path class="fil3" d="M85 88l33 0 0 -5 -32 -3 0 -52 -8 0c0,2 0,24 0,27l0 15c0,7 -1,3 3,7 2,3 4,7 4,11z"/>
+      <g>
+       <circle class="fil4" cx="12" cy="92" r="10"/>
+       <circle class="fil5" cx="12" cy="92" r="5"/>
+      </g>
+      <g>
+       <circle class="fil4" cx="68" cy="89" r="14"/>
+       <circle class="fil5" cx="68" cy="89" r="6"/>
+      </g>
+     </g>
+    </g>
+    <g>
+     <path class="fil6" d="M45 32l0 24 7 0 -12 18 -12 -18 7 0 0 -24 10 0zm0 12m3 12m-2 9m-12 0m-2 -9m3 -12m5 -12"/>
+     <path id="1" class="fil7" d="M46 56l-1 0 -1 0 0 -24 2 0 0 24zm-1 0l-1 0 0 0 1 0zm7 -1l1 1 -1 0 -7 0 0 -1 7 0zm0 0l2 0 -1 1 -1 -1zm-11 19l-2 0 0 -1 12 -18 2 1 -12 18zm0 0l-1 1 -1 -1 2 0zm-14 -18l1 -1 1 0 12 18 -2 1 -12 -18zm0 0l-1 -1 2 0 -1 1zm8 -1l1 1 -1 0 -7 0 0 -1 7 0zm1 1l0 0 -1 0 1 0zm-2 -24l1 0 1 0 0 24 -2 0 0 -24zm0 0l0 0 1 0 -1 0zm11 0l1 0 -1 1 -10 0 0 -1 10 0zm0 0l1 0 0 0 -1 0z"/>
+    </g>
+   </g>
+   <g id="_603758352">
+    <g>
+     <g>
+      <rect class="fil8" transform="matrix(-0.230558 0.00127655 0.00127654 0.230559 112.469 41.888)" width="87.5025" height="87.5025"/>
+      <rect class="fil3" transform="matrix(-0.230558 0.00127655 0.00127654 0.230559 105.676 43.1867)" width="28.5159" height="5.07766"/>
+     </g>
+     <path class="fil9" d="M112 42l-4 -2 -19 0 3 2c0,0 20,0 20,0z"/>
+     <path class="fil9" d="M92 62l-3 -2c0,0 0,-20 0,-20 0,0 3,2 3,2l0 20z"/>
+    </g>
+    <g>
+     <g>
+      <rect class="fil8" transform="matrix(-0.230558 0.00127655 0.00127654 0.230559 112.631 62.2956)" width="87.5025" height="87.5025"/>
+      <rect class="fil3" transform="matrix(-0.230558 0.00127655 0.00127654 0.230559 105.838 63.5944)" width="28.5159" height="5.07766"/>
+     </g>
+     <path class="fil9" d="M113 62l-5 -2 -19 1 3 1c0,0 20,0 21,0z"/>
+     <path class="fil9" d="M93 83l-4 -3c0,0 0,-19 0,-19 0,0 3,1 3,1l1 21z"/>
+    </g>
+    <g>
+     <polygon class="fil10" points="93,19 99,19 92,23 87,23 "/>
+     <polygon class="fil11" points="113,42 92,42 92,23 113,22 "/>
+     <polygon class="fil12" points="99,19 105,19 113,22 107,22 "/>
+     <polygon class="fil13" points="107,42 87,43 87,23 107,22 "/>
+     <polygon class="fil14" points="99,28 94,28 94,23 99,22 "/>
+     <polygon class="fil14" points="100,42 94,42 94,37 100,37 "/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

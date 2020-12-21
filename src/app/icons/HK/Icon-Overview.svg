@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="50px" height="50px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 50 50"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil3 {fill:#23A99C}
+    .fil1 {fill:#2887D2}
+    .fil6 {fill:#B0AEAE}
+    .fil5 {fill:#FC4D44}
+    .fil4 {fill:#FCBC44}
+    .fil2 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" width="50" height="50"/>
+  <g id="_701014832">
+   <path class="fil1" d="M2 0l34 0c1,0 2,1 2,2l0 44c0,1 -1,1 -2,1l-34 0c-1,0 -1,0 -1,-1l0 -44c0,-1 0,-2 1,-2zm1 2l32 0c1,0 1,1 1,1l0 42c0,0 0,0 -1,0l-32 0c0,0 -1,0 -1,0l0 -42c0,0 1,-1 1,-1z"/>
+   <g>
+    <path class="fil1" d="M33 13c8,0 15,7 15,15 0,5 -2,9 -5,12l0 1 1 -1 5 8 -3 2 -5 -8 1 0 -1 -1c-2,1 -5,2 -8,2 -8,0 -15,-6 -15,-15 0,-8 7,-15 15,-15zm0 3c7,0 13,5 13,12 0,7 -6,13 -13,13 -7,0 -13,-6 -13,-13 0,-7 6,-12 13,-12z"/>
+    <circle class="fil2" cx="33" cy="28" r="13"/>
+   </g>
+   <rect class="fil3" x="5" y="31" width="2.47065" height="11.2292"/>
+   <rect class="fil4" x="9" y="23" width="2.47065" height="18.7855"/>
+   <rect class="fil5" x="13" y="26" width="2.47065" height="15.9761"/>
+   <g>
+    <path class="fil5" d="M33 28l0 -7c-4,0 -8,3 -8,7 0,4 4,8 8,8 4,0 7,-4 7,-8l-7 0z"/>
+    <path class="fil4" d="M33 28l0 8c-4,0 -8,-4 -8,-8 0,-4 4,-7 8,-7 4,0 7,3 7,7l-7 0z"/>
+    <path class="fil3" d="M27 24l6 4 7 0c0,0 1,-7 -7,-7 -4,-1 -6,3 -6,3z"/>
+   </g>
+   <rect class="fil3" transform="matrix(1.47994E-013 -2.56228 -4.75184 -5.7707E-014 19.5108 16.1895)" width="0.805537" height="3.14892"/>
+   <rect class="fil5" transform="matrix(1.93348E-013 -2.56228 -6.20808 -5.7707E-014 24.0964 11.8889)" width="0.805537" height="3.14892"/>
+   <rect class="fil3" transform="matrix(2.59504E-013 -2.56228 -8.33224 -5.7707E-014 30.7852 7.26186)" width="0.805537" height="3.14892"/>
+   <rect class="fil6" x="17" y="38" width="2.47065" height="4.08491"/>
+   <rect class="fil4" transform="matrix(1.29752E-013 -2.56228 -4.16612 -5.7707E-014 17.6663 7.26186)" width="0.805537" height="3.14892"/>
+  </g>
+ </g>
+</svg>

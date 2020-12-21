@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="44px" height="48px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 44 48"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#FEFEFE}
+    .fil2 {fill:black}
+    .fil0 {fill:#2887D2}
+    .fil12 {fill:#2887D2}
+    .fil9 {fill:#0063D4;fill-rule:nonzero}
+    .fil7 {fill:#0083FD;fill-rule:nonzero}
+    .fil6 {fill:#0094FD;fill-rule:nonzero}
+    .fil8 {fill:#22A7FF;fill-rule:nonzero}
+    .fil11 {fill:#2887D2;fill-rule:nonzero}
+    .fil4 {fill:#60B8FF;fill-rule:nonzero}
+    .fil3 {fill:#B4DBFF;fill-rule:nonzero}
+    .fil5 {fill:#D9EDFF;fill-rule:nonzero}
+    .fil10 {fill:#E32210;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_787620936">
+   <g>
+    <path class="fil0" d="M3 48l32 0c1,0 2,-1 2,-2l0 -41c0,-1 -1,-2 -2,-2l-32 0 0 0 -3 0 0 45 3 0z"/>
+    <rect class="fil1" x="3" y="4" width="32.8663" height="43.0136"/>
+    <g>
+     <path class="fil2" d="M42 46l0 0c0,0 0,0 0,0l0 2 0 0c0,0 0,0 0,0l0 -2c0,0 0,0 0,0z"/>
+     <path class="fil3" d="M42 47c0,0 0,0 0,0l0 0c0,0 -1,0 -1,0l-1 -5c1,1 1,1 1,1l2 0c0,0 1,0 1,-1l-2 5z"/>
+     <path class="fil4" d="M43 45l-1 -2 -1 0c0,0 0,0 -1,-1l1 5c0,0 1,0 1,0l0 0c0,0 0,0 0,0 1,-1 1,-2 1,-2 0,0 0,0 0,0z"/>
+     <path class="fil3" d="M43 4l-2 0c0,0 0,0 0,0l0 -3c0,-1 0,-1 0,-1l2 0c0,0 1,1 1,1l0 3c0,0 -1,0 -1,0z"/>
+     <path class="fil4" d="M43 2c0,0 0,0 0,0 -1,0 -1,0 -1,-1l0 -1 -1 0c0,0 0,0 0,1l0 3c0,0 0,0 0,0l2 0c0,0 1,0 1,0l0 -2 -1 0z"/>
+     <path class="fil5" d="M43 43l-2 0c0,0 -1,-1 -1,-1l0 -37c0,-1 1,-1 1,-1l2 0c1,0 1,0 1,1l0 37c0,0 -1,1 -1,1z"/>
+     <path class="fil3" d="M42 41c0,0 0,0 0,-1l0 -36 -1 0c0,0 -1,0 -1,1l0 37c0,0 1,1 1,1l2 0c0,0 1,-1 1,-1l0 -1 -2 0z"/>
+     <polygon class="fil6" points="40,31 44,31 44,37 40,37 "/>
+     <polygon class="fil7" points="40,37 40,31 42,31 42,37 "/>
+     <polygon class="fil4" points="40,4 44,4 44,31 40,31 "/>
+     <polygon class="fil8" points="40,4 40,31 40,31 42,31 42,4 "/>
+    </g>
+   </g>
+   <path class="fil9" d="M11 37l12 0 0 2 4 -4 -4 -3 0 2 -12 0 0 3zm6 0m6 1m2 -1m0 -3m-2 -1m-6 1m-6 1"/>
+   <polygon class="fil10" points="27,44 14,44 14,46 11,42 14,38 14,40 23,40 23,40 25,40 27,40 "/>
+   <g>
+    <g>
+     <g>
+      <polygon class="fil11" points="32,13 7,13 7,12 32,12 "/>
+     </g>
+     <g>
+      <polygon class="fil11" points="19,30 19,12 20,12 20,30 "/>
+     </g>
+     <rect class="fil12" x="22" y="16" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="22" y="20" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="22" y="24" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="7" y="28" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="22" y="28" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="7" y="16" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="7" y="20" width="10.4581" height="1.49226"/>
+     <rect class="fil12" x="7" y="24" width="10.4581" height="1.49226"/>
+    </g>
+    <path class="fil11" d="M11 11l0 -5 1 0c1,0 1,0 2,1 0,0 0,0 0,0 0,1 0,1 0,1l0 1c0,0 0,0 0,1 0,0 0,0 0,1 -1,0 -1,0 -2,0l-1 0zm1 -4l0 3 0 0c1,0 1,0 1,0 0,-1 1,-1 1,-1l0 -1c0,0 -1,0 -1,-1 0,0 0,0 -1,0l0 0z"/>
+    <path class="fil11" d="M29 9c0,1 0,1 -1,1 0,1 0,1 -1,1 -1,0 -1,0 -1,-1 -1,0 -1,-1 -1,-1l0 -1c0,0 0,0 0,-1 1,0 1,0 1,0 0,-1 1,-1 1,-1 1,0 1,0 1,1 1,0 1,0 1,1l-1 0c0,0 0,-1 0,-1 -1,0 -1,0 -1,0 0,0 -1,0 -1,0 0,1 0,1 0,1l0 1c0,0 0,1 0,1 0,0 1,0 1,0 0,0 0,0 1,0 0,0 0,0 0,-1l1 0z"/>
+   </g>
+  </g>
+ </g>
+</svg>

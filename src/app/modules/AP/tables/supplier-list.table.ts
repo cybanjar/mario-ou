@@ -1,0 +1,90 @@
+import { TableActionHeader } from '~/components/VhpUI/typings';
+import { ResSupplierList } from '../models/supplier-profile.model';
+
+export const supplierListColumns: TableActionHeader<ResSupplierList>[] = [
+  {
+    label: 'Supplier Name',
+    field: 'firma',
+    name: 'firma',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Supplier Number',
+    field: 'lief-nr',
+    name: 'lief-nr',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Address',
+    field: (row) => `${row.adresse1 + ' ' + row.adresse2 + ' ' + row.adresse3}`,
+    name: 'address',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Phone 1',
+    field: (row) => row.telefon.substring(0, 22),
+    name: 'phone-1',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Phone 2',
+    field: (row) => row.telefon.substring(23, 75),
+    name: 'phone-2',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Email',
+    field: (row) => row.fax.split(';')[1],
+    name: 'email',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Fax',
+    field: (row) => row.fax.split(';')[0],
+    name: 'fax',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'City',
+    field: 'wohnort',
+    name: 'wohnort',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Postal Code',
+    field: 'PLZ',
+    name: 'PLZ',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Country',
+    field: 'land',
+    name: 'land',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Segment',
+    field: 'segment1',
+    name: 'segment1',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Contact Name',
+    field: 'namekontakt',
+    name: 'namekontakt',
+    align: 'left',
+    sortable: true,
+  },
+  { name: 'actions', field: 'actions' },
+];

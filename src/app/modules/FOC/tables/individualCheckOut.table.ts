@@ -1,0 +1,75 @@
+import { TableHeader } from '~/components/VhpUI/typings';
+
+export const tableHeaders: TableHeader[] = [
+  {
+    label: 'Reservation Number',
+    field: 'resnr',
+    name: 'resnr',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Reservation Name',
+    field: 'resname',
+    name: 'resname',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Guest Name',
+    field: 'name',
+    name: 'name',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Arrival',
+    field: 'ankufat',
+    name: 'ankufat',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Departure',
+    field: 'departure',
+    name: 'departure',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Category',
+    field: 'category',
+    name: 'category',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Status',
+    field: 'status',
+    name: 'status',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Arrangement Code',
+    field: 'ac',
+    name: 'ac',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Room Rate',
+    field: 'rate',
+    name: 'rate',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Group Name',
+    field: 'gname',
+    name: 'gname',
+    align: 'left',
+    sortable: true,
+  },
+  { name: 'actions', field: 'actions' },
+];

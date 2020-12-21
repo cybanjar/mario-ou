@@ -1,0 +1,53 @@
+{
+  "name": "webapp",
+  "version": "0.0.1",
+  "description": "A Quasar Framework app",
+  "productName": "VHP Software",
+  "cordovaId": "org.cordova.quasar.app",
+  "capacitorId": "",
+  "author": "praburangki <praburangki@gmail.com>",
+  "private": true,
+  "scripts": {
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.9.6",
+    "@vue/composition-api": "^0.6.7",
+    "core-js": "^3.6.5",
+    "direct-vuex": "^0.11.1",
+    "highcharts": "^8.0.4",
+    "inputmask": "^5.0.5",
+    "ky": "^0.23.0",
+    "litepicker": "^1.5.5",
+    "quasar": "^1.14.0",
+    "v-calendar": "^1.0.8",
+    "vue-touch-keyboard": "^0.3.2"
+  },
+  "devDependencies": {
+    "@quasar/app": "^2.1.0",
+    "@types/node": "14.11.2",
+    "@types/webpack-env": "^1.15.3",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.10.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-vue": "^6.2.2",
+    "fs-extra": "^9.0.1",
+    "prettier": "^2.1.2"
+  },
+  "engines": {
+    "node": ">= 12.16.0",
+    "npm": ">= 6.14.0",
+    "yarn": ">= 1.21.1"
+  },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ]
+}

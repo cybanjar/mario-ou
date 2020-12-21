@@ -1,0 +1,14 @@
+image: alpine
+before_script:
+  - 'which ssh-agent || ( apk --update add openssh-client )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PEM_KEY" | ssh-add -
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    
+deploy_staging:
+  type: deploy
+  script:
+    - ssh vuedev@18.138.115.229 "cd /usr/share/nginx/vhp-web && git pull origin master && yarn && yarn build && exit"
+  only:
+    - master

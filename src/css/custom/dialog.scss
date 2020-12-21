@@ -1,0 +1,22 @@
+.dialog {
+  width: 100%; // If need to custom dialog width, custom it on scoped component style
+
+  &__header {
+    background: $primary-grad;
+    border-bottom: 1px solid #e8e8e8;
+    color: #fff;
+    padding: 16px 24px;
+  }
+
+  &__title {
+    font-size: 16px;
+  }
+
+  &__footer {
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+    border-radius: 0 0 4px 4px;
+    padding: 10px 16px;
+    text-align: right;
+  }
+}

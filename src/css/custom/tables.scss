@@ -1,0 +1,80 @@
+.s-table table.q-table:not(.expandable) {
+  thead tr th {
+    color: #fff;
+    background: $primary-grad;
+  
+    &:not(:last-child) {
+      border-right: 1px solid #e8e8e8;
+    }
+  }
+  
+  tr:not(.expanded):nth-of-type(even) {
+    background-color: #dcebf6;
+
+    .fixed-col {
+      background-color: #dcebf6 !important;
+    }
+  }
+  
+  thead th, tbody td {
+    &.fixed-col {
+      background-color: #fff;
+      position: sticky;
+      z-index: 2;
+    
+      &.left {
+        left: 0;
+        border-right-width: 1px;
+      }
+    
+      &.right {
+        right: 0;
+        border-left-width: 1px;
+      }
+    }
+  }
+}
+
+table.expandable {
+  td {
+    border: none;
+  }
+
+  .q-checkbox__bg,
+  .q-checkbox__bg__absolute {
+    border: 1px solid #d9d9d9;
+  }
+
+  .q-checkbox__inner--truthy .q-checkbox__bg,
+  .q-checkbox__inner--indet .q-checkbox__bg {
+    background: $primary;
+  }
+}
+
+// Style for selected row in table
+tbody tr.selected {
+  td,
+  .fixed-col {
+    background: #2d00e2 !important;
+    color: #fff;
+  }
+}
+
+// Style for virtual scroll table with sticky header
+.virtual-scroll-sticky-header {
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+
+    &.fixed-col {
+      z-index: 3;
+    }
+  }
+
+  thead tr:last-child th {
+    top: 28px;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+}

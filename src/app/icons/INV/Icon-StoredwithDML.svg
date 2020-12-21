@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="120px" height="120px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 120 120"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil1 {fill:#FEFEFE}
+    .fil6 {fill:#A98F71}
+    .fil4 {fill:#2887D2}
+    .fil7 {fill:#F0A71F}
+    .fil3 {fill:#FC4D44}
+    .fil5 {fill:#FFCB68}
+    .fil9 {fill:#FEFEFE;fill-rule:nonzero}
+    .fil2 {fill:#2887D2;fill-rule:nonzero}
+    .fil8 {fill:url(#id0);fill-rule:nonzero}
+   ]]>
+  </style>
+  <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="83.7784" y1="38.9606" x2="83.7784" y2="88.875">
+   <stop offset="0" style="stop-opacity:1; stop-color:#04870F"/>
+   <stop offset="1" style="stop-opacity:1; stop-color:#1DEB23"/>
+  </linearGradient>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" width="120" height="120"/>
+  <g id="_687108360">
+   <g>
+    <g>
+     <g>
+      <path class="fil1" d="M5 27l77 0c1,0 3,1 3,4l0 61c0,2 -1,4 -3,4l-77 0c-2,0 -3,-2 -3,-4l0 -61c0,-3 1,-4 3,-4z"/>
+      <path id="1" class="fil2" d="M82 28l-77 0 0 -3 77 0 0 0 0 3zm4 3l-2 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3 0 0 0 0 0 0 1 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0zm-2 61l0 -61 2 0 0 61 0 0 -2 0zm-2 5l0 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 2 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0zm-77 -2l77 0 0 2 -77 0 0 0 0 -2zm-4 -3l2 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 0 0 0 0 -1 0 0 -1 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0zm2 -61l0 61 -2 0 0 -61 0 0 2 0zm2 -6l0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -2 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0z"/>
+     </g>
+     <path class="fil3" d="M7 17l73 0c3,0 5,2 5,5l0 12 -83 0 0 -12c0,-3 2,-5 5,-5z"/>
+     <g>
+      <rect class="fil4" x="18" y="8" width="6.50805" height="18.9456" rx="2" ry="2"/>
+      <rect class="fil4" x="33" y="8" width="6.50805" height="18.9456" rx="2" ry="2"/>
+      <rect class="fil4" x="48" y="8" width="6.50805" height="18.9456" rx="2" ry="2"/>
+      <rect class="fil4" x="62" y="8" width="6.50805" height="18.9456" rx="2" ry="2"/>
+     </g>
+     <rect class="fil1" x="65" y="58" width="8.02817" height="8.52616"/>
+     <rect class="fil1" x="65" y="77" width="8.02817" height="8.52616"/>
+     <rect class="fil1" x="65" y="39" width="8.02817" height="8.52616"/>
+     <rect class="fil4" x="32" y="39" width="8.02817" height="8.52616"/>
+     <rect class="fil4" x="12" y="39" width="8.02817" height="8.52616"/>
+     <rect class="fil4" x="51" y="39" width="8.02817" height="8.52616"/>
+    </g>
+    <path class="fil2" d="M24 83c-2,0 -4,1 -4,3 0,2 2,4 4,4 2,0 3,-2 3,-4 0,-2 -1,-3 -3,-3zm-12 -29l0 4 4 0 7 14 -3 4c0,1 0,2 0,2 0,2 2,4 4,4l22 0 0 -4 -22 0c0,0 0,0 0,0l0 0 2 -3 14 0c1,0 2,-1 3,-2 1,-2 7,-13 7,-13 0,-2 -1,-2 -2,-2l-28 0 -1 -4 -7 0zm30 29c-2,0 -3,1 -3,3 0,2 1,4 3,4 2,0 4,-2 4,-4 0,-2 -2,-3 -4,-3z"/>
+   </g>
+   <g id="_687108816">
+    <g>
+     <g>
+      <rect class="fil5" x="56" y="60" width="52.5774" height="52.5776"/>
+      <rect class="fil6" x="74" y="101" width="17.1343" height="3.05101"/>
+     </g>
+     <path class="fil7" d="M56 60l13 -5 49 0 -9 5c0,0 -53,0 -53,0z"/>
+     <path class="fil7" d="M109 112l9 -6c0,0 0,-51 0,-51 0,0 -9,5 -9,5l0 52z"/>
+    </g>
+    <g>
+     <path class="fil8" d="M90 39l0 28 8 0 -14 22 -15 -22 9 0 0 -28 12 0zm0 14m4 14m-3 11m-14 0m-3 -11m4 -14m6 -14"/>
+     <path id="1" class="fil9" d="M91 67l-1 1 -1 -1 0 -28 2 0 0 28zm-1 1l-1 0 0 -1 1 1zm8 -2l1 2 -1 0 -8 0 0 -2 8 0zm0 0l2 0 -1 2 -1 -2zm-13 23l-2 0 0 -1 14 -21 2 1 -14 21zm0 0l-1 2 -1 -2 2 0zm-17 -21l1 -2 1 1 15 21 -2 1 -15 -21zm0 0l-1 -2 2 0 -1 2zm10 -2l1 1 -1 1 -9 0 0 -2 9 0zm1 1l0 1 -1 0 1 -1zm-2 -28l1 -1 1 1 0 28 -2 0 0 -28zm0 0l0 -1 1 0 -1 1zm13 -1l1 1 -1 1 -12 0 0 -2 12 0zm0 0l1 0 0 1 -1 -1z"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

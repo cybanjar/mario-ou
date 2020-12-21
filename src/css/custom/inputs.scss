@@ -1,0 +1,43 @@
+.q-field--disabled .q-field__inner {
+  background-color: #e8e8e8;
+}
+
+.q-field--outlined.q-field--readonly .q-field__control:before {
+  border-style: solid;
+}
+
+.s-input {
+  .q-field__control, .q-field__marginal, &.q-field--auto-height.q-field--dense .q-field__native {
+    min-height: 26px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+  }
+}
+
+.q-textarea .q-field__control {
+  height: auto !important;
+}
+
+.q-field__native {
+  padding: 0 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.q-textarea .q-field__native {
+  white-space: normal;
+}
+
+.q-field--dense .q-field__append {
+  padding-left: 0;
+}
+
+.q-item {
+  min-height: 32px;
+}
+
+.q-field__suffix {
+  line-height: 24px;
+  padding: 0;
+}
