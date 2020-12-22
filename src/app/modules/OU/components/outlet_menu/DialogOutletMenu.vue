@@ -189,7 +189,7 @@
                           </q-img>                          
                         </q-card-section>
                       </q-card>
-                      <q-card>
+                      <q-card @click="onClickStandingMode = true" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -494,6 +494,7 @@
           :showDialogDiscountBill="showDialogDiscountBill"
           @onDialogDiscountBill="onDialogDiscountBill" />
 
+        <!-- Confirm Table Transfer -->
         <q-dialog v-model="confirmtt" persistent>
           <q-card style="max-width: 1500px;width:450px;">
             <q-toolbar>
@@ -518,6 +519,29 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+
+        <q-dialog v-model="onClickStandingMode" persistent>
+          <q-card style="max-width: 1500px;width:300px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Information</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section class="row items-center">
+              <div class="row">
+                <div class="col-md-2">
+                  <q-avatar icon="mdi-information" color="info" text-color="white" />
+                </div>
+                <div class="col-md-10">                  
+                  <p class="q-pl-lg q-my-sm">Standing table not define</p>
+                </div>
+              </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn unelevated label="Ok" color="primary" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>        
 
         <dialogTransferTable 
           :showDialogTransferTable="showDialogTransferTable"
@@ -572,6 +596,7 @@ interface State {
   showDialogDiscountBill: boolean,
   showDialogTransferTable: boolean,
   confirmtt: boolean,
+  onClickStandingMode: boolean,
 }
 export default defineComponent({
   props: {
@@ -605,6 +630,7 @@ export default defineComponent({
       showDialogDiscountBill: false,
       showDialogTransferTable: false,
       confirmtt: false,
+      onClickStandingMode: false,
     });
 
     // OnClick listener

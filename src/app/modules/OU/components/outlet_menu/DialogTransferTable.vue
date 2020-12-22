@@ -87,7 +87,7 @@ export default defineComponent({
     });
 
     watch(
-      () => props.showDialogTransferTable, (showDialogSplitBill) => {
+      () => props.showDialogTransferTable, (showDialogTransferTable) => {
         if (props.showDialogTransferTable) {
           state.title = 'Table Transfer';
 
