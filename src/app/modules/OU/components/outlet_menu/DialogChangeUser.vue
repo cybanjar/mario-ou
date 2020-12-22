@@ -9,11 +9,11 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col q-mr-md">
-                <SInput outlined @click="onClickUserPos" label-text="Login" />
+                <SInput outlined @click="dialogUserPos = true" label-text="Login" />
             </div>
 
             <div class="col">
-                <SInput outlined label-text="Code"/>
+                <SInput outlined @click="dialogCode = true" label-text="Code"/>
             </div>
           </div>
           
@@ -25,6 +25,67 @@
           <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn unelevated color="primary" label="OK" @click="onOkDialogSelectUser" />
         </q-card-actions>
+
+        <!--  Dialog User POS -->
+        <q-dialog v-model="dialogUserPos" persistent>
+            <q-card style="max-width: 1500px;width:450px;">
+                <q-toolbar>
+                    <q-toolbar-title class="text-white text-weight-medium">POS Users</q-toolbar-title>
+                </q-toolbar>
+
+                <q-card-section class="row items-center">
+                    <q-list bordered separator>
+                        <q-item clickable v-ripple>
+                            <q-item-section>Ahmad Yani</q-item-section>
+                        </q-item>
+
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                            <q-item-label>Abdul Jamil</q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                <q-btn outline label="Cancel" color="primary" v-close-popup />
+                <q-btn unelevated label="Ok" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+
+        <!--  Dialog Code -->
+        <q-dialog v-model="dialogCode" persistent>
+            <q-card style="max-width: 1500px;width:450px;">
+                <q-toolbar>
+                    <q-toolbar-title class="text-white text-weight-medium">Enter Your ID</q-toolbar-title>
+                </q-toolbar>
+
+                <q-card-section>
+                    <div class="q-ma-sm row q-gutter-xs">
+                        <div class="col q-mr-md">
+                            <SInput outlined label-text="Enter Your ID" />
+                        </div>                        
+                    </div>                    
+                    
+                    <div class="q-ma-sm row q-gutter-xs">
+                        <div class="col">
+                        <vue-touch-keyboard
+                        id="keyboard"
+                        :layout="layout"
+                        :input="input" />
+                        </div>
+                    </div>
+                    
+                </q-card-section>
+
+                <q-card-actions align="right">
+                <q-btn outline label="Cancel" color="primary" v-close-popup />
+                <q-btn unelevated label="Ok" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+
       </q-card>
     </q-dialog>
   </section>
@@ -42,6 +103,8 @@ interface State {
   layout: string;
   input: null;
   title: string;
+  dialogUserPos: boolean,
+  dialogCode: boolean,
 }
 
 export default defineComponent({
@@ -58,6 +121,8 @@ export default defineComponent({
       title: '',
       layout: 'numeric',
       input: null,   
+      dialogUserPos: null,
+      dialogCode: null,
       
     });
 

@@ -85,7 +85,10 @@ interface State {
   layout: string;
   input: null;
   title: string;
-  list: boolean;
+  list: {
+    check1: boolean,
+    check2: boolean
+  };
 }
 
 export default defineComponent({
