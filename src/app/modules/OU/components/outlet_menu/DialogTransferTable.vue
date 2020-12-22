@@ -1,7 +1,7 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:450px;">
+      <q-card  style="max-width: 1500px;width:550px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
@@ -9,10 +9,38 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col q-mr-md">
-                <SInput outlined label-text="Discount (%)" />
-            </div>   
+                <SInput outlined label-text="Enter Table Number" />
+                <STable
+                    flat
+                    bordered
+                    dense
+                    :loading="isLoading"
+                    :columns="tableHeadersPrint"
+                    :data="data.dataDetail"
+                    row-key="name"
+                    separator="cell"
+                    :rows-per-page-options="[10, 13, 16]"
+                    :pagination.sync="pagination">
+                    <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                    </template>
+
+                    <template v-slot:body="props">
+                    <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-black':'bg-white text-black'">
+                        <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                        @click="onRowClick(props.row)">
+                            {{ col.value }}
+                        </q-td>
+                    </q-tr>
+                    </template>
+                </STable>
+            </div> 
+            
           </div>       
-         
+
         </q-card-section>
 
         <q-separator />
@@ -61,7 +89,7 @@ export default defineComponent({
     watch(
       () => props.showDialogTransferTable, (showDialogSplitBill) => {
         if (props.showDialogTransferTable) {
-          state.title = 'Get Discount';
+          state.title = 'Table Transfer';
 
         }
       }
@@ -85,12 +113,43 @@ export default defineComponent({
 
     const tableHeadersPrint = [
       {
-            label: "name", 
+            label: "Table Number", 
             field: "name",
             name: "name",
             align: "center",
-        }, {
-            label: "id", 
+        }, 
+        {
+            label: "Seat", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+        {
+            label: "OCC", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+        {
+            label: "Pax", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+        {
+            label: "Served by", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+        {
+            label: "Balance", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+        {
+            label: "Desc", 
             field: "id",
             name: "id",
             align: "center",
