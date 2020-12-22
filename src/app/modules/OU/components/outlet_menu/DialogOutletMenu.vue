@@ -177,7 +177,7 @@
                     <div
                       class="card-collage q-ma-none row items-start q-gutter-sm q-pa-sm"
                     >
-                      <q-card>
+                      <q-card @click="confirmtt = true" flat bordered>
                         <q-card-section>                          
                           <q-img
                             class="img-collage"
@@ -492,8 +492,36 @@
 
         <dialogDiscountBill 
           :showDialogDiscountBill="showDialogDiscountBill"
-          @onDialogDiscountBill="onDialogDiscountBill"
-        />
+          @onDialogDiscountBill="onDialogDiscountBill" />
+
+        <q-dialog v-model="confirmtt" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section class="row items-center">
+              <div class="row">
+                <div class="col-md-2">
+                  <q-avatar icon="mdi-help" color="negative" text-color="white" />
+                </div>
+                <div class="col-md-10">                  
+                  <p class="q-ml-md">Make sure you no others transactin with Bill: <br>
+                  Do you want to continue?</p>
+                </div>
+              </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn flat outline label="Cancel" color="primary" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickTableTransfer()" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <dialogTransferTable 
+          :showDialogTransferTable="showDialogTransferTable"
+          @onDialogTransferTable="onDialogTransferTable" />
       </q-card>
     </q-dialog>
   </div>
@@ -542,6 +570,8 @@ interface State {
   dialogPayment: boolean,
   showDialogSplitBill: boolean,
   showDialogDiscountBill: boolean,
+  showDialogTransferTable: boolean,
+  confirmtt: boolean,
 }
 export default defineComponent({
   props: {
@@ -573,6 +603,8 @@ export default defineComponent({
       dialogPayment: false,
       showDialogSplitBill: false,
       showDialogDiscountBill: false,
+      showDialogTransferTable: false,
+      confirmtt: false,
     });
 
     // OnClick listener
@@ -969,6 +1001,15 @@ export default defineComponent({
       state.showDialogDiscountBill=val;
     }
 
+    const onClickTableTransfer = () => {
+      console.log("On Click Table Transfer");
+      onDialogTransferTable(true);
+    }
+
+    const onDialogTransferTable = (val) => {
+      state.showDialogTransferTable=val;
+    }
+
     return {
       dialogModel,
       user,
@@ -1001,6 +1042,8 @@ export default defineComponent({
       onClickSplitBill,
       onClickDiscount,
       onDialogDiscountBill,
+      onClickTableTransfer,
+      onDialogTransferTable
     };
   },
   components: {
@@ -1010,6 +1053,7 @@ export default defineComponent({
     dialogPayment:() => import('./payment/DialogPayment.vue'),
     dialogSplitBill:() => import('./DialogSplitBill.vue'),
     dialogDiscountBill:() => import('./DialogDiscountBill.vue'),
+    dialogTransferTable:() => import('./DialogTransferTable.vue'),
   },
 });
 </script>

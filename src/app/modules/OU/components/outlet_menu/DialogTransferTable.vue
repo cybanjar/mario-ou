@@ -9,57 +9,10 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col q-mr-md">
-                <SInput outlined label-text="Discount (%)" data-layout="numeric" ref="splitBox" @focus="showKeyboard" />
-            </div>
-
-            <div class="col">
-              <SInput outlined  label-text="Voucher" :disable="true" readonly/>
-            </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-list bordered padding>
-
-                <q-item tag="label" v-ripple>
-                  <q-item-section side top>
-                    <q-checkbox v-model="list.check1" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    <q-item-label>Ayam Bakar Sukabumi</q-item-label>
-                    <q-item-label caption>
-                      Pedas
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item tag="label" v-ripple>
-                  <q-item-section side top>
-                    <q-checkbox v-model="list.check2" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    <q-item-label>Gurame Goreng</q-item-label>
-                    <q-item-label caption>
-                      More chille
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-
-              </q-list>
-            </div>
-          </div>
-          
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <vue-touch-keyboard
-              id="keyboard"
-              :layout="layout"
-              :input="input" />
-            </div>
-          </div>
-          
+                <SInput outlined label-text="Discount (%)" />
+            </div>   
+          </div>       
+         
         </q-card-section>
 
         <q-separator />
@@ -85,12 +38,12 @@ interface State {
   layout: string;
   input: null;
   title: string;
-  list: boolean;
+  
 }
 
 export default defineComponent({
   props: {
-    showDialogDiscountBill: { type: Boolean, required: true },
+    showDialogTransferTable: { type: Boolean, required: true },
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -102,16 +55,12 @@ export default defineComponent({
       title: '',
       layout: 'numeric',
       input: null,
-      list: {
-        "check1": true,
-        "check2": false,
-      }
       
     });
 
     watch(
-      () => props.showDialogDiscountBill, (showDialogSplitBill) => {
-        if (props.showDialogDiscountBill) {
+      () => props.showDialogTransferTable, (showDialogSplitBill) => {
+        if (props.showDialogTransferTable) {
           state.title = 'Get Discount';
 
         }
@@ -119,7 +68,7 @@ export default defineComponent({
     );
 
     const dialogModel = computed({
-        get: () => props.showDialogDiscountBill,
+        get: () => props.showDialogTransferTable,
         set: (val) => {
             emit('onDialogDiscountBill', val);
         },
@@ -167,7 +116,7 @@ export default defineComponent({
       // }  
 
       // state.data.buttonOkEnable = false;
-      emit('onDialogDiscountBill', false);
+      emit('onDialogTransferTable', false);
     }
 
     return {
