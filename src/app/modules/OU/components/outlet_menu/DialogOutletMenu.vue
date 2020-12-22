@@ -213,7 +213,7 @@
                           </q-img>
                         </q-card-section>
                       </q-card>
-                      <q-card>
+                      <q-card @click="onClickDialogChangeUser()" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -546,6 +546,10 @@
         <dialogTransferTable 
           :showDialogTransferTable="showDialogTransferTable"
           @onDialogTransferTable="onDialogTransferTable" />
+
+        <dialogChangeUser 
+          :showDialogChangeUser="showDialogChangeUser"
+          @onDialogChangeUser="onDialogChangeUser" />
       </q-card>
     </q-dialog>
   </div>
@@ -597,6 +601,7 @@ interface State {
   showDialogTransferTable: boolean,
   confirmtt: boolean,
   onClickStandingMode: boolean,
+  showDialogChangeUser: boolean,
 }
 export default defineComponent({
   props: {
@@ -631,6 +636,7 @@ export default defineComponent({
       showDialogTransferTable: false,
       confirmtt: false,
       onClickStandingMode: false,
+      showDialogChangeUser: false,
     });
 
     // OnClick listener
@@ -1042,6 +1048,15 @@ export default defineComponent({
       
     }
 
+    const onClickDialogChangeUser = () => {
+      console.log(" On Click Dialog Change User");
+      onDialogChangeUser(true);      
+    }
+
+    const onDialogChangeUser = (val) => {
+      state.showDialogChangeUser=val;
+    }
+
     return {
       dialogModel,
       user,
@@ -1076,7 +1091,9 @@ export default defineComponent({
       onDialogDiscountBill,
       onClickTableTransfer,
       onDialogTransferTable,
-      onClickDialogSelectOrderTaker
+      onClickDialogSelectOrderTaker,
+      onClickDialogChangeUser,
+      onDialogChangeUser,
     };
   },
   components: {
@@ -1087,6 +1104,7 @@ export default defineComponent({
     dialogSplitBill:() => import('./DialogSplitBill.vue'),
     dialogDiscountBill:() => import('./DialogDiscountBill.vue'),
     dialogTransferTable:() => import('./DialogTransferTable.vue'),
+    dialogChangeUser:() => import('./DialogChangeUser.vue'),
   },
 });
 </script>
