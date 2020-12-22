@@ -261,7 +261,7 @@
                           </q-img>
                         </q-card-section>
                       </q-card>
-                      <q-card>
+                      <q-card @click="onClickPrintBill = true" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -520,6 +520,7 @@
           </q-card>
         </q-dialog>
 
+        <!-- Dialog Standing Mode -->
         <q-dialog v-model="onClickStandingMode" persistent>
           <q-card style="max-width: 1500px;width:300px;">
             <q-toolbar>
@@ -541,7 +542,32 @@
               <q-btn unelevated label="Ok" color="primary" v-close-popup />
             </q-card-actions>
           </q-card>
-        </q-dialog>        
+        </q-dialog>
+        
+        <!-- Dialog Print Bill -->
+        <q-dialog v-model="onClickPrintBill" persistent>
+          <q-card style="max-width: 1500px;width:350px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Question</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section>
+              <div class="row">
+                <div class="col-md-2">
+                  <q-avatar icon="mdi-help" color="info" text-color="white" />
+                </div>
+                <div class="col-md-10">                  
+                  <p class="q-ml-md q-mt-sm">Print the bill?</p>
+                </div>
+              </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline label="Cancel" color="primary" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
 
         <dialogTransferTable 
           :showDialogTransferTable="showDialogTransferTable"
@@ -602,6 +628,7 @@ interface State {
   confirmtt: boolean,
   onClickStandingMode: boolean,
   showDialogChangeUser: boolean,
+  onClickPrintBill: boolean,
 }
 export default defineComponent({
   props: {
@@ -637,6 +664,7 @@ export default defineComponent({
       confirmtt: false,
       onClickStandingMode: false,
       showDialogChangeUser: false,
+      onClickPrintBill: false,
     });
 
     // OnClick listener
