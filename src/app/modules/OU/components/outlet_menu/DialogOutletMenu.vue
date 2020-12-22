@@ -514,7 +514,7 @@
             </q-card-section>
 
             <q-card-actions align="right">
-              <q-btn flat outline label="Cancel" color="primary" v-close-popup />
+              <q-btn outline label="Cancel" color="primary" v-close-popup />
               <q-btn unelevated label="Ok" color="primary" @click="onClickTableTransfer()" v-close-popup />
             </q-card-actions>
           </q-card>
