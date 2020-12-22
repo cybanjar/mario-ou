@@ -201,7 +201,7 @@
                           </q-img>
                         </q-card-section>
                       </q-card>
-                      <q-card>
+                      <q-card @click="onClickDialogSelectOrderTaker()" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -1036,6 +1036,12 @@ export default defineComponent({
       state.showDialogTransferTable=val;
     }
 
+    const onClickDialogSelectOrderTaker = () => {
+      console.log("On Click Select Order Taker");
+      onDialogSelectOrderTaker(true);
+      
+    }
+
     return {
       dialogModel,
       user,
@@ -1069,7 +1075,8 @@ export default defineComponent({
       onClickDiscount,
       onDialogDiscountBill,
       onClickTableTransfer,
-      onDialogTransferTable
+      onDialogTransferTable,
+      onClickDialogSelectOrderTaker
     };
   },
   components: {
