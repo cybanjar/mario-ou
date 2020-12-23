@@ -7,9 +7,9 @@
         </q-toolbar>
 
         <q-card-section>
-          <div class="q-ma-sm row q-gutter-xs">
+          <div class="row q-gutter-xs">
               <div class="col">
-                <q-radio v-model="data.paymentType" label="Cash" val="0"/>
+                <q-radio class="q-pt-md" v-model="data.paymentType" label="Cash" val="0"/>
               </div>
 
               <div class="col">
@@ -17,9 +17,9 @@
               </div>
           </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
+          <div class="row q-gutter-xs">
               <div class="col">
-                <q-radio v-model="data.paymentType" label="Voucher" val="1"/>
+                <q-radio class="q-pt-md" v-model="data.paymentType" label="Voucher" val="1"/>
               </div>
 
               <div class="col">
@@ -27,9 +27,9 @@
               </div>
           </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
+          <div class="row q-gutter-xs">
               <div class="col">
-                <SInput outlined  label-text="Voucher Number" :disable="true" readonly/>
+                <SInput class="q-mr-md" outlined  label-text="Voucher Number" :disable="true" readonly/>
               </div>
 
               <div class="col">
@@ -38,10 +38,10 @@
           </div>
         </q-card-section>
 
-        <q-card-section class="q-pa-lg">
+        <q-card-section class="q-pa-none">
           <div>
-            <div class="full-width bg-grey">
-              <p><strong> Money </strong></p>
+            <div class="full-width bg-grey-3">
+              <p class="q-pa-md"><strong> Money </strong></p>
             </div>
 
             <STable

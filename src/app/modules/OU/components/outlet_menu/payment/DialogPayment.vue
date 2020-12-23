@@ -9,7 +9,7 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <p>Bill Number</p>
+                <p class="q-pt-md">Bill Number</p>
               </div>
 
               <div class="col">
@@ -18,13 +18,14 @@
           </div>
         </q-card-section>
 
-        <q-card-section>
-          <div class="q-ma-sm">
-            <div class="full-width bg-grey">
-              <p><strong> Print </strong></p>
+        <q-card-section class="q-pa-none">
+          <div>
+            <div class="full-width bg-grey-3">
+              <p class="q-pa-md"><strong> Print </strong></p>
             </div>
             
             <STable
+              class="q-mx-md"
               grid
               hide-header
               hide-bottom
@@ -41,7 +42,7 @@
 
               <template v-slot:item="props">
                 <div class="q-pa-xs col-sm-3 col-md-3">
-                  <q-card :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                  <q-card flat bordered :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                     <q-card-section @click="onRowClickTablePrint(props.row)" >
                         <strong>{{ props.row.name }}</strong>
                     </q-card-section>
@@ -52,13 +53,14 @@
           </div>
         </q-card-section>
 
-        <q-card-section>
-          <div class="q-pa-sm">
-            <div class="full-width bg-grey">
-              <p><strong> Pay </strong></p>
+        <q-card-section class="q-pa-none q-mt-sm">
+          <div>
+            <div class="full-width bg-grey-3">
+              <p class="q-pa-md"><strong> Pay </strong></p>
             </div>
 
             <STable
+              class="q-mx-md"
               grid
               hide-header
               hide-bottom
@@ -75,7 +77,7 @@
 
               <template v-slot:item="props">
                 <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                  <q-card>
+                  <q-card flat bordered>
                     <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                         <strong>{{ props.row.name }}</strong>
                     </q-card-section>

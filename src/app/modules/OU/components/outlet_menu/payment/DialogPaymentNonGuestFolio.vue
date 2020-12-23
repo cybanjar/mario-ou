@@ -9,7 +9,7 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <q-space />
+                <!-- <q-space /> -->
               </div>
 
               <div class="col">
@@ -19,7 +19,7 @@
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <q-space />
+                <!-- <q-space /> -->
               </div>
 
               <div class="col">
@@ -27,9 +27,10 @@
               </div>
           </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
+          <div class="q-pa-sm row q-gutter-xs">
               <div class="col">
                 <SSelect
+                  class="q-px-md q-mt-lg"
                   label-text=""
                   :options="data.dataDept"
                   v-model="data.dataDeptVal">

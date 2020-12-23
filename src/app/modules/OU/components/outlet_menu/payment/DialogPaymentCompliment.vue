@@ -9,7 +9,7 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <p>Cash</p>
+                <p class="q-mt-lg">Cash</p>
               </div>
 
               <div class="col">
@@ -19,7 +19,7 @@
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <p>Voucher</p>
+                <p class="q-mt-lg">Voucher</p>
               </div>
 
               <div class="col">
@@ -29,7 +29,7 @@
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <SInput outlined  label-text="Voucher Number" :disable="true" readonly/>
+                <SInput class="q-mr-md" outlined  label-text="Voucher Number" :disable="true" readonly/>
               </div>
 
               <div class="col">
@@ -38,10 +38,10 @@
           </div>
         </q-card-section>
 
-        <q-card-section>
-          <div class="q-pa-sm">
-            <div class="full-width bg-grey">
-              <p><strong> Pay </strong></p>
+        <q-card-section class="q-pa-none">
+          <div>
+            <div class="full-width bg-grey-3">
+              <p class="q-pa-md"><strong> Pay </strong></p>
             </div>
 
             <STable
@@ -174,7 +174,7 @@ export default defineComponent({
       () => props.showPaymentCompliment, (showPaymentCompliment) => {
         if (props.showPaymentCompliment) {
           state.data.buttonOkEnable = false;
-          state.title = 'Guest Non Folio Payment';
+          state.title = 'Compliment';
 
           console.log("selectedPrint", props.selectedPrint);
           console.log("selectedPayment", props.selectedPayment);
