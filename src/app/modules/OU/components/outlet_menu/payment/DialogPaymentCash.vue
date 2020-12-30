@@ -13,7 +13,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="data.paymentType != '0'" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance"  readonly/>
               </div>
           </div>
 
@@ -23,17 +23,17 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Payment" :disable="data.paymentType != '1'" readonly/>
+                <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentBox" @focus="showKeyboard" @input="onChangePaymentInput(text)"/>
               </div>
           </div>
 
           <div class="row q-gutter-xs">
               <div class="col">
-                <SInput class="q-mr-md" outlined  label-text="Voucher Number" :disable="true" readonly/>
+                <SInput v-model="data.voucherNr" class="q-mr-md" outlined  label-text="Voucher Number" :disable="data.paymentType != '1'"/>
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Changed" :disable="true" readonly/>
+                <SInput outlined v-model="data.change" label-text="Changed" :disable="true" readonly/>
               </div>
           </div>
         </q-card-section>
@@ -61,7 +61,7 @@
 
               <template v-slot:item="props">
                 <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                  <q-card>
+                  <q-card flat bordered>
                     <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                         <strong>{{ props.row.name }}</strong>
                     </q-card-section>
@@ -70,6 +70,17 @@
               </template>
             </STable>
           </div>
+
+          <vue-touch-keyboard 
+            id="keyboard"
+            :options="options" 
+            v-if="numpadVisible" 
+            :layout="layout" 
+            :cancel="hideKeyboard" 
+            :accept="acceptKeyboard" 
+            :next="acceptKeyboard"
+            :input="input"
+            :close="hideKeyboard" />
         </q-card-section>
 
         <q-separator />
@@ -86,17 +97,27 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
+import VueTouchKeyboard from "vue-touch-keyboard";
+import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 
 interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
     dataTablePayment: any;
     buttonOkEnable: boolean;
     paymentType: string;
+    voucherNr: string;
+    payment: any;
+    balance: any;
+    change: any
   }
   title: string;
+  layout: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  options: {};
+  input: null;
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -104,7 +125,7 @@ export default defineComponent({
     showPaymentCash: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataPreparePayment: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -112,64 +133,71 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
         dataTablePayment : [
           {
-            'name': "Cash",
+            'name': "100000",
             'id': '1',
             'selected': false,
+            'value': 100000
           },
           {
-            'name': "Card",
+            'name': "50000",
             'id': '2',
             'selected': false,
+            'value': 50000
           },
           {
-            'name': "City Ledger",
+            'name': "20000",
             'id': '3',
             'selected': false,
+            'value': 20000
           },
           {
-            'name': "Transfer To Guest Folio",
+            'name': "10000",
             'id': '4',
             'selected': false,
+            'value': 10000
           },
           {
-            'name': "Transfer To Non Guest Folio",
+            'name': "5000",
             'id': '5',
             'selected': false,
+            'value': 5000
           },
           {
-            'name': "Transfer To Master Folio",
+            'name': "2000",
             'id': '6',
             'selected': false,
+            'value': 2000
           },
           {
-            'name': "Compliment",
+            'name': "1000",
             'id': '7',
             'selected': false,
+            'value': 1000
           },
           {
-            'name': "Meal Coupon",
+            'name': "500",
             'id': '8',
             'selected': false,
+            'value': 500
           }
         ],
         buttonOkEnable: false,
         paymentType: "0",
+        voucherNr: "",
+        payment: 0,
+        balance: 0,
+        change: 0
       },
       title: '',
+      layout: 'numeric',
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      input: null,
+      numpadVisible: false,
     });
 
     watch(
@@ -177,9 +205,11 @@ export default defineComponent({
         if (props.showPaymentCash) {
           state.data.buttonOkEnable = false;
           state.title = 'Payment Cash';
+          state.data.balance = props.dataPreparePayment['dataTable']['saldo'];
+          state.data.payment = -props.dataPreparePayment['dataTable']['saldo'];
+          state.data.change = 0;
 
-          console.log("selectedPrint", props.selectedPrint);
-          console.log("selectedPayment", props.selectedPayment);
+          console.log("dialog cash mounted, data prepare : ", props.dataPreparePayment);
         }
       }
     );
@@ -203,60 +233,17 @@ export default defineComponent({
         
         if (id === datarow['id']) {
           datarow['selected'] = true;
-          datarow['databaru'] = 1;
+          state.data.payment = -datarow['value'];
+
+          state.data.change = (state.data.payment - state.data.balance) * -1;
           break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
         }
       }
 
       for (let i = 0; i<state.data.dataTablePayment.length; i++) {
         const selected = state.data.dataTablePayment[i]['selected'];
 
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
         if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
           state.data.buttonOkEnable = true;
           break
         }
@@ -285,18 +272,35 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
+      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
+        const datarow = state.data.dataTablePayment[i];
+        datarow['selected'] = false;
+      }     
       emit('onDialogPaymentCash', false);
+    }
+
+    // --
+    const onChangePaymentInput = (input) => {
+      state.data.change = ((state.data.payment * -1) - state.data.balance);
+    }
+
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+        state.layout = e.target.dataset.layout;
+      } 
+
+      if (!state.numpadVisible) {
+        state.numpadVisible = true;
+      }      
+    }
+
+    const hideKeyboard = () => {
+      state.numpadVisible = false;
+    }
+
+    const acceptKeyboard = () => {
+      hideKeyboard();
     }
 
     return {
@@ -304,9 +308,12 @@ export default defineComponent({
       ...toRefs(state),
       tableHeadersPrint,
       onRowClickTablePayment,
-      onRowClickTablePrint,
       onOkDialogSelectUser,
       onCancelDialog,
+      showKeyboard,
+      hideKeyboard,
+      acceptKeyboard,
+      onChangePaymentInput,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -335,6 +342,25 @@ export default defineComponent({
       text-align: right;
     }
   }
+}
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
 }
 </style>
 

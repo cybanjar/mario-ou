@@ -13,7 +13,7 @@
             </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
               </div>
           </div>
 
@@ -23,29 +23,27 @@
             </div>
 
               <div class="col">
-                <SInput outlined  label-text="Payment" :disable="true" readonly/>
+                <SInput outlined v-model="data.payment" label-text="Payment" :disable="true" readonly/>
               </div>
           </div>
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <SInput outlined  label-text="Debit" :disable="true" readonly/>
+                <SInput outlined v-model="data.cardSelected" label-text="Debit" :disable="true" readonly/>
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Card Number" :disable="true" readonly/>
+                <SInput outlined v-model="data.cardNumber" label-text="Card Number" :disable="true" readonly/>
               </div>
           </div>
         </q-card-section>
 
         <q-card-section>
           <div class="q-pa-sm">
-            <!-- <div class="full-width bg-grey">
-              <p><strong> Card </strong></p>
-            </div> -->
-
             <STable
               hide-bottom
+              grid
+              hide-header
               :loading="isLoading"
               :columns="tableHeadersPrint"
               :data="data.dataTablePayment"
@@ -89,9 +87,12 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
     dataTablePayment: any;
     buttonOkEnable: boolean;
+    cardSelected: string
+    cardNumber: string,
+    balance: any,
+    payment: any,
   }
   title: string;
 }
@@ -101,7 +102,7 @@ export default defineComponent({
     showPaymentCard: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataPreparePayment: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -109,61 +110,62 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
         dataTablePayment : [
           {
-            'name': "Cash",
+            'name': "VISA",
             'id': '1',
             'selected': false,
+            'value': "VISA",
           },
           {
-            'name': "Card",
+            'name': "MASTER",
             'id': '2',
             'selected': false,
+            'value': "MASTER",
           },
           {
-            'name': "City Ledger",
+            'name': "DINNER CLUB",
             'id': '3',
             'selected': false,
+            'value': "DINNER CLUB",
+
           },
           {
-            'name': "Transfer To Guest Folio",
+            'name': "JBC",
             'id': '4',
             'selected': false,
+            'value': "JBC",
           },
           {
-            'name': "Transfer To Non Guest Folio",
+            'name': "BCA",
             'id': '5',
             'selected': false,
+            'value': "BCA",
           },
           {
-            'name': "Transfer To Master Folio",
+            'name': "AMERICA EXPRESS",
             'id': '6',
             'selected': false,
+            'value': "AMERICA EXPRESS",
           },
           {
-            'name': "Compliment",
+            'name': "DEBIT",
             'id': '7',
             'selected': false,
+            'value': "DEBIT",
           },
           {
-            'name': "Meal Coupon",
+            'name': "OVO",
             'id': '8',
             'selected': false,
+            'value': "OVO",
           }
         ],
         buttonOkEnable: false,
+        cardSelected: "",
+        cardNumber: "",
+        balance: 0,
+        payment: 0,
       },
       title: '',
     });
@@ -173,6 +175,10 @@ export default defineComponent({
         if (props.showPaymentCard) {
           state.data.buttonOkEnable = false;
           state.title = 'Payment Card';
+
+          state.data.balance = props.dataPreparePayment['dataTable']['saldo'];
+          state.data.payment = -props.dataPreparePayment['dataTable']['saldo'];
+
 
           console.log("selectedPrint", props.selectedPrint);
           console.log("selectedPayment", props.selectedPayment);
@@ -188,6 +194,7 @@ export default defineComponent({
     });
 
     const onRowClickTablePayment = (dataRow) => {
+      console.log('click');
       for (let i = 0; i<state.data.dataTablePayment.length; i++) {
         const datarow = state.data.dataTablePayment[i];
         datarow['selected'] = false;
@@ -199,60 +206,15 @@ export default defineComponent({
         
         if (id === datarow['id']) {
           datarow['selected'] = true;
-          datarow['databaru'] = 1;
+          state.data.cardSelected = datarow['value'];
           break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
         }
       }
 
       for (let i = 0; i<state.data.dataTablePayment.length; i++) {
         const selected = state.data.dataTablePayment[i]['selected'];
 
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
         if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
           state.data.buttonOkEnable = true;
           break
         }
@@ -300,7 +262,6 @@ export default defineComponent({
       ...toRefs(state),
       tableHeadersPrint,
       onRowClickTablePayment,
-      onRowClickTablePrint,
       onOkDialogSelectUser,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },

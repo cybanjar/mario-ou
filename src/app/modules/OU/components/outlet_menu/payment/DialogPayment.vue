@@ -13,7 +13,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
               </div>
           </div>
         </q-card-section>
@@ -101,12 +101,14 @@
       :showPaymentCash="data.showPaymentCash"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCash="onDialogPaymentCash" />
 
     <dialogPaymentCard 
       :showPaymentCard="data.showPaymentCard"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCard="onDialogPaymentCard" />
 
     <dialogPaymentCityLedger
@@ -152,6 +154,7 @@
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
 import DialogPaymentCityLedgerVue from './DialogPaymentCityLedger.vue';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -168,8 +171,10 @@ interface State {
     showPaymentCompliment: boolean;
     showPaymentMasterFolio: boolean;
     showPaymentMealCoupon: boolean;
-    selectedPrint: null;
-    selectedPayment: null;
+    selectedPrint: {};
+    selectedPayment: {};
+    dataPreparePayment: {};
+    balance: any
   }
   title: string;
 }
@@ -177,10 +182,13 @@ interface State {
 export default defineComponent({
   props: {
     dialogPayment: { type: Boolean, required: true },
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataTable: { type: null, required: true },
+    dataPrepare: { type: null, required: true },
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -197,7 +205,7 @@ export default defineComponent({
             'selected': false,
           }
         ],
-        selectedPrint: null,
+        selectedPrint: {},
         dataTablePayment : [
           {
             'name': "Cash",
@@ -240,7 +248,7 @@ export default defineComponent({
             'selected': false,
           }
         ],
-        selectedPayment: null,
+        selectedPayment: {},
         buttonOkEnable: false,
         showPaymentCash: false,
         showPaymentCard: false,
@@ -250,6 +258,8 @@ export default defineComponent({
         showPaymentCompliment: false,
         showPaymentMasterFolio: false,
         showPaymentMealCoupon: false,
+        dataPreparePayment: {},
+        balance: 0,
       },
       title: '',
     });
@@ -288,6 +298,14 @@ export default defineComponent({
         if (props.dialogPayment) {
           state.data.buttonOkEnable = false;
           state.title = 'Payment';
+
+          state.data.dataPreparePayment['dataTable'] = props.dataTable;
+          state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
+
+          state.data.balance = state.data.dataPreparePayment['dataPrepare']['objCheckBill']['saldo'];
+
+          console.log(state.data.dataPreparePayment);
+
           // initDataUser();
         }
       }
@@ -387,12 +405,58 @@ export default defineComponent({
         },
     ];
 
-    // -- 
+    //--HTTP Request
+    const zuggriff = (arrayNr, expectedNr) => {
+      let zuggrifval = false;
+      async function asyncCall() {
+        const [dataZuggrif] = await Promise.all([
+          $api.outlet.getZugriff('checkPermission', {
+            arrayNr: arrayNr,
+            expectedNr: expectedNr,
+            userInit:  dataStoreLogin['userInit']
+          }),
+        ]);
+
+        if (dataZuggrif) {
+          const responseZuggrif = dataZuggrif || [];
+          const okFlag = responseZuggrif['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('responseZuggrif : ', responseZuggrif);
+          zuggrifval = responseZuggrif['zugriff'];
+
+          if (zuggrifval) {
+            state.isLoading = false;
+            onDialogPaymentCash(true);
+          } else {
+            Notify.create({
+              message: responseZuggrif['messStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+        }
+        return zuggrifval;
+      }
+      asyncCall();
+    }
+
+
+    // -- Dialog Method 
     const onOkDialog = () => {
       const idPayment = state.data.selectedPayment['id'];
       
       if (idPayment == 1) {
-        onDialogPaymentCash(true);
+        zuggriff(20, 2);
       } else if (idPayment == 2) {
         onDialogPaymentCard(true);
       } else if (idPayment == 3) {
@@ -421,8 +485,8 @@ export default defineComponent({
         datarow['selected'] = false;
       }  
 
-      state.data.selectedPrint = null;
-      state.data.selectedPayment = null;
+      state.data.selectedPrint = {};
+      state.data.selectedPayment = {};
       state.data.buttonOkEnable = false;
       emit('onDialogPayment', false);
     }

@@ -1,150 +1,119 @@
 <template>
     <!-- <section> -->
-        <div class="q-pa-sm">
+    <div class="q-pa-sm">
+      <q-dialog
+        v-model="dialogModel"
+        :maximized="true"
+        transition-show="slide-up"
+        transition-hide="slide-down">
+        <q-card class="bg-white text-black">
             <STable
-                grid
-                hide-header
-                :loading="isFetching"
-                :data="dataFilteredTable"
-                :columns="tableHeaders"
-                hide-bottom
-                separator="cell"
-                :rows-per-page-options="[0]"
-                :filter="filter"
-                :pagination.sync="pagination" >
-                <template v-slot:item="props">
-                    <div class="q-pa-xs col-xl-12 col-sm-3 col-md-1">
-                        <q-card>
-                          <q-card-section @click="onClickTable(props.row)" :class="props.row.rechnr == 0 ? 'bg-white text-center text-black' : 'bg-red text-center text-white'">
-                              <strong>{{ props.row.tischnr }}</strong>
-                          </q-card-section>
-                        </q-card>
-                    </div>
-                </template>
+              grid
+              hide-header
+              :loading="isFetching"
+              :data="dataFilteredTable"
+              :columns="tableHeaders"
+              hide-bottom
+              separator="cell"
+              :rows-per-page-options="[0]"
+              :filter="filter"
+              :pagination.sync="pagination" >
+              <template v-slot:item="props">
+                <div class="q-pa-xs col-xl-12 col-sm-3 col-md-1">
+                  <q-card>
+                    <q-card-section @click="onClickTable(props.row)" :class="props.row.rechnr == 0 ? 'bg-white text-center text-black' : 'bg-red text-center text-white'">
+                      <strong>{{ props.row.tischnr }}</strong>
+                    </q-card-section>
+                  </q-card>
+                </div>
+              </template>
 
-                <template v-slot:top-right>
-                  <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-                    <template v-slot:append>
-                      <q-icon name="mdi-magnify" />
-                    </template>
-                  </q-input>
-                </template>
+              <template v-slot:top-right>
+                <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+                  <template v-slot:append>
+                    <q-icon name="mdi-magnify" />
+                  </template>
+                </q-input>
+              </template>
             </STable>
 
             <dialogOpenTable :showDialogOpenTable="showDialogOpenTable" @onDialog="onDialog" @onResultOpenTable="onResultOpenTable" :dataTableSelected="dataTableSelected" />
-            <dialogOpenMenu :dialogOpenMenu="dialogOpenMenu" :dataTableSelected="dataTableSelected" @onDialogMenu="onDialogMenu"/>
-        </div>
+                <!-- <dialogOpenMenu :dialogOpenMenu="dialogOpenMenu" :dataTableSelected="dataTableSelected" @onDialogMenu="onDialogMenu"/> -->            
+        </q-card>
+      </q-dialog>
+    </div>
     <!-- </section> -->
 </template>
 
-<script>
-import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
-import { date , Notify} from 'quasar';
-import {displayTime} from './utilsOU/utils';
+<script lang="ts">
+import { defineComponent, toRefs, reactive, watch, computed, ref, onUpdated} from '@vue/composition-api';
+import { date , Notify, Cookies} from 'quasar';
+import {displayTime} from '../../../utilsOU/utils';
+import { store } from '~/store';
+
+interface State {
+  userInit: any,
+  isFetching: Boolean,
+  dataPrepare: {},
+  dataTable: any,
+  dataTableSelected: null,
+  dataFilteredTable: any,
+  showDialogOpenTable: Boolean,
+  filter: String,
+  currDept: any,
+}
 
 export default defineComponent({
-    setup(_, { root: { $api } }) {
+    props: {
+      showDialogTablePlan: { type: Boolean, required: true },
+    },
+    setup(props, { emit, root: { $api, $root } }) {
 
-    const state = reactive({
-      userInit: 1,
-      isFetching: true,
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
+    const state=reactive<State>({
+      userInit: dataStoreLogin['userInit'],
+      isFetching: false,
       dataPrepare: {},
       dataTable: [],
       dataTableSelected: null,
       dataFilteredTable: [],
       showDialogOpenTable: false,
-      dialogOpenMenu: false,
       filter: '',
+      currDept: 1,
     });
+  
+    watch(
+      () => props.showDialogTablePlan, (showDialogTablePlan) => {
+
+        if (props.showDialogTablePlan) {
+          state.isFetching = true;
+          getDataPrepareTable();
+
+          // Cookies.remove('OU_isFisrtLoad');
+
+        }
+      }
+    );
 
     const tableHeaders = [
       {
         label: 'tischnr',
         field: 'tischnr',
-        sortable: false,
         align: 'center',
-        width: 120,
-        divider: true,
       },
       {
         label: 'bezeich',
         field: 'bezeich',
-        sortable: false,
         align: 'right',
-        width: 200,
-        divider: true,
-      },
-    ];
-
-    onMounted(async () => { 
-      const [dataPrepare] = await Promise.all([
-        $api.outlet.getOUPrepare('tablePlanPrepare', {
-            dept : "1",
-            currWaiter : state.userInit
-        }),
-      ]);
-
-      if (dataPrepare) {
-        const responsePrepare = dataPrepare || [];
-        state.dataPrepare = responsePrepare;   
-
-        const okFlag = state.dataPrepare['outputOkFlag'];
-        if (!okFlag) {
-          Notify.create({
-            message: 'Failed when retrive data, please try again',
-            color: 'red',
-          });
-          state.isFetching = false;
-          return false;
-        } 
-
-        state.dataTable = [];
-        state.dataFilteredTable = [];
-        state.dataTable = state.dataPrepare['tTisch']['t-tisch'];
-        state.dataFilteredTable = state.dataTable;
-
-        const tHBill = state.dataPrepare['tHBill']['t-h-bill'];
-        for (let i = 0; i<state.dataFilteredTable.length; i++) {
-            const tischnrTable = state.dataFilteredTable[i]['tischnr'];
-            state.dataFilteredTable[i]['rechnr'] = 0;
-
-            for (let x = 0; x<tHBill.length; x++) {
-                const tischnrBill = tHBill[x]['tischnr'];
-
-                if (tischnrTable == tischnrBill) {
-                    state.dataFilteredTable[i]['rechnr'] = tHBill[x]['rechnr'];
-                    break;
-                }
-            }
-        }
-
-        // add billname in prepare
-        // for (let i = 0; i<tHBill.length; i++) {
-        //   const tischnr = tHBill[i]['tischnr'];
-        //   const dataRow = tHBill[i];
-
-        //   if (tischnr != dataSelected['tischnr']) {
-        //     dataSelected['belegung'] = dataRow['belegung'];
-        //     dataSelected['bilname'] = dataRow['bilname'];
-        //     dataSelected['resnr'] = dataRow['resnr'];
-        //     dataSelected['reslinnr'] = dataRow['reslinnr'];
-        //     dataSelected['saldo'] = dataRow['saldo'];
-        //     break;
-        //   }
-        // }
-
-        console.log("dataPrepare : " , dataPrepare);
-        console.log("dataTable: " , state);
-       
-        state.isFetching = false;
-      } else {
-        Notify.create({
-          message: 'Please check your internet connection',
-          color: 'red',
-        });
-        state.isFetching = false;
-        return false;
       }
+    ];
+ 
+    const dialogModel = computed({
+      get: () => props.showDialogTablePlan,
+      set: (val) => {
+        emit('onDialogTablePlan', val);
+      },
     });
 
     const onDialog = (val) => {
@@ -154,47 +123,13 @@ export default defineComponent({
       state.showDialogOpenTable = val;
     }
 
-    const onDialogMenu = (val) => {
-      state.dialogOpenMenu = val;
-    }
-
     const onClickTable = (data) => {
-      // For Remark: 
       const tQueasy33 = state.dataPrepare['tQueasy33']['t-queasy33'];
       const tQueasy31 = state.dataPrepare['tQueasy31']['t-queasy31'];
       const tQueasy = state.dataPrepare['tQueasy']['t-queasy'];
       const tHBill = state.dataPrepare['tHBill']['t-h-bill'];
       const dataSelected = data;
 
-      // for (let i = 0; i<tQueasy31.length; i++) {
-      //   const number2 = tQueasy31[i]['number2'];
-
-      //   if (number2 == dataSelected['tischnr']) {
-      //     if (tQueasy31['date1'] != null) {
-      //       dataSelected['isReserved'] = true;
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // const currDate = date.formatDate(new Date());
-      // const currDateP2Hour = date.addToDate(currDate, {hours : 2});
-      // const currDateM30Minute = date.addToDate(currDate, {seconds: -1800});
-
-      // const hh1 = date.formatDate(currDate, "HH:mm");
-      // const hh2 = date.formatDate(currDateP2Hour, "HH:mm");
-      // const hh3 = date.formatDate(currDateM30Minute, "HH:mm");
-      // console.log(hh1 + " - " + hh2 + " - " + hh3);
-
-      // for (let i = 0; i<tQueasy33.length; i++) {
-      //   const number2 = tQueasy33[i]['number2'];
-
-      //   if (number2 == dataSelected['tischnr']) {
-          
-      //   }
-      // }
-
-      // Check Table 
       let tableOk = true;
       tableOk = state.dataPrepare['tKellner']['t-kellner'][0]['masterkey'];
 
@@ -320,10 +255,10 @@ export default defineComponent({
 
                   var strDate1 = (queasy['date1']).split('-');
                   var strNumber3 = number3.split(':');
-                  const mCurrDate = strNumber3[0]*3600 + strNumber3[1]*60 + (+strNumber3[2] || 0);
+                  const mCurrDate = (strNumber3[0] as any) *3600 + ( strNumber3[1] as any)*60 + (+strNumber3[2] || 0);
 
                   var timeStart = new Date();
-                  var timeEnd = date.buildDate({ year: strDate1[0], month: strDate1[1], date: strDate1[2], hours: strNumber3[0], minutes: strNumber3[1], seconds: strNumber3[2] });
+                  var timeEnd = date.buildDate({ year: strDate1[0], month: strDate1[1], date: strDate1[2], hours: strNumber3[0] as any, minutes: strNumber3[1] as any, seconds: strNumber3[2] as any });
 
                   var difHours = date.getDateDiff(timeStart, timeEnd, 'hours');
                   var difMinutes = date.getDateDiff(timeStart, timeEnd, 'minutes');
@@ -349,60 +284,11 @@ export default defineComponent({
             dataSelected['flagChangeGuest'] = false;
           }
 
-          // console.log('Response check table : ', responseCheckTable);                
-
           state.dataTableSelected = dataSelected;
           onDialog(true);
         }
       }
       asyncCall();
-
-
-{
-      // for (let i = 0; i<state.dataFilteredTable.length; i++) {
-      //   const aTisch = state.dataFilteredTable[i];
-      //   state.dataFilteredTable[i]['isReserved'] = false;
-
-      //   for (let x = 0; x<tQueasy33.length; x++) {
-      //     const queasy33 = tQueasy33[x];
-            
-      //     if (queasy33['number2'] == aTisch['tischnr']) {
-      //       state.dataFilteredTable[i]['isReserved'] = true;
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // for (let i = 0; i<state.dataFilteredTable.length; i++) {
-      //   const tischnr = state.dataFilteredTable[i]['tischnr'];
-      //   state.dataFilteredTable[i]['dateOpened'] = "";
-      //   state.dataFilteredTable[i]['timeOpened'] = "";
-
-      //   for (let x = 0; x<tQueasy.length; x++) {
-      //     if (tQueasy[x]['key'] == 31) {
-      //       const queasy = tQueasy[x];
-      //       const number2 = tQueasy[x]['number2']
-
-      //       if (tischnr == number2) {
-      //         state.dataFilteredTable[i]['timeOpened'] = queasy['number3'];
-
-      //         const currDate = date.formatDate(new Date(), "HH:mm:ss");
-      //         const number3 = queasy['number3'];
-
-      //         console.log("Number 3 : ", displayTime(number3));
-      //         console.log("Curr Date : ", currDate);
-      //         // console.log("Number 3 Date : ", number2, " - ", displayTime(number3));
-      //         console.log("Date dif : ", date.getDateDiff(currDate, displayTime(number3), 'hours'));
-
-      //         if (queasy['date1'] != null) {
-      //           state.dataFilteredTable[i]['dateOpened'] = queasy['date1'];
-      //         }
-      //         break;
-      //       }
-      //     }
-      //   }
-      // }
-}
     }
 
     const onResultOpenTable = (dataOpenTable) => {
@@ -437,33 +323,97 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            state.isFetching = false;
             return false;
           }
+
           console.log('OU Main - getCheckTable: ', responseCheckTable);
-          onDialogMenu(true);
+          
+          emit('onResultTablePlan', state.dataTableSelected);
+          emit('onDialogTablePlan', false);
+          //emit
         }
         
       }
       asyncCall();
     }
 
+    const getDataPrepareTable = () => {
+        async function asyncCall() {
+            const [dataPrepare] = await Promise.all([
+                $api.outlet.getOUPrepare('tablePlanPrepare', {
+                    dept : state.currDept,
+                    currWaiter : state.userInit
+                }),
+            ]);
+
+            if (dataPrepare) {
+                const responsePrepare = dataPrepare || [];
+                state.dataPrepare = responsePrepare;   
+
+                const okFlag = state.dataPrepare['outputOkFlag'];
+                if (!okFlag) {
+                Notify.create({
+                    message: 'Failed when retrive data, please try again',
+                    color: 'red',
+                });
+                state.isFetching = false;
+                return false;
+                } 
+
+                state.dataTable = [];
+                state.dataFilteredTable = [];
+                state.dataTable = state.dataPrepare['tTisch']['t-tisch'];
+                state.dataFilteredTable = state.dataTable;
+
+                const tHBill = state.dataPrepare['tHBill']['t-h-bill'];
+                for (let i = 0; i<state.dataFilteredTable.length; i++) {
+                    const tischnrTable = state.dataFilteredTable[i]['tischnr'];
+                    state.dataFilteredTable[i]['rechnr'] = 0;
+
+                    for (let x = 0; x<tHBill.length; x++) {
+                        const tischnrBill = tHBill[x]['tischnr'];
+
+                        if (tischnrTable == tischnrBill) {
+                            state.dataFilteredTable[i]['rechnr'] = tHBill[x]['rechnr'];
+                            break;
+                        }
+                    }
+                }
+
+                console.log("dataPrepare : " , dataPrepare);
+                console.log("dataTable: " , state);
+            
+                state.isFetching = false;
+            } else {
+                Notify.create({
+                message: 'Please check your internet connection',
+                color: 'red',
+                });
+                state.isFetching = false;
+                return false;
+            }
+        }
+        asyncCall();
+    }
+
     return {
+      dataStoreLogin,
       ...toRefs(state),
+      dialogModel,
       tableHeaders,
       onDialog,
-      onDialogMenu,
       onClickTable,
       onResultOpenTable,
       getCheckTable,
+      getDataPrepareTable,
       pagination: {
         rowsPerPage: 0,
       },
     };
   },
   components: {
-    dialogOpenTable: () => import('./components/outlet_menu/table/DialogOpenTable.vue'),
-    dialogOpenMenu: () => import('./components/outlet_menu/DialogOutletMenu.vue'),
+    dialogOpenTable: () => import('./DialogOpenTable.vue'),
   },
 })
 </script>
@@ -476,6 +426,7 @@ export default defineComponent({
 }
 
 .flex-container {
+  z-index: 99;
   display: flex;
   flex-wrap: wrap;
   background-color: DodgerBlue;

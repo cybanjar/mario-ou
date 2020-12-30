@@ -54,6 +54,7 @@ interface State {
   data: {
     dataDetail: [];
     buttonOkEnable: boolean;
+    dataSelected: {},
   }
   title: string;
 }
@@ -70,6 +71,7 @@ export default defineComponent({
       data: {
         dataDetail: [],
         buttonOkEnable: false,
+        dataSelected: {}
       },
       title: '',
     });
@@ -104,9 +106,8 @@ export default defineComponent({
 
     watch(
       () => props.dialogSelectOrderTaker, (dialogSelectOrderTaker) => {
-        console.log(props.dialogSelectOrderTaker, "DIALOG");
-
         if (props.dialogSelectOrderTaker) {
+          state.data.dataSelected = props.dataSelectedOrderTaker;
           state.data.buttonOkEnable = false;
           state.title = 'Select Order Taker';
           initDataUser();
@@ -143,7 +144,7 @@ export default defineComponent({
         state.data.dataDetail = dataTable;
 
         dataRow['selected'] = true;
-        props.dataSelectedOrderTaker = dataRow;
+        state.data.dataSelected = dataRow;
         state.data.buttonOkEnable = true;
     }
 
@@ -169,13 +170,13 @@ export default defineComponent({
 
     // -- 
     const closeDialogSelectUser = () => {
-      props.dataSelectedOrderTaker = null;
+      state.data.dataSelected = null;
       state.data.buttonOkEnable = false;
     }
 
     const onOkDialogSelectUser = () => {
-      if (props.dataSelectedOrderTaker != null) {
-        emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
+      if (state.data.dataSelected != null) {
+        emit('onDialogMenuOrderTaker', false, state.data.dataSelected);
       } 
     }
 

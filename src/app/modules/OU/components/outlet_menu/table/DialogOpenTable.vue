@@ -103,11 +103,12 @@ interface State {
   dialogSelectRoom: boolean,
   dataRoom: null,
   dialogTableReservation: boolean,
+  currDept: any,
 }
 
 export default defineComponent({
   props: {
-    dialogOpenTable: { type: Boolean, required: true },
+    showDialogOpenTable: { type: Boolean, required: true },
     dataTableSelected: {type: null, required: true},
   },
   setup(props, { emit, root: { $api, $root } }) {
@@ -132,11 +133,12 @@ export default defineComponent({
       dialogSelectRoom: false,
       dataRoom: null,
       dialogTableReservation: false,
+      currDept: 1,
     });
 
     watch(
-      () => props.dialogOpenTable, (show) => {
-        if ((props.dialogOpenTable) && (props.dataTableSelected != undefined)) {
+      () => props.showDialogOpenTable, (show) => {
+        if ((props.showDialogOpenTable) && (props.dataTableSelected != undefined)) {
           state.title = props.dataTableSelected.bezeich;
           state.dataSelected = props.dataTableSelected;
 
@@ -161,7 +163,7 @@ export default defineComponent({
     );
 
     const dialogModel = computed({
-        get: () => props.dialogOpenTable,
+        get: () => props.showDialogOpenTable,
         set: (val) => {
             emit('onDialog', val);
         },
@@ -179,14 +181,7 @@ export default defineComponent({
 
     const onConfirm = () => {
       state.numpadVisible = false;
-      
-      state.dataSelected['belegung'] = state.pax;
-      state.dataSelected['rmno'] = state.room;
-      state.dataSelected['bilname'] = state.guest;
-      state.dataSelected['saldo'] = state.saldo
-      
-      emit('onResultOpenTable', state.dataSelected)
-      emit('onDialog', false);
+      resInvOpenTable();
     }
     
     const openDialogRoomList = () => {
@@ -264,6 +259,54 @@ export default defineComponent({
       hideKeyboard();
     }
 
+    const resInvOpenTable = () => {
+       state.isLoading = true;
+
+      async function asyncCall() {
+        const [opentTable] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvOpenTable', {
+            balance : "?",
+            currDept: state.currDept,
+            tischnr: state.dataSelected['tischnr'],
+            curedeptFlag: false,
+            userInit: "",
+            userName: "",
+            fromAcct: false,
+            room: "",
+            gname: "",
+
+          })
+        ]);
+
+         if (opentTable) {
+          const responseOpenTable = opentTable || [];
+          const okFlag = responseOpenTable['outputOkFlag'];
+
+          console.log('responseOpenTable : ', responseOpenTable);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.dataSelected['belegung'] = state.pax;
+          state.dataSelected['rmno'] = state.room;
+          state.dataSelected['bilname'] = state.guest;
+          state.dataSelected['saldo'] = state.saldo
+          state.dataSelected['dataopentable'] = responseOpenTable;
+          
+          emit('onResultOpenTable', state.dataSelected)
+          emit('onDialog', false);
+        } 
+      }
+      asyncCall();
+    }
+
+
     return {
       dialogModel,
       onCancel,
@@ -280,6 +323,7 @@ export default defineComponent({
       onDialogRoomList,
       onDialogTableReservation,
       onChangeRoom,
+      resInvOpenTable,
       ...toRefs(state),
     };
   },

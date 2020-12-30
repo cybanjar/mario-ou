@@ -1,45 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-sm">
-    <q-dialog
-      v-model="dialogModel"
-      :maximized="true"
-      transition-show="slide-up"
-      transition-hide="slide-down"
-    >
-      <q-card class="bg-white text-black">
-        <q-header elevated>
-          <q-toolbar class="bg-secondary justify-between">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              viewBox="0 0 50 50"
-              width="44"
-              height="44"
-              class="q-ml-md"
-            >
-              <path fill="none" d="M0 0h50v50H0z" />
-              <g fill="#fefefe">
-                <path
-                  d="M35 15v4h7c3 0 3 4 0 4h-7v12h5v-8h5c6-1 6-12-1-12h-9zM6 15l4 14 4-14h6l-7 20H7L0 15zM21 15h5v8h7v5h-7v7h-5z"
-                />
-              </g>
-            </svg>
-
-            <div class="text-weight-bold">
-              {{ user.htlName }} - {{ user.htlCity }}
-            </div>
-            <div>
-              <q-btn
-                flat
-                :label="user.userName"
-                icon="mdi-account"
-                style="text-transform: none;"
-              >
-              </q-btn>
-            </div>
-          </q-toolbar>
-        </q-header>
+    <div class="q-pa-sm">
         <div class="dialog__restaurant q-mt-lg">
           <div class="row">
             <div class="col-md-8">
@@ -63,7 +23,7 @@
                     <div class="row items-start q-gutter-md scroll overflow" style="height: 250px">
                       <template v-for="datarow in dataFilteredSubGroup">
                         <q-card flat bordered class="my-card" 
-                          style="width:250px" 
+                          style="width:240px" 
                           :key="datarow['zknr']" 
                           @click="onClickSubGroup(datarow)">
                           <q-card-section :class="(datarow['selected']) ? 'bg-cyan text-white':'bg-white text-black'">
@@ -116,8 +76,12 @@
                         dense
                         standout
                         v-model="text"
+                        data-layout="compact" 
+                        ref="searcharticle"
                         input-class="text-left"
                         class="q-ml-md"
+                        @input="onChangeSearchInput(text)"
+                        @focus="showKeyboardSearch"
                       >
                         <template v-slot:append>
                           <q-icon v-if="text === ''" name="mdi-magnify" />
@@ -136,7 +100,7 @@
                   <template v-for="datarow in dataFilteredArticle">
                     <q-card flat bordered
                       class="my-card" 
-                      style="width:250px" 
+                      style="width:240px" 
                       :key="datarow['artnr']"
                       @click="onClickArticle(datarow)">
                       <q-card-section>
@@ -147,6 +111,7 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-4">
               <h5 style="visibility: hidden;">Bill Number</h5>
               <div class="q-ml-lg q-gutter-y-md">
@@ -162,12 +127,15 @@
 
                 <q-tab-panels v-model="tabbill" animated>
                   <q-tab-panel class="q-pa-none" name="calc">
+                    <SInput v-model="qty" label-text="QTY" data-layout="numeric" ref="qtyRoomBox" @focus="showKeyboardQty"/>
+
                     <div class="row items-start">
                       <q-card class="numpad">
                         <q-card-section>
                           <vue-touch-keyboard
                             id="keyboard"
-                            :layout="layout"
+                            :options="options" 
+                            layout="numeric"
                             :input="input" />
                         </q-card-section>
                       </q-card>
@@ -181,7 +149,7 @@
                         <q-card-section>                          
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/TableTransfer.svg"
+                            src="../../icons/OU/collage/TableTransfer.svg"
                           >
                           <q-tooltip>
                             Table Transfer
@@ -193,7 +161,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/StandingMode.svg"
+                            src="../../icons/OU/collage/StandingMode.svg"
                           >
                           <q-tooltip>
                             Standing Mode
@@ -205,7 +173,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/SelectOrderTakers.svg"
+                            src="../../icons/OU/collage/SelectOrderTakers.svg"
                           >
                           <q-tooltip>
                             Select Order Taker
@@ -217,7 +185,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/ChangeUser.svg"
+                            src="../../icons/OU/collage/ChangeUser.svg"
                           >
                           <q-tooltip>
                             Change User
@@ -229,7 +197,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/Discount.svg"
+                            src="../../icons/OU/collage/Discount.svg"
                           >
                           <q-tooltip>
                             Discount
@@ -241,7 +209,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/PrintOrderChecker.svg"
+                            src="../../icons/OU/collage/PrintOrderChecker.svg"
                           >
                           <q-tooltip>
                             Print Order Checker
@@ -253,7 +221,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/rePrintBill1.svg"
+                            src="../../icons/OU/collage/rePrintBill1.svg"
                           >
                           <q-tooltip>
                             Reprint Bill
@@ -265,7 +233,7 @@
                         <q-card-section>
                           <q-img
                             class="img-collage"
-                            src="../../../../icons/OU/collage/BillPrint.svg"
+                            src="../../icons/OU/collage/BillPrint.svg"
                           >
                           <q-tooltip>
                             Bill Print
@@ -282,17 +250,17 @@
               <q-card class="bill-number q-pa-md q-ml-lg q-mt-lg">
                 <div class="row text-white">
                   <div class="col-md-4">
-                    <h6 class="text-weight-bolder">{{dataTable['rechnr']}} - {{dataTable['belegung'] }}</h6>
+                    <h6 class="text-weight-bolder">{{dataTable.rechnr}} - {{dataTable.belegung}}</h6>
                   </div>
                   <div class="col-md-4">
                     <p>
-                      <span class="text-weight-bolder">{{dataTable['bezeich']}}</span> <br />
+                      <span class="text-weight-bolder">{{dataTable.bezeich}}</span> <br />
                       <span class="text-grey-7">D-001201</span><br />
-                      {{dataTable['bilname']}}
+                      {{dataTable.bilname}}
                     </p>
                   </div>
                   <div class="col-md-4 items-bottom">
-                    <p class="text-weight-think text-grey-7">{{dataTable['timeOpened']}}</p>
+                    <p class="text-weight-think text-grey-7">{{dataTable.timeOpened}}</p>
                   </div>
                 </div>
                 <q-separator />
@@ -332,7 +300,7 @@
 
                             <q-item-section top side>
                               <div class="text-grey-3 q-gutter-xs">
-                                <q-btn size="12px" flat dense :label="'Rp.' + datarow['epreis1']" />
+                                <q-btn size="12px" flat dense :label="datarow['epreis1']" />
                               </div>
                             </q-item-section>
                           </q-item>
@@ -373,7 +341,7 @@
 
                           <q-item-section top side>
                             <div class="text-grey-3 q-gutter-xs">
-                              <q-btn size="14px" flat dense label="12.000" />
+                              <q-btn size="14px" flat dense :label="datarow['epreis'] + ' x ' + datarow['anzahl']" />
                               <q-btn size="12px" flat dense round icon="mdi-dots-vertical" >
                                 <q-menu>
                                   <q-list style="min-width: 100px;">
@@ -483,6 +451,8 @@
 
         <dialogPayment
           :dialogPayment="dialogPayment"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           @onDialogPayment="onDialogPayment" />
 
         <dialogSplitBill
@@ -576,9 +546,48 @@
         <dialogChangeUser 
           :showDialogChangeUser="showDialogChangeUser"
           @onDialogChangeUser="onDialogChangeUser" />
-      </q-card>
-    </q-dialog>
-  </div>
+
+        <dialogTablePlan
+          :showDialogTablePlan="showDialogTablePlan"
+          @onDialogTablePlan="onDialogTablePlan"
+          @onResultTablePlan="onResultTablePlan"/>
+
+        <dialogInputPrice
+          :showDialogInputPrice="showDialogInputPrice"
+          @onDialogInputPrice="onDialogInputPrice"/>
+
+        <dialogInputMultiple          
+          :showDialogInputMultiple="showDialogInputMultiple"
+          @onDialogInputMultiple="onDialogInputMultiple"/>
+
+        <dialogSelectMenuItem 
+          :showDialogSelectMenuItem="showDialogSelectMenuItem"
+          @onDialogSelectMenuItem="onDialogSelectMenuItem"/>
+        
+        <dialogInputDescription
+          :showDialogInputDescription="showDialogInputDescription"
+          @onDialogInputDescription="onDialogInputDescription"/>
+        
+
+
+        <vue-touch-keyboard 
+            id="keyboardbottom"
+            :options="options" 
+            v-if="keyboardVisible" 
+            layout="compact" 
+            :accept="hideKeyboard" 
+            :next="hideKeyboard"
+            :input="input"
+            :close="hideKeyboard" />
+
+          <!-- <div>
+            <q-circular-progress
+              indeterminate
+              size="100px"
+              color="cyan"
+              class="progressDialog" />
+          </div> -->
+    </div>
 </template>
 
 <script lang="ts">
@@ -589,16 +598,8 @@ Vue.use(VueTouchKeyboard);
 // Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 
-import {
-  defineComponent,
-  computed,
-  watch,
-  reactive,
-  toRefs,
-  ref,
-  onMounted,
-} from '@vue/composition-api';
-import { date, Notify } from 'quasar';
+import { defineComponent, computed, watch, reactive, toRefs, ref, onMounted, } from '@vue/composition-api';
+import { date, Notify, Cookies } from 'quasar';
 import Vue from 'vue';
 import { store } from '~/store';
 
@@ -606,7 +607,6 @@ interface State {
   isLoading: boolean;
   dialog: boolean;
   title: string;
-  layout: string;
   input: null;
   dialogSelectOrderTaker: boolean,
   dataSelectedOrderTaker: null,
@@ -618,9 +618,9 @@ interface State {
   dataOrdered:any,
   dataSelectedNewOrder: null
   dialogEditNewOrder: boolean,
-  dataTable: null,
+  dataTable: {},
   dialogSplitItem: boolean,
-  dataSelected: null,
+  dataSelected: {},
   dialogPayment: boolean,
   showDialogSplitBill: boolean,
   showDialogDiscountBill: boolean,
@@ -630,20 +630,27 @@ interface State {
   showDialogChangeUser: boolean,
   onClickPrintBill: boolean,
   currDept: any,
+  showDialogTablePlan: boolean;
+  dataPrepare: {},
+  options: {},
+  qty: any,
+  keyboardVisible: boolean,
+  text: string,
+  showDialogInputPrice: boolean,
+  dataValidationSelectArticle: {},
+  tempDataRowSelectedArticle: {},
+  showDialogInputMultiple: boolean,
+  showDialogSelectMenuItem: boolean,
+  showDialogInputDescription: boolean,
 }
 export default defineComponent({
-  props: {
-    dialogOpenMenu: { type: Boolean, required: true },
-    dataTableSelected: {type: null, required: true }
-  },
-  setup(props, { emit, root: { $api, $root } }) {
-    const user = store.state.auth.user || {} as any;
+  setup(_, {root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
 
     const state = reactive<State>({
       isLoading: false,
       dialog: false,
       title: 'Menu',
-      layout: 'numeric',
       input: null,
       dialogSelectOrderTaker: false,
       dataSelectedOrderTaker: null,
@@ -655,9 +662,9 @@ export default defineComponent({
       dataOrdered: [] as any,
       dataSelectedNewOrder: null,
       dialogEditNewOrder: false,
-      dataTable: null,
+      dataTable: {},
       dialogSplitItem: false,
-      dataSelected: null,
+      dataSelected: {},
       dialogPayment: false,
       showDialogSplitBill: false,
       showDialogDiscountBill: false,
@@ -667,9 +674,57 @@ export default defineComponent({
       showDialogChangeUser: false,
       onClickPrintBill: false,
       currDept: 1,
+      showDialogTablePlan: false,
+      dataPrepare: {},
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      qty: 1,
+      keyboardVisible: false,
+      text: '',
+      showDialogInputPrice: false,
+      dataValidationSelectArticle: {},
+      tempDataRowSelectedArticle: {},
+      showDialogInputMultiple: false,
+      showDialogSelectMenuItem: false,
+      showDialogInputDescription: false,
     });
 
-    // OnClick listener
+    onMounted(async () => { 
+      state.isLoading = true;
+
+      //const ouStore = {'Ou': true };
+      // store.state['ou'] = ouStore;
+
+      // sessionStorage.setItem('OU_isFisrtLoad', 'true');
+      // 0 true || 1 false
+
+      let isFirstLoad = "0" as any;
+      let ouFirstLoad = Cookies.get('OU_isFisrtLoad'); 
+
+      if (ouFirstLoad == null) {
+        ouFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
+        isFirstLoad = "0"
+      } else {
+
+      }
+
+      const test = Cookies.get('OU_isFisrtLoad');
+      Cookies.remove('OU_isFisrtLoad');
+      // console.log(test,"git");
+      
+      // const flagFirstLoad = store;
+      // const flagFirstLoad = Cookies.get("OU_isFisrtLoad");
+
+      // console.log('flagFirstLoad', store);
+
+      setTimeout(() => {
+        getHTParam(4, 60);
+      }, 1000);
+    });
+
+    // OnClick listener Event
     const onClickSubGroup = (datarow) => {
       for (let i = 0; i<state.dataFilteredSubGroup.length; i++) {
         const zknr = datarow['zknr'];
@@ -690,55 +745,19 @@ export default defineComponent({
     } 
 
     const onClickArticle = (datarows) => {
-      console.log('datarow click : ', datarows);
-      // data['qty'] = 1;
-      // data['position'] = state.dataNewOrder.length;
-      // datarow['position'] = state.dataNewOrder.length;
-      state.dataNewOrder.push(
-        {
-          'abbuchung' : datarows['abbuchung'],
-          'activeflag' : datarows['activeflag'],
-          'aenderwunsch' : datarows['aenderwunsch'],
-          'artart' : datarows['artart'],
-          'artnr' : datarows['artnr'],
-          'artnrfront' : datarows['artnrfront'],
-          'artnrlager' : datarows['artnrlager'],
-          'artnrrezept' : datarows['artnrrezept'],
-          'autosaldo': datarows['autosaldo'],
-          'betriebsnr': datarows['betriebsnr'],
-          'bezaendern': datarows['bezaendern'],
-          'bezeich': datarows['bezeich'],
-          'bondruckernr': datarows['bondruckernr'],
-          'departement': datarows['departement'],
-          'e-gueltig': datarows['e-gueltig'],
-          'endkum': datarows['endkum'],
-          'epreis1': datarows['epreis1'],
-          'epreis2': datarows['epreis2'],
-          'gang': datarows['gang'],
-          'lagernr': datarows['lagernr'],
-          'mwst-code': datarows['mwst-code'],
-          'position': state.dataNewOrder.length,
-          'prozent': datarows['prozent'],
-          'rec-id': datarows['rec-id'],
-          's-gueltig': datarows['s-gueltig'],
-          'service-code': datarows['service-code'],
-          'qty': 1,
-          'remark': "",
-          'zwkum': datarows['zwkum'],
-          'dataremark': [],
-          'customRemark': ""
-        }
-      );
-
-      // for(let i = 0; i<state.dataNewOrder.length; i++) {
-      //   state.dataNewOrder[i]['position'] = i;
-      // }
-      console.log('New Order List : ', state.dataNewOrder);
+      if (state.qty == 0) {
+        Notify.create({
+          type: "warning",
+          message: 'Quantity cannot be 0',
+        });
+      } else {
+        getHBLineSelectItem(datarows);
+      }
     }
 
     const onClickNewOrder = (datarow) => {
       state.dataSelectedNewOrder = datarow;
-      console.log('datarow : ', datarow);
+      // console.log('datarow : ', datarow);
       onDialogEditNewOrder(true, null);
     }
 
@@ -756,25 +775,33 @@ export default defineComponent({
       onDialogSplitBill(true);
     }
 
-    watch(
-      () => props.dialogOpenMenu,
-      (show) => {
-        if (props.dialogOpenMenu) {
-          state.dataTable = props.dataTableSelected;
-          console.log("Menu open, dataTable : ", state.dataTable);
+    const confirmNewOrder = () => {
+      state.dataOrdered = state.dataNewOrder;
+      state.dataNewOrder = [];
+    }
 
-          checkBill();
-        }
-      }
-    );
+    const onClickDiscount = () => {
+      console.log("on click discount");
+      onDialogDiscountBill(true);
+    }
+   
+    const onClickTableTransfer = () => {
+      console.log("On Click Table Transfer");
+      onDialogTransferTable(true);
+    }
 
-    const dialogModel = computed({
-      get: () => props.dialogOpenMenu,
-      set: (val) => {
-        emit('onDialogMenu', val);
-      },
-    });
+    const onClickDialogSelectOrderTaker = () => {
+      onDialogSelectOrderTaker(true);
+      
+    }
 
+    const onClickDialogChangeUser = () => {
+      console.log(" On Click Dialog Change User");
+      onDialogChangeUser(true);      
+    }
+
+
+    // Dialog Listener
     const onDialogSelectOrderTaker = (val) => {
       if(!val) {
         state.dataSelectedOrderTaker = null;
@@ -788,7 +815,6 @@ export default defineComponent({
       
       if (!val) {
         zuggriff(19, 2);
-        getPrepare();
         // checkBill();
       }
     }
@@ -818,7 +844,7 @@ export default defineComponent({
 
     const onDialogSplitItem = (val, datarow) => {
       if (!val) {
-        state.dataSelected = null;
+        state.dataSelected = {};
       }
       state.dialogSplitItem = val;
     }
@@ -851,7 +877,77 @@ export default defineComponent({
     const onDialogSplitBill = (val) => {
       state.showDialogSplitBill = val;
     }
+
+    const onDialogDiscountBill = (val) => {
+      state.showDialogDiscountBill=val;
+    }
+
+    const onDialogTransferTable = (val) => {
+      state.showDialogTransferTable=val;
+    }
+
+    const onDialogChangeUser = (val) => {
+      state.showDialogChangeUser=val;
+    }
+
+    const onDialogTablePlan = (val) => {
+      state.showDialogTablePlan = val;
+    }
+
+    const onDialogInputPrice = (val, result) => {
+      state.showDialogInputPrice = val;
+
+      if (!state.showDialogInputPrice && result != null) {
+        if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['bezaendern']) {
+          state.dataValidationSelectArticle['tempPrice'] = result;
+          onDialogInputDescription(true, "");
+        } else {
+          state.tempDataRowSelectedArticle['epreis1'] = result;
+          initDataClickMenu();
+        }
+      }
+    }
+
+    const onDialogInputMultiple = (val, result) => {
+      state.showDialogInputMultiple = val;
+
+      if (!state.showDialogInputMultiple && result != null) {
+        // state.tempDataRowSelectedArticle['epreis1'] = result;
+
+        console.log('result', state.tempDataRowSelectedArticle);
+        const epreis1 = state.tempDataRowSelectedArticle['epreis1'];
+        let epreis = (epreis1 * result);
+        state.tempDataRowSelectedArticle['epreis1'] = epreis;
+        state.tempDataRowSelectedArticle['bezeich'] = result + " " + state.tempDataRowSelectedArticle['bezeich'];
+        
+        if (state.dataValidationSelectArticle['responseSelectItem2']['param172']) {
+
+        }
+        initDataClickMenu();
+      }
+    }
+
+    const onDialogSelectMenuItem = (val, result) => {
+      state.showDialogSelectMenuItem = val;
+
+      if (!state.showDialogSelectMenuItem && result != null) {
+
+      }
+    }
+
+    const onDialogInputDescription = (val, result) => {
+      state.showDialogInputDescription = val;
+
+      if (!state.showDialogInputDescription && result != null) {
+        if (state.dataValidationSelectArticle['tempPrice'] != null) {
+          state.tempDataRowSelectedArticle['epreis1'] = state.dataValidationSelectArticle['tempPrice'];
+        }
+        state.tempDataRowSelectedArticle['bezeich'] = result;
+        initDataClickMenu();
+      }
+    }
     
+
 
     // HTTP Request and Response
     const zuggriff = (arrayNr, expectedNr) => {
@@ -861,13 +957,14 @@ export default defineComponent({
           $api.outlet.getZugriff('checkPermission', {
             arrayNr: arrayNr,
             expectedNr: expectedNr,
-            userInit:  state.dataSelectedOrderTaker['number1']
+            userInit:  dataStoreLogin['userInit']
           }),
         ]);
 
         if (dataZuggrif) {
           const responseZuggrif = dataZuggrif || [];
           const okFlag = responseZuggrif['outputOkFlag'];
+
           if (!okFlag) {
             Notify.create({
               message: 'Failed when retrive data, please try again',
@@ -877,11 +974,10 @@ export default defineComponent({
             return false;
           }
 
-          // console.log('Response : ', responseZuggrif);
-          console.log('state.dataSelectedOrderTaker', state.dataSelectedOrderTaker);
+          console.log('responseZuggrif : ', responseZuggrif);
           zuggrifval = responseZuggrif['zugriff'];
 
-          if (zuggrifval) { // testing dev mode
+          if (zuggrifval) {
             state.isLoading = false;
             getSubgroup();
           } else {
@@ -890,9 +986,15 @@ export default defineComponent({
               color: 'red',
             });
             state.isLoading = false;
-            emit("onDialogMenu", false);
             return false;
           }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
         }
         return zuggrifval;
       }
@@ -905,7 +1007,7 @@ export default defineComponent({
       async function asyncCall() {
         const [dataSubgroup] = await Promise.all([
           $api.outlet.getOUPrepare('hblinePrepare', {
-            userInit : "1",
+            userInit : dataStoreLogin['userInit'],
             dept : 1,
             currRechnr : 0,
           }),
@@ -931,12 +1033,22 @@ export default defineComponent({
               tempDataSubGroup[i]['selected'] = i === 0 ? true : false;
             }
             state.dataSubGroup = tempDataSubGroup;
+
+            state.dataPrepare['billdate'] = tempDataSubGroup['billdate'];
           }
 
           if (state.dataSubGroup.length != 0) {
             getArticle();       
           }
           state.isLoading = false;
+          console.log("response subgr", responseSubGroup);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
         }
       }
       asyncCall();
@@ -971,7 +1083,7 @@ export default defineComponent({
             return false;
           } 
 
-          if (responseGetArticle['flCode'] === 0) {
+          if (responseGetArticle['flCode'] === 1) {
              Notify.create({
               message: 'Please check, Kitchen Printer Program might not be running',
               type: 'warning'
@@ -1002,42 +1114,16 @@ export default defineComponent({
               }
             }
           }
+
+          getBillLine();
           state.isLoading = false;
-        }
-      }
-      asyncCall();
-    }
-
-    const getPrepare = () => {
-      state.isLoading = true;
-
-      async function asyncCall() {
-        const [dataPrepare] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvPrepare', {
-            pvlLanguage: 1,
-            currDept : state.currDept,
-            currPrinter : " ",
-            userInitStr: state.dataSelectedOrderTaker['char1'],
-            transdate: "?",
-          })
-        ]);
-        
-        console.log('Menu dataPrepare : ', dataPrepare);
-
-        if (dataPrepare) {
-          const responsePrepare = dataPrepare || [];
-          const okFlag = responsePrepare['outputOkFlag'];
-
-          console.log('responsePrepare : ', responsePrepare);
-
-          if (!okFlag) {
-            Notify.create({
-              message: 'Failed when retrive data, please try again',
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
               color: 'red',
             });
             state.isLoading = false;
             return false;
-          } 
         }
       }
       asyncCall();
@@ -1069,17 +1155,452 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+
+          const dataThBill = responseCheckBill['tHBill']['t-h-bill'];
+          for (let i = 0; i<dataThBill.length; i++) {
+            if (dataThBill[i]['rechnr'] == state.dataTable['rechnr']) {
+              state.dataPrepare['objCheckBill'] = dataThBill[i];
+              break;
+            }
+          }
           onDialogMenuOrderTaker(true, null);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }    
+    
+    const getHTParam = (caseType, inp) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [gethtparam] = await Promise.all([
+          $api.outlet.getCommonOutletUserList('getHTParam0', {
+            caseType : caseType,
+            inpParam: inp
+          })
+        ]);
+
+        if (gethtparam) {
+          const responseHTParam = gethtparam || [];
+          const okFlag = responseHTParam['outputOkFlag'];
+
+          console.log('responseHTParam : ', responseHTParam);
+          getPrepare(responseHTParam['fint']);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
         }
       }
       asyncCall();
     }
 
-    const confirmNewOrder = () => {
-      state.dataOrdered = state.dataNewOrder;
-      state.dataNewOrder = [];
+    const getPrepare = (currPrinter) => {
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvPrepare', {
+            pvlLanguage: 1,
+            currDept : state.currDept,
+            currPrinter : currPrinter,
+            userInitStr: dataStoreLogin['userInit'],
+            transdate: "",
+          })
+        ]);
+        
+        console.log('Menu dataPrepare : ', dataPrepare);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          state.dataPrepare = responsePrepare;
+          const okFlag = responsePrepare['outputOkFlag'];
+          const msgStr = responsePrepare['msgStr'];
+
+          console.log('responsePrepare : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (msgStr != "") {
+            Notify.create({
+              message: msgStr,
+              color: 'red',
+            });
+            // Uncoment below on production : 
+            // state.isLoading = false;
+            // return false;
+          }
+
+          if (responsePrepare['miOrdertaker']) {
+            // true menu order taker dapat di klik/ enable visca versa
+          }
+
+          if (responsePrepare['doubleCurrency']) {
+            //
+          }
+
+          if (responsePrepare['flCode'] == 1) {
+            // const bTitle = responsePrepare['bTitle'];
+            // var strBtitle = bTitle.split(";");
+            // console.log(strBtitle)
+          } else {
+            const bTitle = "abc;def";
+            var strBtitle = bTitle.split(";");
+            responsePrepare['btitleMicrosFlag'] = strBtitle[1];
+            responsePrepare['btitleTitle'] = strBtitle[0];
+            console.log(responsePrepare);
+
+            state.showDialogTablePlan = true;
+            onDialogTablePlan(true);
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+        state.isLoading = false;
+      }
+      asyncCall();
     }
 
+    const getBillLine = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataBillLine] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvDispBillLine', {
+            doubleCurrency : false,
+            rechnr: state.dataTable['rechnr'],
+            currDept: state.currDept,
+            availTHBill: true,
+          })
+        ]);
+
+         if (dataBillLine) {
+          const responseGetBillLine = dataBillLine || [];
+          const okFlag = responseGetBillLine['outputOkFlag'];
+
+          console.log('responseGetBillLine : ', responseGetBillLine);
+
+          state.dataOrdered = responseGetBillLine['tHBillLine']['t-h-bill-line'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getHBLineSelectItem = (datarows) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataSelectItem] = await Promise.all([
+          $api.outlet.getOUPrepare('hblineSelectItem ', {
+            pvILanguage : 1,
+            dept : state.currDept,
+            helpFlag: true,
+            artListArtnr: datarows['artnr'],
+          })
+        ]);
+
+         if (dataSelectItem) {
+          const responseSelectItem = dataSelectItem || [];
+          const okFlag = responseSelectItem['outputOkFlag'];
+
+          console.log('responseSelectItem : ', responseSelectItem);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.dataValidationSelectArticle['responseSelectItem'] = responseSelectItem;
+
+          getHBLineGetPrice(datarows);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getHBLineGetPrice = (datarows) => {
+      async function asyncCall() {
+        const [dataGetPrice] = await Promise.all([
+          $api.outlet.getOUPrepare('hblineGetPrice ', {
+            pvILanguage : 1,
+            dept : state.currDept,
+            artListArtnr: datarows['artnr'],
+          })
+        ]);
+
+        if (dataGetPrice) {
+          const responseGetPrice = dataGetPrice || [];
+          const okFlag = responseGetPrice['outputOkFlag'];
+
+          console.log('responseGetPrice : ', responseGetPrice);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.dataValidationSelectArticle['responseGetPrice'] = responseGetPrice;
+          getHBLineSelectItem2(datarows);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getHBLineSelectItem1 = (datarows) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataSelectItem] = await Promise.all([
+          $api.outlet.getOUPrepare('hblineSelectItem1 ', {
+            dept : state.currDept,
+            billdate: state.dataPrepare['billdate'],
+            currRechnr: state.dataTable['rechnr'],
+          })
+        ]);
+
+        if (dataSelectItem) {
+          const responseSelectItem = dataSelectItem || [];
+          const okFlag = responseSelectItem['outputOkFlag'];
+
+          console.log('responseSelectItem1 : ', responseSelectItem);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.dataValidationSelectArticle['responseSelectItem1'] = responseSelectItem;
+          readDataClickPerArticle(datarows);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getHBLineSelectItem2 = (datarows) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataSelectItem] = await Promise.all([
+          $api.outlet.getOUPrepare('hblineSelectItem2 ', {
+            dept : state.currDept,
+            artListArtnr: datarows['artnr'],         
+          })
+        ]);
+
+        if (dataSelectItem) {
+          const responseSelectItem = dataSelectItem || [];
+          const okFlag = responseSelectItem['outputOkFlag'];
+
+          console.log('responseSelectItem2 : ', responseSelectItem);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.dataValidationSelectArticle['responseSelectItem2'] = responseSelectItem;
+          getHBLineSelectItem1(datarows);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const readDataClickPerArticle = (datarows) => {
+      state.tempDataRowSelectedArticle = {
+          'abbuchung' : datarows['abbuchung'],
+          'activeflag' : datarows['activeflag'],
+          'aenderwunsch' : datarows['aenderwunsch'],
+          'artart' : datarows['artart'],
+          'artnr' : datarows['artnr'],
+          'artnrfront' : datarows['artnrfront'],
+          'artnrlager' : datarows['artnrlager'],
+          'artnrrezept' : datarows['artnrrezept'],
+          'autosaldo': datarows['autosaldo'],
+          'betriebsnr': datarows['betriebsnr'],
+          'bezaendern': datarows['bezaendern'],
+          'bezeich': datarows['bezeich'],
+          'bondruckernr': datarows['bondruckernr'],
+          'departement': datarows['departement'],
+          'e-gueltig': datarows['e-gueltig'],
+          'endkum': datarows['endkum'],
+          'epreis1': datarows['epreis1'],
+          'epreis2': datarows['epreis2'],
+          'gang': datarows['gang'],
+          'lagernr': datarows['lagernr'],
+          'mwst-code': datarows['mwst-code'],
+          'position': state.dataNewOrder.length,
+          'prozent': datarows['prozent'],
+          'rec-id': datarows['rec-id'],
+          's-gueltig': datarows['s-gueltig'],
+          'service-code': datarows['service-code'],
+          'qty': state.qty,
+          'remark': "",
+          'zwkum': datarows['zwkum'],
+          'dataremark': [],
+          'customRemark': ""
+      };
+
+      state.dataValidationSelectArticle['tempPrice'] = null;
+      console.log("dataValidationSelectArticle : ", state.dataValidationSelectArticle);
+
+      if (state.dataValidationSelectArticle['responseGetPrice']['err'] == "true") {
+        onDialogInputPrice(true, 0);
+        return false;
+      }
+
+      if (state.dataValidationSelectArticle['responseGetPrice']['err1'] == "true") {
+        onDialogInputMultiple(true, 0);
+        return false;
+      }
+
+      if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['betriebsnr'] != 0) {
+        onDialogSelectMenuItem(true, null);
+        return false;
+      }
+
+      if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['bezaendern']) {
+        onDialogInputDescription(true, "");
+        return false;
+      }
+
+      initDataClickMenu();
+    }
+
+    const initDataClickMenu = () => {
+      state.dataNewOrder.push({
+          'abbuchung' : state.tempDataRowSelectedArticle['abbuchung'],
+          'activeflag' : state.tempDataRowSelectedArticle['activeflag'],
+          'aenderwunsch' : state.tempDataRowSelectedArticle['aenderwunsch'],
+          'artart' : state.tempDataRowSelectedArticle['artart'],
+          'artnr' : state.tempDataRowSelectedArticle['artnr'],
+          'artnrfront' : state.tempDataRowSelectedArticle['artnrfront'],
+          'artnrlager' : state.tempDataRowSelectedArticle['artnrlager'],
+          'artnrrezept' : state.tempDataRowSelectedArticle['artnrrezept'],
+          'autosaldo': state.tempDataRowSelectedArticle['autosaldo'],
+          'betriebsnr': state.tempDataRowSelectedArticle['betriebsnr'],
+          'bezaendern': state.tempDataRowSelectedArticle['bezaendern'],
+          'bezeich': state.tempDataRowSelectedArticle['bezeich'],
+          'bondruckernr': state.tempDataRowSelectedArticle['bondruckernr'],
+          'departement': state.tempDataRowSelectedArticle['departement'],
+          'e-gueltig': state.tempDataRowSelectedArticle['e-gueltig'],
+          'endkum': state.tempDataRowSelectedArticle['endkum'],
+          'epreis1': state.tempDataRowSelectedArticle['epreis1'],
+          'epreis2': state.tempDataRowSelectedArticle['epreis2'],
+          'gang': state.tempDataRowSelectedArticle['gang'],
+          'lagernr': state.tempDataRowSelectedArticle['lagernr'],
+          'mwst-code': state.tempDataRowSelectedArticle['mwst-code'],
+          'position': state.dataNewOrder.length,
+          'prozent': state.tempDataRowSelectedArticle['prozent'],
+          'rec-id': state.tempDataRowSelectedArticle['rec-id'],
+          's-gueltig': state.tempDataRowSelectedArticle['s-gueltig'],
+          'service-code': state.tempDataRowSelectedArticle['service-code'],
+          'qty': state.qty,
+          'remark': "",
+          'zwkum': state.tempDataRowSelectedArticle['zwkum'],
+          'dataremark': [],
+          'customRemark': ""
+      });
+      state.qty = 1;
+      state.tempDataRowSelectedArticle = {};
+      console.log('New Order List : ', state.dataNewOrder);
+    }
+
+
+    // Delegate Listener
+    const onResultTablePlan = (result) => {
+      console.log('result table plan: ', result);
+      state.dataTable = result;
+      checkBill();
+    }
+
+    // Private Utils 
     function compare(a, b) {
       if (a['bezeich'] < b['bezeich'] ){
         return -1;
@@ -1090,55 +1611,56 @@ export default defineComponent({
       return 0;
     }
 
-    const onClickDiscount = () => {
-      console.log("on click discount");
-      onDialogDiscountBill(true);
+    const showKeyboardSearch = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+      } 
+
+      if (!state.keyboardVisible) {
+        state.keyboardVisible = true;
+      }       
     }
 
-    const onDialogDiscountBill = (val) => {
-      state.showDialogDiscountBill=val;
+    const showKeyboardQty = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+      } 
     }
 
-    const onClickTableTransfer = () => {
-      console.log("On Click Table Transfer");
-      onDialogTransferTable(true);
+    const hideKeyboard = () => {
+      state.keyboardVisible = false;
     }
 
-    const onDialogTransferTable = (val) => {
-      state.showDialogTransferTable=val;
-    }
+    const onChangeSearchInput = (input) => {
+      state.dataFilteredArticle = [];
 
-    const onClickDialogSelectOrderTaker = () => {
-      console.log("On Click Select Order Taker");
-      onDialogSelectOrderTaker(true);
-      
-    }
+      if (state.text.length > 0) {
+        for(let i = 0; i<state.dataArticle.length; i++) {
+          const datarow = state.dataArticle[i];
+          const bezeich = state.dataArticle[i]['bezeich'] as string;
 
-    const onClickDialogChangeUser = () => {
-      console.log(" On Click Dialog Change User");
-      onDialogChangeUser(true);      
-    }
-
-    const onDialogChangeUser = (val) => {
-      state.showDialogChangeUser=val;
+          if (bezeich.toLocaleLowerCase().includes(state.text.toLocaleLowerCase())) {
+            state.dataFilteredArticle.push(datarow);
+          }
+        }
+      } else {
+        state.dataFilteredArticle = state.dataArticle;
+      }
     }
 
     return {
-      dialogModel,
-      user,
+      dataStoreLogin,
       ...toRefs(state),
       tab: 'variant',
       tabbill: 'calc',
       tabbillnumber: 'neworder',
       lorem: 'Wastern Flavor',
-      text: '',
       dense: false,
       restaurant: 'Resto Barokah',
       zuggriff,
       checkBill,
       getArticle,
       getSubgroup,
-      getPrepare,
       onClickSubGroup,
       onClickArticle,
       onClickNewOrder,
@@ -1161,17 +1683,44 @@ export default defineComponent({
       onClickDialogSelectOrderTaker,
       onClickDialogChangeUser,
       onDialogChangeUser,
+      onDialogTablePlan,
+      onResultTablePlan,
+      getHTParam,
+      getPrepare,
+      getBillLine,
+      showKeyboardSearch,
+      showKeyboardQty,
+      hideKeyboard,
+      onChangeSearchInput,
+      getHBLineSelectItem,
+      getHBLineGetPrice,
+      onDialogInputPrice,
+      onDialogInputMultiple,
+      onDialogSelectMenuItem,
+      onDialogInputDescription,
     };
   },
   components: {
-    dialogSelectOrderTakers: () => import('./DialogSelectOrderTaker.vue'),
-    dialogNewOrder:() => import('./DialogEditNewOrder.vue'),
-    dialogSplitItem:() => import('./DialogSplitItem.vue'),
-    dialogPayment:() => import('./payment/DialogPayment.vue'),
-    dialogSplitBill:() => import('./DialogSplitBill.vue'),
-    dialogDiscountBill:() => import('./DialogDiscountBill.vue'),
-    dialogTransferTable:() => import('./DialogTransferTable.vue'),
-    dialogChangeUser:() => import('./DialogChangeUser.vue'),
+    dialogSelectOrderTakers: () => import('./components/outlet_menu/DialogSelectOrderTaker.vue'),
+    dialogNewOrder:() => import('./components/outlet_menu/DialogEditNewOrder.vue'),
+    dialogSplitItem:() => import('./components/outlet_menu/DialogSplitItem.vue'),
+    dialogPayment:() => import('./components/outlet_menu/payment/DialogPayment.vue'),
+    dialogSplitBill:() => import('./components/outlet_menu/DialogSplitBill.vue'),
+    dialogDiscountBill:() => import('./components/outlet_menu/DialogDiscountBill.vue'),
+    dialogTransferTable:() => import('./components/outlet_menu/DialogTransferTable.vue'),
+    dialogChangeUser:() => import('././components/outlet_menu/DialogChangeUser.vue'),
+    dialogTablePlan:()=> import('./components/outlet_menu/table/DialogTablePlan.vue'),
+    dialogInputPrice:()=> import('./components/outlet_menu/components_article/DialogInputPrice.vue'),
+    dialogInputMultiple:()=> import('./components/outlet_menu/components_article/DialogInputMultiple.vue'),
+    dialogSelectMenuItem:()=>import('./components/outlet_menu/components_article/DialogSelectMenuItem.vue'),
+    dialogInputDescription:()=>import('./components/outlet_menu/components_article/DialogInputDescription.vue'),
   },
 });
 </script>
+
+<style lang="scss">
+
+</style>
+
+
+

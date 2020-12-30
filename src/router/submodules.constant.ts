@@ -524,7 +524,7 @@ export const SUBMODULES: Pages = {
   OU: {
     routes: [
       {
-        name: 'Main',
+        name: 'Menu',
         pathParent: '/',
       },
     ],
@@ -533,87 +533,87 @@ export const SUBMODULES: Pages = {
       {
         name: 'Meal Coupon',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Breakfast',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Laundry Compliment',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Occupied Table',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Order Taker Report',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Outlet Turnover',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Outlet User Transaction',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Outlet Bill Transaction',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Outlet Article Transaction',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Outlet Shift Revenue And Cost',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Join To Guest Folio',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Drugstore Report',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Daily Sales By User',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Compliment Report',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Cancellation Journal',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Article Transaction',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       },
       {
         name: 'Actual And RecipeCost',
         keyword: 'Outlet',
-        pathParent: '/ou/main',
+        pathParent: '/ou/menu',
       }
     ],
     

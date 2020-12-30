@@ -41,7 +41,7 @@ export const moduleList: HomeModule[] = [
     logo: 'Banquet',
   },
   {
-    path: '/ou/main',
+    path: '/ou/menu',
     name: 'Outlet',
     logo: 'Outlet',
   },
