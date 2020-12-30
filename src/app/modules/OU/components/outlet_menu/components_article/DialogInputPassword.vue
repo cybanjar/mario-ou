@@ -1,15 +1,31 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:450px;">
+      <q-card  style="max-width: 1500px;width:450px;" class="justify-center items-center">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
         <q-card-section>
           <div class="q-ma-sm q-gutter-xs">
-            <SInput outlined v-model="data.dataInputPrice" label-text="Price" data-layout="numeric" ref="priceBox" @focus="showKeyboard" />
+            <SInput outlined v-model="data.dataInputPassword" label-text="Password" :data-layout="layout" ref="priceBox" @focus="showKeyboard" />
           </div>
+
+          <div class="q-ma-sm q-gutter-xs center">
+            <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
+            <q-btn color="primary" label="OK" @click="onOkDialog" />
+          </div>
+          
+          <q-separator />
+
+          <div class="q-ma-sm q-gutter-xs">
+            <SInput outlined v-model="data.remarkApproval" label-text="" :data-layout="layout" ref="priceBox" @focus="showKeyboard" />
+          </div>
+          
+          <div class="q-ma-sm q-gutter-xs center">
+            <q-btn style="align:center;" unelevated color="primary" label="ASK FOR APPROVAL" @click="onClickApproval" />
+          </div>
+
 
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col">
@@ -22,12 +38,9 @@
           
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialog" />
-        </q-card-actions>
+        <!-- <q-card-actions align="right">
+         
+        </q-card-actions> -->
       </q-card>
     </q-dialog>
   </section>
@@ -40,7 +53,8 @@ import { Notify } from 'quasar';
 interface State {
   isLoading: boolean;
   data: {
-    dataInputPrice: any;
+    dataInputPassword: any;
+    remarkApproval: string;
   },
   layout: string;
   input: null;
@@ -49,33 +63,35 @@ interface State {
 
 export default defineComponent({
   props: {
-    showDialogInputPrice: { type: Boolean, required: true },
+    showDialogInputPassword: { type: Boolean, required: true },
+    pass: { type: String, required: true },
   },
 
   setup(props, { emit, root: { $api } }) {
     const state = reactive<State>({
       isLoading: false,
       data: {
-        dataInputPrice: 0,
+        dataInputPassword: "",
+        remarkApproval: ""
       },
       title: '',
-      layout: 'numeric',
+      layout: 'compact',
       input: null,
     });
 
     watch(
-      () => props.showDialogInputPrice, (showDialogInputPrice) => {
-        if (props.showDialogInputPrice) {
-          state.title = 'Input Price';
-          state.data.dataInputPrice = 0;
+      () => props.showDialogInputPassword, (showDialogInputPrice) => {
+        if (props.showDialogInputPassword) {
+          state.title = 'Input Password';
+          state.data.dataInputPassword = "";
         }
       }
     );
 
     const dialogModel = computed({
-        get: () => props.showDialogInputPrice,
+        get: () => props.showDialogInputPassword,
         set: (val) => {
-            emit('onDialogInputPrice', val, state.data.dataInputPrice);
+            emit('onDialogInputPassword', val, state.data.dataInputPassword);
         },
     });
 
@@ -88,11 +104,24 @@ export default defineComponent({
 
     // -- 
     const onOkDialog = () => {
-      emit('onDialogInputPrice', false, state.data.dataInputPrice);
+        if (state.data.dataInputPassword == props.pass) {
+            emit('onDialogInputPassword', false, state.data.dataInputPassword);
+        } else {
+          Notify.create({
+            type: "warning",
+            message: 'Password Incorrect',
+          });
+          state.data.dataInputPassword = "";
+        }
     }
 
     const onCancelDialog = () => {
-      emit('onDialogInputPrice', false, null);
+        state.data.dataInputPassword = "";
+        emit('onDialogInputPassword', false, null);
+    }
+
+    const onClickApproval = () => {
+        console.log("APPROVAL");
     }
 
     return {
@@ -101,6 +130,7 @@ export default defineComponent({
       onOkDialog,
       showKeyboard,
       onCancelDialog,
+      onClickApproval,
       pagination: { rowsPerPage: 0 },
     };
   },

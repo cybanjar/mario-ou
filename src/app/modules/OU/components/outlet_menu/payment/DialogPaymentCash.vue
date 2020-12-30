@@ -87,7 +87,7 @@
 
         <q-card-actions align="right">
           <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -240,14 +240,14 @@ export default defineComponent({
         }
       }
 
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
+      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
+      //   const selected = state.data.dataTablePayment[i]['selected'];
 
-        if (selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      //   if (selected === true) {
+      //     state.data.buttonOkEnable = true;
+      //     break
+      //   }
+      // }
     }
 
     const tableHeadersPrint = [

@@ -131,5 +131,24 @@ export default defineComponent({
     }
   }
 }
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
+}
 </style>
 

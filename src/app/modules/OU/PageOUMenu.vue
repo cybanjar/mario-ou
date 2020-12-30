@@ -567,6 +567,11 @@
         <dialogInputDescription
           :showDialogInputDescription="showDialogInputDescription"
           @onDialogInputDescription="onDialogInputDescription"/>
+
+        <dialogInputPassword
+          :showDialogInputPassword="showDialogInputPassword"
+          :pass="pass"
+          @onDialogInputPassword="onDialogInputPassword"/>
         
 
 
@@ -642,6 +647,8 @@ interface State {
   showDialogInputMultiple: boolean,
   showDialogSelectMenuItem: boolean,
   showDialogInputDescription: boolean,
+  showDialogInputPassword: boolean, 
+  pass: string;
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -689,6 +696,8 @@ export default defineComponent({
       showDialogInputMultiple: false,
       showDialogSelectMenuItem: false,
       showDialogInputDescription: false,
+      showDialogInputPassword: false,
+      pass: "",
     });
 
     onMounted(async () => { 
@@ -920,10 +929,12 @@ export default defineComponent({
         state.tempDataRowSelectedArticle['epreis1'] = epreis;
         state.tempDataRowSelectedArticle['bezeich'] = result + " " + state.tempDataRowSelectedArticle['bezeich'];
         
-        if (state.dataValidationSelectArticle['responseSelectItem2']['param172']) {
-
+        if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['epreis1'] == 0
+              && state.dataValidationSelectArticle['responseSelectItem2']['param172'] != "") {
+          onDialogInputPassword(true, "");
+        } else {
+          initDataClickMenu();
         }
-        initDataClickMenu();
       }
     }
 
@@ -940,10 +951,26 @@ export default defineComponent({
 
       if (!state.showDialogInputDescription && result != null) {
         if (state.dataValidationSelectArticle['tempPrice'] != null) {
-          state.tempDataRowSelectedArticle['epreis1'] = state.dataValidationSelectArticle['tempPrice'];
+            state.tempDataRowSelectedArticle['epreis1'] = state.dataValidationSelectArticle['tempPrice'];
         }
         state.tempDataRowSelectedArticle['bezeich'] = result;
-        initDataClickMenu();
+
+        if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['epreis1'] == 0 
+            && state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['param172'] != "") {
+          onDialogInputPassword(true, "");
+        } else {
+          initDataClickMenu();
+        }
+      }
+    }
+
+    const onDialogInputPassword = (val, result) => {
+      state.showDialogInputPassword = val;
+
+      if (!state.showDialogInputPassword && result != null) {
+        if (result == "123") {
+          initDataClickMenu();
+        }
       }
     }
     
@@ -1528,6 +1555,8 @@ export default defineComponent({
       };
 
       state.dataValidationSelectArticle['tempPrice'] = null;
+      state.pass = state.dataValidationSelectArticle['responseSelectItem2']['param172'];
+      
       console.log("dataValidationSelectArticle : ", state.dataValidationSelectArticle);
 
       if (state.dataValidationSelectArticle['responseGetPrice']['err'] == "true") {
@@ -1698,6 +1727,7 @@ export default defineComponent({
       onDialogInputMultiple,
       onDialogSelectMenuItem,
       onDialogInputDescription,
+      onDialogInputPassword,
     };
   },
   components: {
@@ -1714,6 +1744,7 @@ export default defineComponent({
     dialogInputMultiple:()=> import('./components/outlet_menu/components_article/DialogInputMultiple.vue'),
     dialogSelectMenuItem:()=>import('./components/outlet_menu/components_article/DialogSelectMenuItem.vue'),
     dialogInputDescription:()=>import('./components/outlet_menu/components_article/DialogInputDescription.vue'),
+    dialogInputPassword:()=>import('./components/outlet_menu/components_article/DialogInputPassword.vue'),
   },
 });
 </script>
