@@ -7,22 +7,78 @@
         </q-toolbar>
 
         <q-card-section>
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
-
-            <div class="col">
-              <SInput outlined  label-text="Payment" :disable="true" readonly/>
-            </div>
+          <div
+            class="row items-center q-gutter-sm q-mx-sm"
+          >
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/CashPayment1.svg"
+                >
+                <q-tooltip>
+                  Cash Payment
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/CCPayment1.svg"
+                >
+                <q-tooltip>
+                  Credit Cash Payment
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/CityLedger.svg"
+                >
+                <q-tooltip>
+                  City Ledger/ Transfer
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/rePrintBill1.svg"
+                >
+                <q-tooltip>
+                  Table Transfer
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/PrintOrderChecker.svg"
+                >
+                <q-tooltip>
+                  Print Order Taker
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
           </div>
-
         </q-card-section>
 
         <q-card-section>
             <div class="q-ma-sm row q-gutter-xs">
                 <div class="col">
                     <STable
+                        flat
+                        bordered
                         hide-bottom
                         :loading="isLoading"
                         :columns="tableHeadersPrint"
@@ -47,18 +103,21 @@
                     </STable>
                 </div>
 
-                <div class="row">
-                    <div>
-                        <q-btn color="primary" label="<" />
-                    </div>
-
-                    <div>
-                        <q-btn color="primary" label=">"/>
-                    </div>
+                <div class="row items-center">
+                  <div class="col q-gutter-xs">
+                    <q-btn unelevated color="primary" icon="mdi-chevron-left" />
+                  </div>
+                </div>
+                <div class="row items-center">
+                  <div class="col">
+                    <q-btn unelevated color="primary" icon="mdi-chevron-right" />
+                  </div>
                 </div>
 
                 <div class="col">
                     <STable
+                        flat
+                        bordered
                         hide-bottom
                         :loading="isLoading"
                         :columns="tableHeadersPrint"
@@ -85,10 +144,23 @@
             </div>
         </q-card-section>
 
+        <q-card-section>
+          <div class="q-ma-sm row">
+            <div class="col-md-8">
+              <q-btn flat unelevated color="primary" icon="mdi-chevron-left" />
+              <q-avatar rounded color="primary" text-color="white">01</q-avatar>
+              <q-btn flat unelevated color="primary" icon="mdi-chevron-right" />
+            </div>
+            <div class="col-md-4">
+              <SInput outlined  label-text="Amount" :disable="true" readonly/>
+            </div>
+          </div>
+        </q-card-section>
+
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
         </q-card-actions>
       </q-card>

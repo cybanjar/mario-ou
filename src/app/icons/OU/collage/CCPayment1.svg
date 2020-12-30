@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="120px" height="120px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 120 120"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil2 {fill:#FEFEFE}
+    .fil8 {fill:#C73538}
+    .fil7 {fill:#1CC8EB}
+    .fil11 {fill:#6E3614}
+    .fil10 {fill:#99562C}
+    .fil1 {fill:#AD5F2F}
+    .fil12 {fill:#E09200}
+    .fil4 {fill:black;fill-rule:nonzero}
+    .fil5 {fill:#CF6302;fill-rule:nonzero}
+    .fil9 {fill:#F0A71F;fill-rule:nonzero}
+    .fil6 {fill:#F1F2F2;fill-rule:nonzero}
+    .fil3 {fill:#FC4D44;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" width="120" height="120"/>
+  <g id="_717637472">
+   <path class="fil1" d="M15 47l80 0c4,0 8,4 8,8l0 1 0 9c-4,-1 -3,-1 -8,-1l-80 0c-5,0 -8,-6 -8,-9l0 0c0,-4 4,-8 8,-8zm3 2c0,0 -7,0 -8,4 -1,5 1,7 4,8 4,0 34,0 34,0l41 0c0,0 6,0 8,0 2,1 4,1 4,1 0,0 0,-6 -1,-9 0,-2 -2,-3 -19,-3 -17,0 -63,-1 -63,-1z"/>
+   <path class="fil2" d="M17 49c0,0 72,0 77,0 5,1 6,2 7,3 1,2 0,13 0,13 0,0 -2,-1 -7,-1 -5,0 -53,0 -53,0 0,0 -24,0 -28,-1 -3,-1 -4,-4 -4,-7 -1,-3 1,-5 4,-6 2,-2 4,-1 4,-1z"/>
+   <g>
+    <g>
+     <path class="fil3" d="M94 11c-2,-3 -7,-4 -10,-2l-55 33c-3,3 -4,7 -2,11l2 3 67 -41 -2 -4z"/>
+     <path class="fil3" d="M33 62l11 20c3,3 7,4 11,2l54 -33c4,-3 5,-7 3,-11l-12 -19 -67 41z"/>
+     <polygon class="fil4" points="33,62 100,21 96,15 29,56 "/>
+     <path class="fil5" d="M33 62l11 20c3,3 7,4 11,2l25 -16c-17,11 -39,8 -47,-6z"/>
+     <polygon class="fil6" points="47,61 92,33 91,31 46,59 "/>
+    </g>
+    <circle class="fil7" transform="matrix(0.680525 -0.417236 0.417238 0.680521 90.5873 47.078)" r="8"/>
+    <circle class="fil8" transform="matrix(0.680525 -0.417236 0.417238 0.680521 96.1366 43.6757)" r="8"/>
+   </g>
+   <g>
+    <g>
+     <path class="fil9" d="M76 6c-3,-4 -7,-5 -11,-3l-54 33c-4,3 -5,7 -3,11l2 3 68 -41 -2 -3z"/>
+     <path class="fil9" d="M14 56l12 20c2,3 7,4 10,2l55 -33c3,-2 4,-7 2,-11l-11 -19 -68 41z"/>
+     <polygon class="fil4" points="14,56 82,15 78,9 10,50 "/>
+     <path class="fil9" d="M14 56l12 20c2,3 7,4 10,2l26 -16c-18,11 -39,9 -48,-6z"/>
+     <polygon class="fil6" points="29,55 74,27 73,25 28,53 "/>
+    </g>
+    <circle class="fil7" transform="matrix(0.680525 -0.417236 0.417238 0.680521 72.2624 41.1682)" r="8"/>
+    <circle class="fil8" transform="matrix(0.680525 -0.417236 0.417238 0.680521 77.8117 37.7658)" r="8"/>
+   </g>
+   <g>
+    <path class="fil10" d="M15 63l83 1c4,0 8,3 8,7l0 40c0,4 -4,7 -8,7l-83 0c-4,0 -8,-3 -8,-7l0 -35 0 -7 0 -13c2,3 4,7 8,7z"/>
+    <path class="fil10" d="M106 76c0,0 3,0 4,1 0,1 1,1 1,1 0,0 -3,2 -4,2 -1,0 -1,0 -1,0l0 -2 0 -2z"/>
+    <path class="fil1" d="M13 66c0,0 -1,42 0,42 1,0 0,4 5,4 6,0 77,0 77,0 0,0 5,0 6,-4 0,-4 0,-37 0,-37 0,0 0,-4 -5,-4 -4,0 -79,1 -79,0 -1,0 -4,-2 -4,-1z"/>
+    <path class="fil10" d="M85 80c0,0 -4,0 -9,4 -4,3 -2,10 -1,12 2,2 5,4 9,5 5,1 21,0 22,0 2,0 3,0 5,-2 1,-2 0,-18 0,-18 0,0 0,-2 0,-3 -1,-1 -1,-1 -1,-1 0,0 1,2 -3,3 -3,1 -22,0 -22,0z"/>
+    <path class="fil11" d="M107 78c1,1 2,1 2,1l-3 1 0 -2 1 0z"/>
+    <ellipse class="fil12" cx="89" cy="91" rx="8" ry="7"/>
+   </g>
+  </g>
+ </g>
+</svg>

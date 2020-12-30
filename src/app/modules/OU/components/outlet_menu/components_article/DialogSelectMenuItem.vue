@@ -12,11 +12,24 @@
           </div>
 
           <div class="q-ma-sm row q-gutter-xs">
+            <div class="col q-pr-md">
+              <q-card flat bordered>
+                <q-card-section>
+                  <p>List bisa di select</p>
+                </q-card-section>
+              </q-card>
+            </div>
             <div class="col">
-              <vue-touch-keyboard
-              id="keyboard"
-              :layout="layout"
-              :input="input" />
+              <q-card flat bordered>
+                <q-card-section>
+                  <p>Deskripsi</p>
+                </q-card-section>
+              </q-card>
+              <q-card class="q-mt-md" flat bordered>
+                <q-card-section>
+                  <p>Request</p>
+                </q-card-section>
+              </q-card>
             </div>
           </div>
           
