@@ -292,8 +292,8 @@ export default defineComponent({
     }
 
     const onResultOpenTable = (dataOpenTable) => {
-      console.log("data open table", dataOpenTable);
-      console.log("data table selected", state.dataTableSelected);
+      // console.log("data open table", dataOpenTable);
+      // console.log("data table selected", state.dataTableSelected);
 
       getCheckTable(dataOpenTable);
     }
@@ -381,8 +381,8 @@ export default defineComponent({
                     }
                 }
 
-                console.log("dataPrepare : " , dataPrepare);
-                console.log("dataTable: " , state);
+                // console.log("dataPrepare : " , dataPrepare);
+                // console.log("dataTable: " , state);
             
                 state.isFetching = false;
             } else {

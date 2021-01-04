@@ -298,13 +298,15 @@ export default defineComponent({
         if (props.dialogPayment) {
           state.data.buttonOkEnable = false;
           state.title = 'Payment';
+          
+          console.log('Dialog Payment Mount: ', state.data.dataPreparePayment);
 
           state.data.dataPreparePayment['dataTable'] = props.dataTable;
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
-          state.data.balance = state.data.dataPreparePayment['dataPrepare']['objCheckBill']['saldo'];
+          state.data.balance = state.data.dataPreparePayment['dataTable']['dataThBill'][0]['saldo'];
 
-          console.log(state.data.dataPreparePayment);
+          // console.log(state.data.dataPreparePayment);
 
           // initDataUser();
         }
@@ -407,7 +409,7 @@ export default defineComponent({
 
     //--HTTP Request
     const zuggriff = (arrayNr, expectedNr) => {
-      let zuggrifval = false;
+      let zuggrifval = "false";
       async function asyncCall() {
         const [dataZuggrif] = await Promise.all([
           $api.outlet.getZugriff('checkPermission', {
@@ -433,9 +435,24 @@ export default defineComponent({
           console.log('responseZuggrif : ', responseZuggrif);
           zuggrifval = responseZuggrif['zugriff'];
 
-          if (zuggrifval) {
-            state.isLoading = false;
-            onDialogPaymentCash(true);
+          if (zuggrifval == "true") {
+            getPreparePayCash3();
+            // state.isLoading = false;
+            // onDialogPaymentCash(true);
+            /*if (state.data.dataPreparePayment['dataPrepare']['doubleCurrency'] == "true") {
+              state.isLoading = false;
+              onDialogPaymentCash(true);
+            } else {
+              if (state.data.dataPreparePayment['dataPrepare']['cashlessFlag']) {  
+                Notify.create({
+                  message: 'Select Type Of Cash Payment',
+                  type: 'warning',
+                });
+                state.isLoading = false;
+                return false;
+              }
+              state.isLoading = false;
+            }
           } else {
             Notify.create({
               message: responseZuggrif['messStr'],
@@ -443,13 +460,74 @@ export default defineComponent({
             });
             state.isLoading = false;
             return false;
-          }
+          }*/
         }
-        return zuggrifval;
+      }
+    }
+    asyncCall();
+  }
+
+    const getPreparePayCash3 = () => {
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvPayCash3', {
+            pvlLanguage: 1,
+            currDept: state.data.dataPreparePayment['dataPrepare']['currDept'],
+            doIt: true,
+            recId: state.data.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            balanceForeign: "?",
+            balance: "?",
+            doubleCurrency: false
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('responsePrepare : ', responsePrepare);
+
+          if (responsePrepare['msgStr'] == "") {
+            state.isLoading = false;
+            onDialogPaymentCash(true);
+
+            if (state.data.dataPreparePayment['dataPrepare']['doubleCurrency'] == "true") {
+              // state.isLoading = false;
+              // onDialogPaymentCash(true);
+            } else {
+              // if (state.data.dataPreparePayment['dataPrepare']['cashlessFlag'] == "true") {  
+              //   Notify.create({
+              //     message: 'Select Type Of Cash Payment',
+              //     type: 'warning',
+              //   });
+              //   state.isLoading = false;
+              //   return false;
+              // }
+              // state.isLoading = false;
+            }
+            // state.isLoading = false;
+            // onDialogPaymentCash(true);
+          } else {
+            Notify.create({
+              message: responsePrepare['msgStr'],
+              type: 'warning',
+            });
+            state.isLoading = false;
+            return false;
+          }         
+        }
       }
       asyncCall();
     }
-
 
     // -- Dialog Method 
     const onOkDialog = () => {

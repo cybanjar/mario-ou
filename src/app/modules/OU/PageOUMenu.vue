@@ -181,7 +181,7 @@
                           </q-img>
                         </q-card-section>
                       </q-card>
-                      <q-card @click="onClickDialogChangeUser()" flat bordered>
+                      <q-card @click="flagOrderTakerDisable ? null : onClickDialogChangeUser()" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -462,6 +462,7 @@
 
         <dialogDiscountBill 
           :showDialogDiscountBill="showDialogDiscountBill"
+          :dataTable="dataTable"
           @onDialogDiscountBill="onDialogDiscountBill" />
 
         <!-- Confirm Table Transfer -->
@@ -649,6 +650,8 @@ interface State {
   showDialogInputDescription: boolean,
   showDialogInputPassword: boolean, 
   pass: string;
+  flagOrderTakerDisable: boolean;
+  flagFirstLoad: any;
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -698,6 +701,8 @@ export default defineComponent({
       showDialogInputDescription: false,
       showDialogInputPassword: false,
       pass: "",
+      flagOrderTakerDisable: false,
+      flagFirstLoad: 0,
     });
 
     onMounted(async () => { 
@@ -705,33 +710,44 @@ export default defineComponent({
 
       //const ouStore = {'Ou': true };
       // store.state['ou'] = ouStore;
-
       // sessionStorage.setItem('OU_isFisrtLoad', 'true');
       // 0 true || 1 false
+      // let isFirstLoad = "0" as any;
 
-      let isFirstLoad = "0" as any;
-      let ouFirstLoad = Cookies.get('OU_isFisrtLoad'); 
+      // let ouFirstLoad = Cookies.get('OU_isFisrtLoad'); 
 
-      if (ouFirstLoad == null) {
-        ouFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
-        isFirstLoad = "0"
-      } else {
+      state.flagFirstLoad = Cookies.get('OU_isFisrtLoad');
 
+      if (state.flagFirstLoad == undefined) {
+        state.flagFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
       }
 
-      const test = Cookies.get('OU_isFisrtLoad');
-      Cookies.remove('OU_isFisrtLoad');
+      // if (state.flagFirstLoad == 0) {
+      //   state.flagFirstLoad = 1;
+      //   // ouFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
+      //   // // isFirstLoad = "0"
+      // } 
+
+      // const test = Cookies.get('OU_isFisrtLoad');
+      // Cookies.remove('OU_isFisrtLoad');
       // console.log(test,"git");
       
       // const flagFirstLoad = store;
       // const flagFirstLoad = Cookies.get("OU_isFisrtLoad");
 
-      // console.log('flagFirstLoad', store);
+      console.log('flagFirstLoad', state.flagFirstLoad);
 
       setTimeout(() => {
         getHTParam(4, 60);
       }, 1000);
     });
+
+    // onDestroy : 
+    window.onbeforeunload = function(){
+      Cookies.remove('OU_isFisrtLoad');
+      state.flagFirstLoad = Cookies.get('OU_isFisrtLoad');
+      console.log("refresh, delete ou cookies");
+    }
 
     // OnClick listener Event
     const onClickSubGroup = (datarow) => {
@@ -777,7 +793,30 @@ export default defineComponent({
     }
 
     const onClickPayment = () => {
-      onDialogPayment(true);
+      if (state.dataTable.hasOwnProperty('dataThBill')) {
+        if (state.dataTable['dataThBill'].length == 0) {
+          Notify.create({
+            message: 'No bill found',
+              type: 'warning',
+            });
+            return false;
+        } else if (state.dataTable['tischnr'] == 0) {
+          Notify.create({
+            message: 'No table selected, select table first',
+              type: 'warning',
+            });
+            onDialogTablePlan(true);
+            return false;
+        } else {
+          onDialogPayment(true);
+        }
+      } else {
+        Notify.create({
+          message: 'No bill found and no table selected',
+          type: 'warning',
+        });
+        return false;
+      }
     }
 
     const onClickSplitBill = () => {
@@ -790,8 +829,7 @@ export default defineComponent({
     }
 
     const onClickDiscount = () => {
-      console.log("on click discount");
-      onDialogDiscountBill(true);
+      zuggriff(79,2,"checkOpenDiscount");
     }
    
     const onClickTableTransfer = () => {
@@ -823,7 +861,7 @@ export default defineComponent({
       state.dataSelectedOrderTaker = val2;
       
       if (!val) {
-        zuggriff(19, 2);
+        // zuggriff(19, 2);
         // checkBill();
       }
     }
@@ -977,8 +1015,8 @@ export default defineComponent({
 
 
     // HTTP Request and Response
-    const zuggriff = (arrayNr, expectedNr) => {
-      let zuggrifval = false;
+    const zuggriff = (arrayNr, expectedNr, flagCheck) => {
+      let zuggrifval = "false";
       async function asyncCall() {
         const [dataZuggrif] = await Promise.all([
           $api.outlet.getZugriff('checkPermission', {
@@ -1001,12 +1039,34 @@ export default defineComponent({
             return false;
           }
 
-          console.log('responseZuggrif : ', responseZuggrif);
+          // console.log('responseZuggrif : ' + flagCheck, responseZuggrif);
+          // console.log('state.dataTable', state.dataTable);
           zuggrifval = responseZuggrif['zugriff'];
 
-          if (zuggrifval) {
-            state.isLoading = false;
-            getSubgroup();
+          if (zuggrifval == "true") {
+            if (flagCheck == "getPrepare") {
+              getSubgroup();
+            } else if (flagCheck == "checkOpenDiscount") {
+              state.isLoading = false;
+
+              if (state.dataTable.hasOwnProperty('dataThBill')) {
+                if (state.dataTable['dataThBill'] != 0 && state.dataTable['saldo'] != 0) {
+                  onDialogDiscountBill(true);
+                } else {
+                  Notify.create({
+                    message: 'Bill not found or saldo already balance',
+                    type: 'warning',
+                  });
+                  state.isLoading = false;
+                  return false;
+                }
+              } else {
+                  Notify.create({
+                    message: 'Bill not found',
+                    type: 'warning',
+                  });
+              }
+            }
           } else {
             Notify.create({
               message: responseZuggrif['messStr'],
@@ -1023,7 +1083,6 @@ export default defineComponent({
             state.isLoading = false;
             return false;
         }
-        return zuggrifval;
       }
       asyncCall();
     }
@@ -1091,7 +1150,7 @@ export default defineComponent({
             kprRecid : 0,
             billDate : '',
             tischnr: state.dataTable['tischnr'],
-            currDept:state.currDept
+            currDept: state.currDept
           }),
         ]);
 
@@ -1141,8 +1200,6 @@ export default defineComponent({
               }
             }
           }
-
-          getBillLine();
           state.isLoading = false;
         } else {
           Notify.create({
@@ -1190,7 +1247,9 @@ export default defineComponent({
               break;
             }
           }
-          onDialogMenuOrderTaker(true, null);
+
+          state.dataTable['dataThBill'] = dataThBill;
+          getBillLine();
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -1260,6 +1319,7 @@ export default defineComponent({
           state.dataPrepare = responsePrepare;
           const okFlag = responsePrepare['outputOkFlag'];
           const msgStr = responsePrepare['msgStr'];
+          responsePrepare['currDept'] = state.currDept;
 
           console.log('responsePrepare : ', responsePrepare);
 
@@ -1282,18 +1342,19 @@ export default defineComponent({
             // return false;
           }
 
-          if (responsePrepare['miOrdertaker']) {
             // true menu order taker dapat di klik/ enable visca versa
+          if (responsePrepare['miOrdertaker'] == 'true') {
+            state.flagOrderTakerDisable = false
+          } else {
+            state.flagOrderTakerDisable = true
           }
 
-          if (responsePrepare['doubleCurrency']) {
+          if (responsePrepare['doubleCurrency'] == "true") {
             //
           }
 
           if (responsePrepare['flCode'] == 1) {
-            // const bTitle = responsePrepare['bTitle'];
-            // var strBtitle = bTitle.split(";");
-            // console.log(strBtitle)
+            
           } else {
             const bTitle = "abc;def";
             var strBtitle = bTitle.split(";");
@@ -1301,8 +1362,12 @@ export default defineComponent({
             responsePrepare['btitleTitle'] = strBtitle[0];
             console.log(responsePrepare);
 
-            state.showDialogTablePlan = true;
-            onDialogTablePlan(true);
+            zuggriff(19, 2, "getPrepare");
+
+            if (state.flagFirstLoad == undefined) {
+              onDialogTablePlan(true);
+            }
+            // onDialogTablePlan(true);
           }
         } else {
           Notify.create({
@@ -1346,6 +1411,8 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+          onDialogMenuOrderTaker(true, null);
+          state.isLoading = false;
         } else {
           Notify.create({
               message: 'Please check your internet connection',

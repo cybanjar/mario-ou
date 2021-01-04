@@ -98,7 +98,6 @@
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
-import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 
 interface State {
   isLoading: boolean;

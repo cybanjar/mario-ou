@@ -37,7 +37,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <!-- <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialogSelectUser" /> -->
+          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialogSelectUser" />
           <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
         </q-card-actions>
       </q-card>
