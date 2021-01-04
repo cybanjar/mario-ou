@@ -463,7 +463,7 @@ export default defineComponent({
   },
   components: {
     dialogOpenTable: () => import('./components/outlet_menu/table/DialogOpenTable.vue'),
-    dialogOpenMenu: () => import('./components/outlet_menu/DialogOutletMenu.vue'),
+    // dialogOpenMenu: () => import('./components/outlet_menu/DialogOutletMenu.vue'),
   },
 })
 </script>
