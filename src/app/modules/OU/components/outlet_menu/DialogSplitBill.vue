@@ -81,8 +81,8 @@
                         bordered
                         hide-bottom
                         :loading="isLoading"
-                        :columns="tableHeadersPrint"
-                        :data="data.dataTablePayment"
+                        :columns="tableHeadersMainBill"
+                        :data="data.dataTableMainBill"
                         row-key="name"
                         separator="cell"
                         :rows-per-page-options="[0]"
@@ -91,26 +91,29 @@
                             <q-inner-loading showing color="primary" />
                         </template>
 
-                        <template v-slot:item="props">
-                            <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                            <q-card>
-                                <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                                    <strong>{{ props.row.name }}</strong>
-                                </q-card-section>
-                            </q-card>
-                            </div>
+                        <template v-slot:body="props">
+                          <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                            <q-td
+                              v-for="col in props.cols"
+                              :key="col.name"
+                              :props="props"
+                              @click="onRowClickMainBill(props.row)">
+                                {{ col.value }}
+                            </q-td>
+                          </q-tr>
                         </template>
                     </STable>
                 </div>
 
                 <div class="row items-center">
                   <div class="col q-gutter-xs">
-                    <q-btn unelevated color="primary" icon="mdi-chevron-left" />
+                    <q-btn unelevated color="primary" icon="mdi-chevron-left" @click="onClickMoveLeft"/>
                   </div>
                 </div>
+
                 <div class="row items-center">
                   <div class="col">
-                    <q-btn unelevated color="primary" icon="mdi-chevron-right" />
+                    <q-btn unelevated color="primary" icon="mdi-chevron-right" @click="onClickMoveRight" />
                   </div>
                 </div>
 
@@ -120,8 +123,8 @@
                         bordered
                         hide-bottom
                         :loading="isLoading"
-                        :columns="tableHeadersPrint"
-                        :data="data.dataTablePayment"
+                        :columns="tableHeadersSplitBill"
+                        :data="data.dataTableSplitBill"
                         row-key="name"
                         separator="cell"
                         :rows-per-page-options="[0]"
@@ -133,7 +136,7 @@
                         <template v-slot:item="props">
                             <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
                             <q-card>
-                                <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                                <q-card-section @click="onRowClickSplitBill(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                                     <strong>{{ props.row.name }}</strong>
                                 </q-card-section>
                             </q-card>
@@ -175,9 +178,10 @@ import { Notify } from 'quasar';
 interface State {
   isLoading: boolean;
   data: {
-    dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
+    dataWantToSplit: any;
+    dataTableSplitBill: any;
+    dataTableMainBill: any;
+    dataTableMain: any;
     buttonOkEnable: boolean;
   }
   title: string;
@@ -193,20 +197,10 @@ export default defineComponent({
     const state = reactive<State>({
       isLoading: false,
       data: {
-        dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
+        dataWantToSplit: [],
+        dataTableSplitBill : [],
+        dataTableMainBill : [],
+        dataTableMain : [
           {
             'name': "Cash",
             'id': '1',
@@ -259,6 +253,8 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Split Bill';
 
+          state.data.dataTableMainBill = state.data.dataTableMain.slice();
+
           console.log("Selected Data : ", props.dataSelectedSplitBill);
         }
       }
@@ -271,79 +267,75 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        datarow['selected'] = false;
-      }        
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          datarow['databaru'] = 1;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+    const onRowClickSplitBill = (dataRow) => {
+      console.log("Click split bill", state.data.dataTableSplitBill);
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
+    const onRowClickMainBill = (dataRow) => {
+      var dataTable = state.data.dataTableMainBill;
+      for (let i = 0; i<dataTable.length; i++) {
+        const datarow = dataTable[i] as object;
+        if (dataRow['id'] == datarow["id"]) {
+          datarow['selected'] = !datarow['selected'];
+          state.data.dataWantToSplit.push(dataRow);
         }
       }
 
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
+      for (let x = 0; x<state.data.dataWantToSplit.length; x++) {
+        const dataRow = state.data.dataWantToSplit[x];
+        if (!dataRow['selected']) {
+          state.data.dataWantToSplit.splice(x, 1);
         }
       }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      console.log("Click main bill : ", state.data.dataWantToSplit);
     }
 
-    const tableHeadersPrint = [
+    const onClickMoveRight = () => {
+      // state.data.dataTableSplitBill = state.data.dataWantToSplit.slice();
+      console.log(state.data.dataWantToSplit);
+
+      // var dataTable = state.data.dataTableMainBill.slice()
+      // for (let x = 0; x<dataTable.length; x++) {
+      //   const dataRow = dataTable[x];
+      //   if (dataRow['selected']) {
+      //     state.data.dataTableMainBill.splice(x, 1);
+      //     console.log(dataRow['name'] + dataRow['selected']);
+      //   }
+      // }
+
+      // for (let x = 0; x<state.data.dataTableSplitBill.length; x++) {
+      //     const datarowX = state.data.dataTableSplitBill[x];
+
+      //     for (let i = 0; i<state.data.dataTableMainBill.length; i++) {
+      //       const datarowI = state.data.dataTableMainBill[i];
+      //       if (datarowI['id'] == datarowX['id']) {
+      //         console.log(datarowX['name'])
+      // //       state.data.dataTableMainBill.splice(i);
+      //       }
+      //     }
+      //   }
+
+    }
+
+    const onClickMoveLeft = () => {
+
+    }
+
+    const tableHeadersMainBill = [
+      {
+            label: "name", 
+            field: "name",
+            name: "name",
+            align: "center",
+        }, {
+            label: "id", 
+            field: "id",
+            name: "id",
+            align: "center",
+        },
+    ];
+
+    const tableHeadersSplitBill = [
       {
             label: "name", 
             field: "name",
@@ -359,33 +351,25 @@ export default defineComponent({
 
     // -- 
     const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
+      state.data.dataTableMainBill = state.data.dataTableMain;
+      state.data.dataWantToSplit = [];
+      state.data.dataTableSplitBill = [];
       emit('onDialogSplitBill', false);
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
+      tableHeadersMainBill,
+      tableHeadersSplitBill,
+      onRowClickSplitBill,
+      onRowClickMainBill,
       onOkDialogSelectUser,
+      onClickMoveRight,
+      onClickMoveLeft,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },
     };
