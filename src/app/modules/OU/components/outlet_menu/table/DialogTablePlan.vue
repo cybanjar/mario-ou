@@ -19,7 +19,7 @@
               :filter="filter"
               :pagination.sync="pagination" >
               <template v-slot:item="props">
-                <div class="q-pa-xs col-xl-12 col-sm-3 col-md-1">
+                <div class="q-pa-xs col-xl-1 col-sm-3 col-md-1">
                   <q-card>
                     <q-card-section @click="onClickTable(props.row)" :class="props.row.rechnr == 0 ? 'bg-white text-center text-black' : 'bg-red text-center text-white'">
                       <strong>{{ props.row.tischnr }}</strong>

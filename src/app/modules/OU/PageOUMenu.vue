@@ -1,67 +1,30 @@
 <template>
     <div class="q-pa-sm">
-        <div class="dialog__restaurant q-mt-lg">
+        <div class="dialog__restaurant">
           <div class="row">
             <div class="col-md-8">
-              <h5 class="q-ml-lg">{{ restaurant }}</h5>
-              <div class="q-gutter-y-md">
-                <q-tabs
-                  v-model="tab"
-                  inline-label
-                  class="text-blue q-ml-lg"
-                  align="left"
-                  :breakpoint="0"
-                >
-                  <q-tab name="variant" icon="mdi-food-variant" label="All" />
-                  <q-tab name="food" icon="mdi-noodles" label="Food" />
-                  <q-tab name="beverange" icon="mdi-coffee" label="Beverange" />
-                  <q-tab name="foodva" icon="mdi-food" label="Other" />
-                </q-tabs>
-
-                <q-tab-panels v-model="tab" animated>
-                  <q-tab-panel name="variant">
-                    <div class="row items-start q-gutter-md scroll overflow" style="height: 250px">
-                      <template v-for="datarow in dataFilteredSubGroup">
-                        <q-card flat bordered class="my-card" 
-                          style="width:240px" 
-                          :key="datarow['zknr']" 
-                          @click="onClickSubGroup(datarow)">
-                          <q-card-section :class="(datarow['selected']) ? 'bg-cyan text-white':'bg-white text-black'">
-                            {{datarow['bezeich']}}
-                          </q-card-section>
-                        </q-card>
-                      </template>
-                    </div>
-                  </q-tab-panel>
-
-                  <q-tab-panel name="food">
-                    <div class="q-pa-md row items-start q-gutter-sm">
-                      <q-card class="my-card">
-                        <q-card-section>
-                          {{ lorem }}
-                        </q-card-section>
-                      </q-card>
-                    </div>
-                  </q-tab-panel>
-                  <q-tab-panel name="beverange">
-                    <div class="q-pa-md row items-start q-gutter-md">
-                      <q-card class="my-card">
-                        <q-card-section>
-                          {{ lorem }}
-                        </q-card-section>
-                      </q-card>
-                    </div>
-                  </q-tab-panel>
-                  <q-tab-panel name="foodva">
-                    <div class="q-pa-md row items-start q-gutter-md">
-                      <q-card class="my-card">
-                        <q-card-section>
-                          {{ lorem }}
-                        </q-card-section>
-                      </q-card>
-                    </div>
-                  </q-tab-panel>
-                </q-tab-panels>
+              <h5 class="q-ml-lg">{{ restaurant }}
+                <span @click="onDialogTablePlan(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                  <q-icon color="white" name="mdi-table-furniture" >
+                    <q-tooltip>
+                      Select Table
+                    </q-tooltip>
+                  </q-icon>
+                </span>
+              </h5>
+              <div class="q-gutter-y-md">                
+                <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 250px">
+                  <template v-for="datarow in dataFilteredSubGroup">
+                    <q-card flat bordered class="my-card" 
+                      style="width:240px" 
+                      :key="datarow['zknr']" 
+                      @click="onClickSubGroup(datarow)">
+                      <q-card-section :class="(datarow['selected']) ? 'bg-cyan text-white':'bg-white text-black'">
+                        {{datarow['bezeich']}}
+                      </q-card-section>
+                    </q-card>
+                  </template>
+                </div>                  
               </div>
 
               <div>
@@ -96,10 +59,10 @@
                     </div>
                   </div>
                 </q-card>
-                <div class="q-pa-md row items-start q-gutter-md scroll overflow" style="height: 250px">
+                <div class="q-pa-md row items-start scroll overflow" style="height: 250px">
                   <template v-for="datarow in dataFilteredArticle">
                     <q-card flat bordered
-                      class="my-card" 
+                      class="my-card q-mr-md q-mb-md" 
                       style="width:240px" 
                       :key="datarow['artnr']"
                       @click="onClickArticle(datarow)">
@@ -122,7 +85,11 @@
                   :breakpoint="0"
                 >
                   <q-tab class="tabcalc" name="calc" icon="mdi-calculator" />
-                  <q-tab name="collage" icon="mdi-collage" />
+                  <q-tab name="collage" icon="mdi-collage">
+                    <q-tooltip>
+                      More Options
+                    </q-tooltip>
+                  </q-tab>
                 </q-tabs>
 
                 <q-tab-panels v-model="tabbill" animated>
