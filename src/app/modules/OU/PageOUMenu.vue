@@ -11,6 +11,13 @@
                     </q-tooltip>
                   </q-icon>
                 </span>
+                <span @click="onDialogCashierTransfer(true)" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                  <q-icon color="white" name="mdi-table-account" >
+                    <q-tooltip>
+                      Cashier Transfer
+                    </q-tooltip>
+                  </q-icon>
+                </span>
               </h5>
               <div class="q-gutter-y-md">                
                 <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 250px">
@@ -540,6 +547,11 @@
           :showDialogInputPassword="showDialogInputPassword"
           :pass="pass"
           @onDialogInputPassword="onDialogInputPassword"/>
+
+        <dialogCashierTransfer
+          :showDialogCashierTransfer="showDialogCashierTransfer"
+          :dataSelectedCashierTransfer="dataSelected"
+          @onDialogCashierTransfer="onDialogCashierTransfer"/>
         
 
 
@@ -619,6 +631,7 @@ interface State {
   pass: string;
   flagOrderTakerDisable: boolean;
   flagFirstLoad: any;
+  showDialogCashierTransfer: boolean,
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -670,6 +683,7 @@ export default defineComponent({
       pass: "",
       flagOrderTakerDisable: false,
       flagFirstLoad: 0,
+      showDialogCashierTransfer: false,
     });
 
     onMounted(async () => { 
@@ -1711,6 +1725,14 @@ export default defineComponent({
       }
     }
 
+    const onClickCashierTransfer = () => {
+      onDialogSplitBill(true);
+    }
+
+    const onDialogCashierTransfer = (val) => {
+      state.showDialogCashierTransfer = val;
+    }
+
     return {
       dataStoreLogin,
       ...toRefs(state),
@@ -1762,6 +1784,8 @@ export default defineComponent({
       onDialogSelectMenuItem,
       onDialogInputDescription,
       onDialogInputPassword,
+      onDialogCashierTransfer,
+      onClickCashierTransfer,
     };
   },
   components: {
@@ -1779,6 +1803,7 @@ export default defineComponent({
     dialogSelectMenuItem:()=>import('./components/outlet_menu/components_article/DialogSelectMenuItem.vue'),
     dialogInputDescription:()=>import('./components/outlet_menu/components_article/DialogInputDescription.vue'),
     dialogInputPassword:()=>import('./components/outlet_menu/components_article/DialogInputPassword.vue'),
+    dialogCashierTransfer:() => import('./components/outlet_menu/DialogCashierTransfer.vue'),
   },
 });
 </script>
