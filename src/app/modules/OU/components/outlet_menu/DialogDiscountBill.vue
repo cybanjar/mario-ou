@@ -53,6 +53,32 @@
             </div>
           </div>
 
+          <q-dialog v-model="showDialogComfirmation" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section class="row items-center">
+              <div class="row">
+                <div class="col-md-2">
+                  <q-avatar icon="mdi-help" color="negative" text-color="white" />
+                </div>
+                <div class="col-md-10">                  
+                  <p class="q-ml-md">Select a discount article? <br>
+                  Do you want to continue?</p>
+                </div>
+              </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline label="Cancel" color="primary" @click="onClickConfirmation('cancel')" />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation('ok')" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+
           
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col">
@@ -96,12 +122,14 @@ interface State {
     discountPercent: any;
     discountBalance: any;
     discountAmount: any;
+    dataArticleSelected: {},
   },
   layout: string;
   input: null;
   title: string;
   options: {};
   numpadVisible: boolean,
+  showDialogComfirmation: boolean
 }
 
 export default defineComponent({
@@ -120,7 +148,7 @@ export default defineComponent({
         discountPercent: 0,
         discountBalance: 0,
         discountAmount: 0,
-
+        dataArticleSelected: {},
       },
       title: '',
       layout: 'numeric',
@@ -130,6 +158,7 @@ export default defineComponent({
         preventClickEvent: false
       },
       numpadVisible: false,
+      showDialogComfirmation: false,
     });
 
     watch(
@@ -236,7 +265,7 @@ export default defineComponent({
       asyncCall();
     }
 
-     const getDisc1GetArticle = () => {
+    const getDisc1GetArticle = () => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -263,9 +292,125 @@ export default defineComponent({
             return false;
           } 
 
+          state.data.dataPrepare['prepareArticle'] = responsePrepare;
+          for (let i = 0; i<state.data.dataDetail.length; i++) {
+            const datarow = state.data.dataDetail[i] as any;
+            datarow['selected'] = false;
+            datarow['prtflag'] = 0;
+          }
+          const tempData = state.data.dataDetail;
+          state.data.dataDetail = [];
+          state.data.dataDetail = tempData;
+
+
+
           // const objTHBill = responsePrepare['tHBill']['t-h-bill'][0];
           // state.title = "Discount Bill Number " + objTHBill['rechnr'] + " - " + "Table " + objTHBill['tischnr'];
           console.log("responsePrepareGetArticle", responsePrepare);
+          console.log("dataDetail : ", state.data.dataDetail);
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getDisc1CalAmount = (datarow) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('disc1CalAmount', {
+            menuDepartement : 1,
+            menuArtnr: datarow['artnr'],
+          }),
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+          const selected = datarow['selected'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          console.log("responseDisc1CalAmount", response);
+          console.log('prepare article: ', state.data.dataPrepare['prepareArticle']);
+
+          if (selected && (datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] && 
+                datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] && 
+                datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt3']) ) {
+                Notify.create({
+                  message: 'Select a discount article',
+                  color: 'red',
+                });
+                state.isLoading = false;
+                return false;
+            }        
+
+            // state.data.discountAmount = state.data.discountAmount as any + (datarow['anzahl'] as any * datarow['epreis'] as any);
+            const discList = state.data.dataPrepare['prepareArticle']['discList']['disc-list'];
+            const tArtikel = response['tArtikel']['t-artikel'];
+            const tHArtikel = response['tHArtikel']['t-h-artikel'];
+
+            // Check Here tommorow
+            if (discList.length == 0) {
+              Notify.create({
+                message: 'Discount Article not found for menu item ' + datarow['artnr'] + " " + datarow['bezeich'],
+                color: 'red',
+              });
+            } else {
+              let flag = false;
+              let balance = 0;
+              
+              // check here
+              for (let i = 0; i<discList.length; i++) {
+                const umzatI = discList[i]['umsatzart'];
+                const mwstI = discList[i]['mwst'];
+                const serviceI = discList[i]['list.service '];
+
+                for (let x = 0; x<tArtikel.length; x++) {
+                  const umzatX = tArtikel[x]['umsatzart'];
+                  if (umzatI == umzatX) {
+                    flag = true;
+                    break;
+                  }
+                }
+
+                if (flag) {
+                  for (let y = 0; y<tHArtikel.length; y++) {
+                    const mwst = tHArtikel[y]['mwst'];
+                    const service = tHArtikel[y]['mwst'];
+
+                    if (mwstI == mwst && serviceI == service) {
+                      const tempBalance = state.data.discountAmount - state.data.discountValue;
+                      // origAmt  atau "Amount" = balance
+                      // balance atau "balance" = balance + amount atau "Discount".
+                    }
+                  }
+                }
+              }
+              state.data.discountBalance = balance;
+            }
+
+          // console.log('nettoBetrag : ', nettoBetrag);
+
+            const tempData = state.data.dataDetail;
+            state.data.dataDetail = [];
+            state.data.dataDetail = tempData;
+
+            // console.log('state.data.dataDetail', state.data.dataDetail);
+            state.isLoading = false;
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -305,36 +450,170 @@ export default defineComponent({
 
     const onCancelDialog = () => {
       state.data.discountValue = 0;
+      state.data.discountBalance = 0;
+      state.data.discountAmount = 0;
+      state.data.discountPercent = 0;
       state.data.dataDetail = [];
       emit('onDialogDiscountBill', false);
     }
 
     const onClickItem = (datarow) => {
-      for (let i = 0; i<state.data.dataDetail.length; i++) {
-        if (datarow['position'] == i) {
+      // console.log('datarow : ', datarow);
+
+      // amount   = ? || rumus / betrag + betrag
+      // balance  = ? || rumus / amount - discount
+      // discount = input text || input% * amount
+
+      state.data.dataArticleSelected = datarow;
+      
+      // for (let i = 0; i<state.data.dataDetail.length; i++) {
+      //   let datarow = state.data.dataDetail[i] as object;
+      //   datarow['selected'] = false;
+      //   datarow['prtflag'] = 0;
+      // }
+
+      console.log('artnr : ', datarow['artnr']);
+      console.log('discArt1 : ', state.data.dataPrepare['prepare1']['discArt1']);
+      console.log('discArt2 : ', state.data.dataPrepare['prepare1']['discArt2']);
+      console.log('discArt3 : ', state.data.dataPrepare['prepare1']['discArt3']);
+
+      // console.log('Selected : ', state.data.dataArticleSelected['selected']);
+
+      if (!state.data.dataArticleSelected['selected'] && (state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] || 
+          state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] ||
+            state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt3'])) {
+          state.showDialogComfirmation = true;
+      } else if (state.data.dataArticleSelected['selected'] && (state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] ||
+          state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] ||
+            state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt3'])) {
+            
+            state.data.dataArticleSelected['selected'] = false;
+            datarow['prtflag'] = 0;
+            calculateBalanceAndAmount();
+
+
+            // for (let i = 0; i<state.data.dataDetail.length; i++) {
+            //   let datarow = state.data.dataDetail[i] as object;
+            //   datarow['selected'] = false;
+            //   datarow['prtflag'] = 0;
+            // }
+      } else {
+        // Assign data selected
+        for (let i = 0; i<state.data.dataDetail.length; i++) {
+          if (state.data.dataArticleSelected['position'] == i) {
+            let datarow = state.data.dataDetail[i] as object;
+            datarow['selected'] = !datarow['selected'];
+            datarow['prtflag'] = 1;
+            break;
+          }
+        }
+        calculateBalanceAndAmount();
+      }
+    }
+
+    const onClickConfirmation = (flag) => {
+      if (flag == "ok") {
+        // Assign data selected
+        for (let i = 0; i<state.data.dataDetail.length; i++) {
+          const datarow = state.data.dataDetail[i] as any;
+
+          if (datarow['position'] == i) {
+            state.data.dataArticleSelected['selected'] = true;
+            state.data.dataArticleSelected['prtflag'] = 1;
+
+            datarow[i] = state.data.dataArticleSelected;
+            break;
+          }
+        }
+
+
+        // for (let i = 0; i<state.data.dataDetail.length; i++) {
+        //   const datarow = state.data.dataDetail[i];
+        //   if (state.data.dataArticleSelected['position'] == i) {
+        //     let datarow = state.data.dataDetail[i] as object;
+        //     datarow['selected'] = true;
+        //     datarow['prtflag'] = 1;
+        //     console.log(datarow + " - " + i);
+        //     break;
+        //   }
+        // }
+
+        calculateBalanceAndAmount();
+        state.showDialogComfirmation = false;
+      } else {
+        for (let i = 0; i<state.data.dataDetail.length; i++) {
           let datarow = state.data.dataDetail[i] as object;
-          datarow['selected'] = !datarow['selected'];
+          datarow['selected'] = false;
+          datarow['prtflag'] = 0;
+        }
+        calculateBalanceAndAmount();
+        state.showDialogComfirmation = false;
+      }
+    }
+
+    // Calculate Amount
+    const calculateBalanceAndAmount = () => {
+      let amount = 0;
+      state.data.discountAmount = amount;
+
+      for(let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i];
+        const selected = datarow['selected'];
+
+        if (selected) {
+          if (datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt1'] &&
+              datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt2'] &&
+              datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt3']) {            
+            amount = amount + datarow['betrag'];
+          }
+        }
+      }
+      state.data.discountAmount = amount;
+
+      // Calculate Discount
+      let discount = 0;
+      state.data.discountValue = discount;
+
+      for (let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i];
+        const selected = datarow['selected'];
+
+        if (selected && (datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt1'] && 
+            datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt2'] &&
+              datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt3'])) {
+          discount = (state.data.discountPercent * state.data.discountAmount) / 100;
+        }
+      }
+      state.data.discountValue = discount;
+
+      // Calculate Balance
+      for(let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i];
+        const selected = datarow['selected'];
+
+        if (selected && datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt1'] && 
+            datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt2'] &&
+              datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt3']) {
+          getDisc1CalAmount(datarow); 
           break;
         }
       }
-      const tempData = state.data.dataDetail;
-      state.data.dataDetail = [];
-      state.data.dataDetail = tempData;
-      console.log('state.data.dataDetail', state.data.dataDetail);      
+
+      
     }
-    
+
+
     const onChangeDiscount = () => {
-      getDisc1GetArticle();
+        getDisc1GetArticle();
     }
 
-
-     const showKeyboard = (e) => {
+    const showKeyboard = (e) => {
       if (e.target.localName == "input") {
         state.input = e.target; 
         state.layout = e.target.dataset.layout;
-      } 
+    } 
 
-      if (!state.numpadVisible) {
+    if (!state.numpadVisible) {
         state.numpadVisible = true;
       }      
     }
@@ -360,6 +639,8 @@ export default defineComponent({
       onChangeDiscount,
       getDisc1Prepare,
       getDisc1Prepare1,
+      getDisc1CalAmount,
+      onClickConfirmation,
       pagination: { rowsPerPage: 0 },
     };
   },
