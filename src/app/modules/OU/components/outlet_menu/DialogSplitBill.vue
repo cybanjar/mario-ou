@@ -133,14 +133,16 @@
                             <q-inner-loading showing color="primary" />
                         </template>
 
-                        <template v-slot:item="props">
-                            <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                            <q-card>
-                                <q-card-section @click="onRowClickSplitBill(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                                    <strong>{{ props.row.name }}</strong>
-                                </q-card-section>
-                            </q-card>
-                            </div>
+                        <template v-slot:body="props">
+                          <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                            <q-td
+                              v-for="col in props.cols"
+                              :key="col.name"
+                              :props="props"
+                              @click="onRowClickSplitBill(props.row)">
+                                {{ col.value }}
+                            </q-td>
+                          </q-tr>
                         </template>
                     </STable>
                 </div>
@@ -150,9 +152,9 @@
         <q-card-section>
           <div class="q-ma-sm row">
             <div class="col-md-8">
-              <q-btn flat unelevated color="primary" icon="mdi-chevron-left" />
-              <q-avatar rounded color="primary" text-color="white">01</q-avatar>
-              <q-btn flat unelevated color="primary" icon="mdi-chevron-right" />
+              <q-btn flat unelevated color="primary" icon="mdi-chevron-left" @click="onClickChangeCounter('min')"/>
+              <q-avatar rounded color="primary" text-color="white">{{data.counter}}</q-avatar>
+              <q-btn flat unelevated color="primary" icon="mdi-chevron-right" @click="onClickChangeCounter('plus')"/>
             </div>
             <div class="col-md-4">
               <SInput outlined  label-text="Amount" :disable="true" readonly/>
@@ -178,11 +180,11 @@ import { Notify } from 'quasar';
 interface State {
   isLoading: boolean;
   data: {
-    dataWantToSplit: any;
     dataTableSplitBill: any;
     dataTableMainBill: any;
     dataTableMain: any;
     buttonOkEnable: boolean;
+    counter: any,
   }
   title: string;
 }
@@ -197,7 +199,6 @@ export default defineComponent({
     const state = reactive<State>({
       isLoading: false,
       data: {
-        dataWantToSplit: [],
         dataTableSplitBill : [],
         dataTableMainBill : [],
         dataTableMain : [
@@ -205,44 +206,53 @@ export default defineComponent({
             'name': "Cash",
             'id': '1',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Card",
             'id': '2',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "City Ledger",
             'id': '3',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Transfer To Guest Folio",
             'id': '4',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Transfer To Non Guest Folio",
             'id': '5',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Transfer To Master Folio",
             'id': '6',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Compliment",
             'id': '7',
             'selected': false,
+            'counter': 0,
           },
           {
             'name': "Meal Coupon",
             'id': '8',
             'selected': false,
+            'counter': 0,
           }
         ],
         buttonOkEnable: false,
+        counter: 1,
       },
       title: '',
     });
@@ -253,9 +263,7 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Split Bill';
 
-          state.data.dataTableMainBill = state.data.dataTableMain.slice();
-
-          console.log("Selected Data : ", props.dataSelectedSplitBill);
+          state.data.dataTableMainBill = state.data.dataTableMain.slice()
         }
       }
     );
@@ -268,57 +276,120 @@ export default defineComponent({
     });
 
     const onRowClickSplitBill = (dataRow) => {
-      console.log("Click split bill", state.data.dataTableSplitBill);
+      state.data.dataTableSplitBill.forEach(function(item, index, object) {
+        if (item['id'] == dataRow['id']) {
+          item['selected'] = !item['selected'];
+        }
+      });
     }
 
-    const onRowClickMainBill = (dataRow) => {
-      var dataTable = state.data.dataTableMainBill;
-      for (let i = 0; i<dataTable.length; i++) {
-        const datarow = dataTable[i] as object;
-        if (dataRow['id'] == datarow["id"]) {
-          datarow['selected'] = !datarow['selected'];
-          state.data.dataWantToSplit.push(dataRow);
+    const onRowClickMainBill = (dataRow) => {      
+      state.data.dataTableMainBill.forEach(function(item, index, object) {
+        if (item['id'] == dataRow['id']) {
+          item['selected'] = !item['selected'];
         }
-      }
-
-      for (let x = 0; x<state.data.dataWantToSplit.length; x++) {
-        const dataRow = state.data.dataWantToSplit[x];
-        if (!dataRow['selected']) {
-          state.data.dataWantToSplit.splice(x, 1);
-        }
-      }
-      console.log("Click main bill : ", state.data.dataWantToSplit);
+      });
     }
 
     const onClickMoveRight = () => {
-      // state.data.dataTableSplitBill = state.data.dataWantToSplit.slice();
-      console.log(state.data.dataWantToSplit);
+      var dataTable = state.data.dataTableMainBill.slice()
+      let index = dataTable.length - 1;
 
-      // var dataTable = state.data.dataTableMainBill.slice()
-      // for (let x = 0; x<dataTable.length; x++) {
-      //   const dataRow = dataTable[x];
-      //   if (dataRow['selected']) {
-      //     state.data.dataTableMainBill.splice(x, 1);
-      //     console.log(dataRow['name'] + dataRow['selected']);
-      //   }
-      // }
+      while (index >= 0) {
+        if (dataTable[index]['selected']) {
+          dataTable[index]['counter'] = state.data.counter;
+          state.data.dataTableSplitBill.push(dataTable[index]);
+          dataTable.splice(index, 1);
+        }
+        index -= 1;
+      }
 
-      // for (let x = 0; x<state.data.dataTableSplitBill.length; x++) {
-      //     const datarowX = state.data.dataTableSplitBill[x];
+      // Assign Counter to Native Data
+      for (let i = 0; i<state.data.dataTableMain.length; i++) {
+        const dataRowI = state.data.dataTableMain[i];
+        for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
+          const dataRowX = state.data.dataTableMainBill[x];
+          if (dataRowI['id'] == dataRowX['id']) {
+            dataRowI['counter'] = dataRowX['counter'];
+          }
+        }
 
-      //     for (let i = 0; i<state.data.dataTableMainBill.length; i++) {
-      //       const datarowI = state.data.dataTableMainBill[i];
-      //       if (datarowI['id'] == datarowX['id']) {
-      //         console.log(datarowX['name'])
-      // //       state.data.dataTableMainBill.splice(i);
-      //       }
-      //     }
-      //   }
-
+        for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
+          const dataRowY = state.data.dataTableSplitBill[y];
+          if (dataRowI['id'] == dataRowY['id']) {
+            dataRowI['counter'] = dataRowY['counter'];
+          }
+        }
+      }
+ 
+      state.data.dataTableSplitBill.forEach(function(item, index, object) {
+        item['selected'] = false;
+      });
+      state.data.dataTableMainBill = dataTable;
     }
 
     const onClickMoveLeft = () => {
+      var dataTable = state.data.dataTableSplitBill.slice()
+      let index = dataTable.length - 1;
 
+      while (index >= 0) {
+        if (dataTable[index]['selected']) {
+          dataTable[index]['counter'] = 0;
+          state.data.dataTableMainBill.push(dataTable[index]);
+          dataTable.splice(index, 1);
+        }
+        index -= 1;
+      }
+
+      // Assign Counter to Native Data
+      for (let i = 0; i<state.data.dataTableMain.length; i++) {
+        const dataRowI = state.data.dataTableMain[i];
+        for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
+          const dataRowX = state.data.dataTableMainBill[x];
+          if (dataRowI['id'] == dataRowX['id']) {
+            dataRowI['counter'] = dataRowX['counter'];
+          }
+        }
+
+        for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
+          const dataRowY = state.data.dataTableSplitBill[y];
+          if (dataRowI['id'] == dataRowY['id']) {
+            dataRowI['counter'] = dataRowY['counter'];
+          }
+        }
+      }
+ 
+      state.data.dataTableSplitBill.forEach(function(item, index, object) {
+        item['selected'] = false;
+      });
+      state.data.dataTableSplitBill = dataTable;
+    }
+
+    const onClickChangeCounter = (flag) => {
+      if (flag == "min") {
+        if (state.data.counter >= 2) {
+          state.data.counter--;
+        }
+      } else {
+        state.data.counter++;
+      }
+
+      if (state.data.counter != 0) {
+        var dataTable = state.data.dataTableMain;
+        var newDataTable = [];
+        dataTable.forEach(function(item, index, object) {
+          const currCounter = item['counter'];
+          
+          if (currCounter == state.data.counter) {
+            newDataTable.push(item);
+          }
+        });
+
+        state.data.dataTableSplitBill = [];
+        state.data.dataTableSplitBill = newDataTable;   
+      }
+      // console.log(state.data.dataTableMain);
+      
     }
 
     const tableHeadersMainBill = [
@@ -354,8 +425,7 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      state.data.dataTableMainBill = state.data.dataTableMain;
-      state.data.dataWantToSplit = [];
+      state.data.dataTableMainBill = [];
       state.data.dataTableSplitBill = [];
       emit('onDialogSplitBill', false);
     }
@@ -371,6 +441,7 @@ export default defineComponent({
       onClickMoveRight,
       onClickMoveLeft,
       onCancelDialog,
+      onClickChangeCounter,
       pagination: { rowsPerPage: 0 },
     };
   },

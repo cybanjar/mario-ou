@@ -349,8 +349,8 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+          console.log('prepare article: ', state.data.dataPrepare);
           console.log("responseDisc1CalAmount", response);
-          console.log('prepare article: ', state.data.dataPrepare['prepareArticle']);
 
           if (selected && (datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] && 
                 datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] && 
@@ -395,6 +395,7 @@ export default defineComponent({
                   discount = discount + (tempValue + (tHArtikel[0]['service'] * tempValue /100) + tempValue2);
       
                   state.data.discountValue = (discount.toFixed(2));
+                  state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
 
                   console.log('epreis', datarow['epreis']);
                   console.log('val1 : ' , tempValue);
@@ -423,7 +424,7 @@ export default defineComponent({
             } 
 
             let flag = false;
-            state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
+            // state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
             
             // check here
             // for (let i = 0; i<discList.length; i++) {
@@ -580,19 +581,25 @@ export default defineComponent({
 
                   const tempValue = ((datarow['epreis'] * state.data.discountPercent) / 100);
                   const tempValue2 = ((tempValue * tHArtikel[0]['service']) / 100);
-                  discount = discount + ((tempValue * 0.1 )+ (tHArtikel[0]['service'] * tempValue /100) + tempValue2);
-      
+
+                  if (flagService == "true" && flagTax == "false") { 
+                    discount = discount + (tempValue + tempValue2);      
+                  } else if (flagService == "true" && flagTax == "true") {
+                    discount = discount + (tempValue);      
+                  } else if (flagTax == "true" && flagService == "false") {
+                    discount = discount + (tempValue + tempValue2);      
+                  }
                   state.data.discountValue = (discount.toFixed(2));
 
                   console.log('epreis', datarow['epreis']);
                   console.log('val1 : ' , tempValue);
                   console.log('val2 : ' , tempValue2);
-                  console.log('discount value : ' , flagTax);       
+                  console.log('discount value : ' , discount);       
                
               }
             }
 
-
+          state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
           console.log("responseTaxService", responseTaxService);
         } else {
           Notify.create({
@@ -643,26 +650,11 @@ export default defineComponent({
     }
 
     const onClickItem = (datarow) => {
-      // console.log('datarow : ', datarow);
-
       // amount   = ? || rumus / betrag + betrag      v
       // balance  = ? || rumus / amount - discount    x
       // discount = input text || input% * amount     v
 
       state.data.dataArticleSelected = datarow;
-      
-      // for (let i = 0; i<state.data.dataDetail.length; i++) {
-      //   let datarow = state.data.dataDetail[i] as object;
-      //   datarow['selected'] = false;
-      //   datarow['prtflag'] = 0;
-      // }
-
-      // console.log('artnr : ', datarow['artnr']);
-      // console.log('discArt1 : ', state.data.dataPrepare['prepare1']['discArt1']);
-      // console.log('discArt2 : ', state.data.dataPrepare['prepare1']['discArt2']);
-      // console.log('discArt3 : ', state.data.dataPrepare['prepare1']['discArt3']);
-
-      // console.log('Selected : ', state.data.dataArticleSelected['selected']);
 
       if (!state.data.dataArticleSelected['selected'] && (state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] || 
           state.data.dataArticleSelected['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] ||
@@ -732,6 +724,8 @@ export default defineComponent({
     const calculateBalanceAndAmount = () => {
       let amount = 0;
       state.data.discountAmount = amount;
+      state.data.discountBalance = 0;
+      state.data.discountValue = 0;
 
       const procent = state.data.dataPrepare['prepare1']['procent'];
 
