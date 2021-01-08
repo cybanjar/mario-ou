@@ -107,7 +107,7 @@
 
         <q-card-actions align="right">
           <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialogSelectUser" />
+          <q-btn unelevated color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -119,6 +119,8 @@ import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composit
 import { Notify } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
 import {formatThousands} from '~/app/helpers/numberFormat.helpers';
+import { dataTable } from '~/app/modules/GC/utils/params.cashAdvance';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -147,6 +149,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -378,6 +382,8 @@ export default defineComponent({
             for (let i = 0; i<state.data.dataDetail.length; i++) {
               const datarow = state.data.dataDetail[i];
               const selected = datarow['selected'];
+              // console.log(i);
+              
 
               if (selected && (datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt1'] && 
                   datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt2'] &&
@@ -397,23 +403,14 @@ export default defineComponent({
                   state.data.discountValue = (discount.toFixed(2));
                   state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
 
+                  // console.log(i);     
                   console.log('epreis', datarow['epreis']);
                   console.log('val1 : ' , tempValue);
                   console.log('val2 : ' , tempValue2);
-                  console.log('discount value : ' , flagTax);          
+                  console.log('discount value : ' , discount);     
                 }
-
-                // if (flagTax == "true") { // p134
-                  
-                // } 
-
-                // if (flagService == "true") { // p135
-
-                // } 
-
               }
             }
-            // state.data.discountValue = (discount.toFixed(2));
 
             // Check Here
             if (discList.length == 0) {
@@ -637,7 +634,135 @@ export default defineComponent({
     ];
 
     // -- 
-    const onOkDialogSelectUser = () => {
+    const onOkDialog = () => {
+      var dataMenu = [];
+      var dataBillLine = state.data.dataPrepare['prepare2']['tHBillLine']['t-h-bill-line'];
+      var dataDetail = state.data.dataDetail;
+
+      dataDetail.forEach(function(item, index, object) {
+        if (item['selected']) {
+          let obj = {} as object;
+          obj['artnr'] = item['artnr']
+          obj['anzahl '] = item['anzahl']
+          obj['departement'] = item['departement']
+          obj['prtflag'] = item['prtflag']
+          obj['pos'] = item['position']
+          obj['bcolor'] = 0
+          obj['epreis'] = item['epreis']
+          obj['betrag'] = item['betrag']
+          obj['fremdwbetra'] = item['fremdwbetrag']  
+          obj['bezeich'] = item['anzahl'] + " " + item['bezeich']
+          obj['bez0'] = item['bezeich']
+          dataMenu.push(obj);
+        }
+      });
+
+      console.log('data : ', state.data.dataDetail);
+      console.log('billLine : ', state.data.dataPrepare['prepare2']['tHBillLine']['t-h-bill-line']);
+      console.log({
+            recId  : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['rec-id'],
+            billart  : state.data.dataPrepare['prepareArticle']['billart'],
+            dept : 1,
+            transdate : '',
+            amount : state.data.discountAmount,
+            DESCRIPTION : state.data.dataPrepare['prepareArticle']['description'],
+            nettoBetrag : (state.data.discountBalance * state.data.discountPercent) / 100,
+            exchgRate : state.data.dataPrepare['prepare2']['exchgRate'],
+            tischnr : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['tischnr'],
+            currSelect : '0',
+            discValue : state.data.discountPercent,
+            qty  : '1',
+            cancelStr  : '',
+            currWaiter  : '1',
+            procent  : state.data.dataPrepare['prepare1']['procent'],
+            bArtnrfront   : state.data.dataPrepare['prepareArticle']['bArtnrfront'],
+            oArtnrfront   : state.data.dataPrepare['prepareArticle']['oArtnrfront'],
+            priceDecimal   : state.data.dataPrepare['prepare2']['priceDecimal'],
+            userInit    : dataStoreLogin['userInit'],
+            MENU : {MENU: dataMenu}, 
+            vatList: {
+              'vat-list': {
+                'ArtNo ': 0,
+                'vatProz': 0,
+                'vatAmt': 0,
+                'netto': 0,
+                'betrag': 0,
+                'fbetrag': 0,
+              }
+            },
+            discList: {
+              'disc-list': {
+                
+              }
+            } 
+          });
+     
+     async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('disc1BtnExit ', {
+            recId  : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['rec-id'],
+            billart  : state.data.dataPrepare['prepareArticle']['billart'],
+            dept : 1,
+            transdate : '',
+            amount : state.data.discountAmount,
+            DESCRIPTION : state.data.dataPrepare['prepareArticle']['description'],
+            nettoBetrag : (state.data.discountBalance * state.data.discountPercent) / 100,
+            exchgRate : state.data.dataPrepare['prepare2']['exchgRate'],
+            tischnr : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['tischnr'],
+            currSelect : '0',
+            discValue : state.data.discountPercent,
+            qty  : '1',
+            cancelStr  : '',
+            currWaiter  : '1',
+            procent  : state.data.dataPrepare['prepare1']['procent'],
+            bArtnrfront: state.data.dataPrepare['prepareArticle']['bArtnrfront'],
+            oArtnrfront: state.data.dataPrepare['prepareArticle']['oArtnrfront'],
+            priceDecimal: state.data.dataPrepare['prepare2']['priceDecimal'],
+            userInit: dataStoreLogin['userInit'],
+            MENU : { MENU: dataMenu }, 
+            vatList: {
+              'vat-list': {
+                'ArtNo': 0,
+                'vatProz': 0,
+                'vatAmt': 0,
+                'netto': 0,
+                'betrag': 0,
+                'fbetrag': 0,
+              }
+            },
+            discList: {
+              'disc-list': {
+                
+              }
+            } 
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response button ok: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
     }
 
     const onCancelDialog = () => {
@@ -753,7 +878,7 @@ export default defineComponent({
             datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt2'] &&
               datarow['artnr'] != state.data.dataPrepare['prepare1']['discArt3']) {
           getDisc1CalAmount(datarow); 
-          break;
+          // break;
         }
       }
     }
@@ -786,7 +911,7 @@ export default defineComponent({
       dialogModel,
       ...toRefs(state),
       tableHeadersPrint,
-      onOkDialogSelectUser,
+      onOkDialog,
       showKeyboard,
       hideKeyboard,
       acceptKeyboard,
@@ -799,6 +924,7 @@ export default defineComponent({
       onClickConfirmation,
       getDataArticle,
       getDataTaxService,
+      dataStoreLogin,
       pagination: { rowsPerPage: 0 },
     };
   },
