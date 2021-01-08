@@ -18,6 +18,22 @@
                     </q-tooltip>
                   </q-icon>
                 </span>
+
+                <span @click="onDialogCloseBill(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                  <q-icon color="white" name="mdi-account-cash" >
+                    <q-tooltip>
+                      Close Bill
+                    </q-tooltip>
+                  </q-icon>
+                </span>
+                <span @click="onDialogChangeOutlet(true)" class="q-mr-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                  <q-icon color="white" name="mdi-account-convert" >
+                    <q-tooltip>
+                      Change Outlet
+                    </q-tooltip>
+                  </q-icon>
+                </span>
+
               </h5>
               <div class="q-gutter-y-md">                
                 <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 250px">
@@ -553,7 +569,14 @@
           :dataSelectedCashierTransfer="dataSelected"
           @onDialogCashierTransfer="onDialogCashierTransfer"/>
         
+        <dialogCloseBill
+          :showDialogCloseBill="showDialogCloseBill"
+          @onDialogCloseBill="onDialogCloseBill" />
 
+        <dialogChangeOutlet
+          :showDialogChangeOutlet="showDialogChangeOutlet"
+          :dataSelectedChangeOutlet="dataSelected"
+          @onDialogChangeOutlet="onDialogChangeOutlet" />
 
         <vue-touch-keyboard 
             id="keyboardbottom"
@@ -633,6 +656,8 @@ interface State {
   flagOrderTakerDisable: boolean;
   flagFirstLoad: any;
   showDialogCashierTransfer: boolean,
+  showDialogChangeOutlet: boolean,
+  showDialogCloseBill: boolean,
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -686,6 +711,8 @@ export default defineComponent({
       flagOrderTakerDisable: false,
       flagFirstLoad: 0,
       showDialogCashierTransfer: false,
+      showDialogChangeOutlet: false,
+      showDialogCloseBill: false,
     });
 
     onMounted(async () => { 
@@ -1735,6 +1762,25 @@ export default defineComponent({
       state.showDialogCashierTransfer = val;
     }
 
+    const onClickCloseBill = () => {
+      onDialogCloseBill(true);
+    }
+
+    const onDialogCloseBill = (val) => {
+      state.showDialogCloseBill = val;
+    }
+
+    const onClickChangeOutlet = () => {
+      onDialogChangeOutlet(true, '');
+    }
+
+    const onDialogChangeOutlet = (val, flag) => {
+      state.showDialogChangeOutlet = val;
+      if(!val && flag == 'ok') {
+        onDialogTablePlan(true);
+      }
+    }
+
     return {
       dataStoreLogin,
       ...toRefs(state),
@@ -1788,6 +1834,10 @@ export default defineComponent({
       onDialogInputPassword,
       onDialogCashierTransfer,
       onClickCashierTransfer,
+      onClickCloseBill,
+      onDialogCloseBill,
+      onClickChangeOutlet,
+      onDialogChangeOutlet,
     };
   },
   components: {
@@ -1806,6 +1856,8 @@ export default defineComponent({
     dialogInputDescription:()=>import('./components/outlet_menu/components_article/DialogInputDescription.vue'),
     dialogInputPassword:()=>import('./components/outlet_menu/components_article/DialogInputPassword.vue'),
     dialogCashierTransfer:() => import('./components/outlet_menu/DialogCashierTransfer.vue'),
+    dialogCloseBill:() => import('./components/outlet_menu/DialogCloseBill.vue'),
+    dialogChangeOutlet:() => import('./components/outlet_menu/DialogChangeOutlet.vue'),
   },
 });
 </script>
