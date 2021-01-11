@@ -2,7 +2,7 @@
     <div class="q-pa-sm">
         <div class="dialog__restaurant">
           <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-8" style="margin-top: -34px">
               <h5 class="q-ml-lg">{{ restaurant }}
                 <span @click="onDialogTablePlan(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-table-furniture" >
@@ -12,7 +12,7 @@
                   </q-icon>
                 </span>
                 <span @click="onDialogCashierTransfer(true)" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
-                  <q-icon color="white" name="mdi-table-account" >
+                  <q-icon color="white" name="mdi-account-switch" >
                     <q-tooltip>
                       Cashier Transfer
                     </q-tooltip>
@@ -99,7 +99,7 @@
             </div>
 
             <div class="col-md-4">
-              <h5 style="visibility: hidden;">Bill Number</h5>
+              <!-- <h5 style="visibility: hidden;">Bill Number</h5> -->
               <div class="q-ml-lg q-gutter-y-md">
                 <q-tabs
                   v-model="tabbill"
@@ -120,7 +120,7 @@
                     <SInput v-model="qty" label-text="QTY" data-layout="numeric" ref="qtyRoomBox" @focus="showKeyboardQty"/>
 
                     <div class="row items-start">
-                      <q-card class="numpad">
+                      <q-card flat class="numpad">
                         <q-card-section>
                           <vue-touch-keyboard
                             id="keyboard"
@@ -133,7 +133,7 @@
                   </q-tab-panel>
                   <q-tab-panel class="q-pa-none" name="collage">
                     <div
-                      class="card-collage q-ma-none row items-start q-gutter-sm q-pa-sm"
+                      class="card-collage q-ma-none row items-start q-gutter-sm"
                     >
                       <q-card @click="onClickTableTransfer" flat bordered>
                         <q-card-section>                          
@@ -237,20 +237,19 @@
               </div>
 
               <!-- Bill Number -->
-              <q-card class="bill-number q-pa-md q-ml-lg q-mt-lg">
-                <div class="row text-white">
-                  <div class="col-md-4">
-                    <h6 class="text-weight-bolder">{{dataTable.rechnr}} - {{dataTable.belegung}}</h6>
+              <q-card class="bg-dark q-pa-md q-ml-lg">
+                <div class="row text-white"> 
+                  <div class="col-6">
+                    <p class="text-subtitle1 text-grey-7">Bill Number : <span class="q-ml-sm text-white text-weight-bold">{{dataTable.rechnr}}</span></p>
+                    <p class="text-subtitle1 text-grey-7">Pax : <span class="q-ml-sm text-white text-weight-bold">{{dataTable.belegung}}</span></p>
                   </div>
-                  <div class="col-md-4">
-                    <p>
+                  <div class="col-6">
+                    <!-- <p class="q-ml-sm">
                       <span class="text-weight-bolder">{{dataTable.bezeich}}</span> <br />
-                      <span class="text-grey-7">D-001201</span><br />
                       {{dataTable.bilname}}
-                    </p>
-                  </div>
-                  <div class="col-md-4 items-bottom">
-                    <p class="text-weight-think text-grey-7">{{dataTable.timeOpened}}</p>
+                    </p> -->
+                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable.bezeich}}</span></p>
+                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable.bilname}}</span></p>
                   </div>
                 </div>
                 <q-separator />
@@ -271,7 +270,7 @@
                 <q-tab-panels v-model="tabbillnumber" animated>
                   <q-tab-panel class="q-pa-none" name="neworder">
                     <div class="bg-grey-10 text-white">
-                      <q-list dark>
+                      <q-list dark class="scroll overflow" style="height: 200px">
                         <template v-for="datarow in dataNewOrder">
                           <q-item clickable v-ripple :key="datarow['position']" @click="onClickNewOrder(datarow)" >
                             <q-item-section avatar top>
@@ -313,11 +312,11 @@
 
                   <q-tab-panel class="q-pa-none" name="ordered">
                     <div class="bg-grey-10 text-white">
-                      <q-list dark>
+                      <q-list dark class="scroll overflow" style="height: 200px">
                         <template v-for="datarow in dataOrdered">
                           <q-item clickable v-ripple :key="datarow['position']">
                            <q-item-section avatar top>
-                            <q-item-label class="q-mt-sm"><strong>{{datarow['qty']}}</strong></q-item-label>
+                            <q-item-label class="q-mt-sm"><strong>{{datarow['anzahl']}}</strong></q-item-label>
                           </q-item-section>
 
                           <q-item-section top>
@@ -331,7 +330,7 @@
 
                           <q-item-section top side>
                             <div class="text-grey-3 q-gutter-xs">
-                              <q-btn size="14px" flat dense :label="datarow['epreis'] + ' x ' + datarow['anzahl']" />
+                              <q-btn size="14px" flat dense :label="datarow['epreis']" />
                               <q-btn size="12px" flat dense round icon="mdi-dots-vertical" >
                                 <q-menu>
                                   <q-list style="min-width: 100px;">
@@ -1975,6 +1974,7 @@ export default defineComponent({
 
 	border-radius: 10px;
 }
+
 </style>
 
 
