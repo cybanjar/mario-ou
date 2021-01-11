@@ -340,7 +340,7 @@
                                       </q-item-section>
                                     </q-item>
 
-                                    <q-item clickable v-close-popup>
+                                    <q-item clickable @click="onVoidItem(datarow)" v-close-popup>
                                       <q-item-section>Void Item</q-item-section>
                                     </q-item>
                                   </q-list>
@@ -362,26 +362,6 @@
                           </q-item-section>
                         </q-item>
 
-                        <!-- <q-item>
-                          <q-item-section class="text-grey-7"
-                            >Service</q-item-section
-                          >
-                          <q-item-section avatar>
-                            <q-item-label class="text-grey-5">
-                              Rp. 0
-                            </q-item-label>
-                          </q-item-section>
-                        </q-item>
-                        <q-item>
-                          <q-item-section class="text-grey-7"
-                            >Tax</q-item-section
-                          >
-                          <q-item-section avatar>
-                            <q-item-label class="text-grey-5">
-                              Rp. 3.000
-                            </q-item-label>
-                          </q-item-section>
-                        </q-item> -->
                         <q-item>
                           <q-item-section class="text-white"
                             >Total</q-item-section
@@ -475,7 +455,7 @@
 
             <q-card-actions align="right">
               <q-btn outline label="Cancel" color="primary" v-close-popup />
-              <q-btn unelevated label="Ok" color="primary" @click="onDialogTransferTable(true)" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
             </q-card-actions>
           </q-card>
         </q-dialog>
@@ -846,6 +826,7 @@ export default defineComponent({
    
     const onClickTableTransfer = () => {
       console.log("On Click Table Transfer");
+      state.currentState = "tabletransfer";
       getRestInvCheckSaldo();
     }
 
@@ -857,6 +838,16 @@ export default defineComponent({
     const onClickDialogChangeUser = () => {
       console.log(" On Click Dialog Change User");
       onDialogChangeUser(true);      
+    }
+
+    const onClickConfirmation = () => {
+      if (state.currentState == "tabletransfer") {
+        onDialogTransferTable(true);
+      }
+    }
+
+    const onVoidItem = (datarow) => {
+      console.log('onClick Void Item : ', datarow)
     }
 
 
@@ -1933,6 +1924,8 @@ export default defineComponent({
       onDialogCloseBill,
       onClickChangeOutlet,
       onDialogChangeOutlet,
+      onClickConfirmation,
+      onVoidItem,
     };
   },
   components: {

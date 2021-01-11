@@ -97,6 +97,31 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="showConfirmationDialog" persistent>
+      <q-card style="max-width: 1500px;width:450px;">
+        <q-toolbar>
+          <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+        </q-toolbar>
+
+      <q-card-section class="row items-center">
+        <div class="row">
+          <div class="col-md-2">
+            <q-avatar icon="mdi-help" color="negative" text-color="white" />
+          </div>
+          <div class="col-md-10">                  
+            <p class="q-ml-md">Make sure you no others transactin with Bill: <br>
+                  Do you want to continue?</p>
+          </div>
+        </div>              
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn outline label="Cancel" color="primary" v-close-popup />
+          <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <dialogPaymentCash
       :showPaymentCash="data.showPaymentCash"
       :selectedPayment="data.selectedPayment"
@@ -177,6 +202,7 @@ interface State {
     balance: any
   }
   title: string;
+  showConfirmationDialog: boolean;
 }
 
 export default defineComponent({
@@ -262,6 +288,7 @@ export default defineComponent({
         balance: 0,
       },
       title: '',
+      showConfirmationDialog: false,
     });
 
   {
@@ -299,16 +326,11 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Payment';
           
-          console.log('Dialog Payment Mount: ', state.data.dataPreparePayment);
-
           state.data.dataPreparePayment['dataTable'] = props.dataTable;
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
           state.data.balance = state.data.dataPreparePayment['dataTable']['dataThBill'][0]['saldo'];
-
-          // console.log(state.data.dataPreparePayment);
-
-          // initDataUser();
+          console.log('Dialog Payment Mount: ', state.data.dataPreparePayment);
         }
       }
     );
@@ -437,30 +459,6 @@ export default defineComponent({
 
           if (zuggrifval == "true") {
             getPreparePayCash3();
-            // state.isLoading = false;
-            // onDialogPaymentCash(true);
-            /*if (state.data.dataPreparePayment['dataPrepare']['doubleCurrency'] == "true") {
-              state.isLoading = false;
-              onDialogPaymentCash(true);
-            } else {
-              if (state.data.dataPreparePayment['dataPrepare']['cashlessFlag']) {  
-                Notify.create({
-                  message: 'Select Type Of Cash Payment',
-                  type: 'warning',
-                });
-                state.isLoading = false;
-                return false;
-              }
-              state.isLoading = false;
-            }
-          } else {
-            Notify.create({
-              message: responseZuggrif['messStr'],
-              color: 'red',
-            });
-            state.isLoading = false;
-            return false;
-          }*/
         }
       }
     }
@@ -525,6 +523,57 @@ export default defineComponent({
             return false;
           }         
         }
+      }
+      asyncCall();
+    }
+
+     const getRestInvGetSaldo = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvGetSaldo ', {
+            dept : state.data.dataPreparePayment['dataTable']['departement'],
+            rechnr: state.data.dataPreparePayment['dataTable']['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response get saldo: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataPreparePayment['dataTable']['saldo'] = response['amount'];
+
+          if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+            Notify.create({
+              message: 'Bill not found or balance already 0',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            state.showConfirmationDialog = true;
+          }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
       }
       asyncCall();
     }
