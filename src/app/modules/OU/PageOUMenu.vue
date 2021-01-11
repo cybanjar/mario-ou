@@ -135,7 +135,7 @@
                     <div
                       class="card-collage q-ma-none row items-start q-gutter-sm q-pa-sm"
                     >
-                      <q-card @click="confirmtt = true" flat bordered>
+                      <q-card @click="onClickTableTransfer" flat bordered>
                         <q-card-section>                          
                           <q-img
                             class="img-collage"
@@ -389,7 +389,7 @@
                           >
                           <q-item-section avatar>
                             <q-item-label class="text-white">
-                              Rp. 0
+                              {{dataTable['saldo']}}
                             </q-item-label>
                           </q-item-section>
                         </q-item>
@@ -456,7 +456,7 @@
           @onDialogDiscountBill="onDialogDiscountBill" />
 
         <!-- Confirm Table Transfer -->
-        <q-dialog v-model="confirmtt" persistent>
+        <q-dialog v-model="showConfirmationDialog" persistent>
           <q-card style="max-width: 1500px;width:450px;">
             <q-toolbar>
               <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
@@ -476,7 +476,7 @@
 
             <q-card-actions align="right">
               <q-btn outline label="Cancel" color="primary" v-close-popup />
-              <q-btn unelevated label="Ok" color="primary" @click="onClickTableTransfer()" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onDialogTransferTable(true)" v-close-popup />
             </q-card-actions>
           </q-card>
         </q-dialog>
@@ -532,6 +532,7 @@
 
         <dialogTransferTable 
           :showDialogTransferTable="showDialogTransferTable"
+          :dataTable="dataTable"
           @onDialogTransferTable="onDialogTransferTable" />
 
         <dialogChangeUser 
@@ -634,7 +635,7 @@ interface State {
   showDialogSplitBill: boolean,
   showDialogDiscountBill: boolean,
   showDialogTransferTable: boolean,
-  confirmtt: boolean,
+  showConfirmationDialog: boolean,
   onClickStandingMode: boolean,
   showDialogChangeUser: boolean,
   onClickPrintBill: boolean,
@@ -658,6 +659,7 @@ interface State {
   showDialogCashierTransfer: boolean,
   showDialogChangeOutlet: boolean,
   showDialogCloseBill: boolean,
+  currentState: string;
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -686,7 +688,7 @@ export default defineComponent({
       showDialogSplitBill: false,
       showDialogDiscountBill: false,
       showDialogTransferTable: false,
-      confirmtt: false,
+      showConfirmationDialog: false,
       onClickStandingMode: false,
       showDialogChangeUser: false,
       onClickPrintBill: false,
@@ -713,6 +715,7 @@ export default defineComponent({
       showDialogCashierTransfer: false,
       showDialogChangeOutlet: false,
       showDialogCloseBill: false,
+      currentState: "",
     });
 
     onMounted(async () => { 
@@ -844,7 +847,7 @@ export default defineComponent({
    
     const onClickTableTransfer = () => {
       console.log("On Click Table Transfer");
-      onDialogTransferTable(true);
+      getRestInvCheckSaldo();
     }
 
     const onClickDialogSelectOrderTaker = () => {
@@ -1553,6 +1556,97 @@ export default defineComponent({
             state.isLoading = false;
             return false;
         }
+      }
+      asyncCall();
+    }
+
+    const getRestInvCheckSaldo = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvCheckSaldo ', {
+            dept : state.currDept,
+            rechnr: state.dataTable['rechnr'],
+            saldo: state.dataTable['saldo'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          getRestInvGetSaldo();
+          state.isLoading = true;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getRestInvGetSaldo = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvGetSaldo ', {
+            dept : state.currDept,
+            rechnr: state.dataTable['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response get saldo: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.dataTable['saldo'] = response['amount'];
+
+          if (state.dataTable['saldo'] == 0) {
+            Notify.create({
+              message: 'Bill not found or balance already 0',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            state.showConfirmationDialog = true;
+          }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
       }
       asyncCall();
     }

@@ -131,6 +131,7 @@ interface State {
     discountPercent: any;
     discountBalance: any;
     discountAmount: any;
+    discountEpreis: any,
     dataArticleSelected: {},
     checkBoxSelection: any,
   },
@@ -160,6 +161,7 @@ export default defineComponent({
         discountPercent: 0,
         discountBalance: 0,
         discountAmount: 0,
+        discountEpreis: 0,
         dataArticleSelected: {},
         checkBoxSelection: [],
       },
@@ -378,6 +380,7 @@ export default defineComponent({
             const flagService = state.data.dataPrepare['prepare2']['p135'];
 
             state.data.discountValue = discount.toFixed(2);
+            state.data.discountEpreis = 0;
 
             for (let i = 0; i<state.data.dataDetail.length; i++) {
               const datarow = state.data.dataDetail[i];
@@ -400,14 +403,14 @@ export default defineComponent({
                   const tempValue2 = (tempValue * tHArtikel[0]['service']) / 100;
                   discount = discount + (tempValue + (tHArtikel[0]['service'] * tempValue /100) + tempValue2);
       
-                  state.data.discountValue = (discount.toFixed(2));
+                  state.data.discountValue = (-discount.toFixed(2));
                   state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
 
                   // console.log(i);     
                   console.log('epreis', datarow['epreis']);
                   console.log('val1 : ' , tempValue);
                   console.log('val2 : ' , tempValue2);
-                  console.log('discount value : ' , discount);     
+                  console.log('discount value : ' , -discount);     
                 }
               }
             }
