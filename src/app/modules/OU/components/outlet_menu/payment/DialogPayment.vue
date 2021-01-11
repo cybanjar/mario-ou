@@ -170,6 +170,7 @@
       :showPaymentMealCoupon="data.showPaymentMealCoupon"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentMealCoupon="onDialogPaymentMealCoupon" />
 
   </section>
@@ -444,6 +445,7 @@ export default defineComponent({
         if (dataZuggrif) {
           const responseZuggrif = dataZuggrif || [];
           const okFlag = responseZuggrif['outputOkFlag'];
+          const idPayment = state.data.selectedPayment['id'];
 
           if (!okFlag) {
             Notify.create({
@@ -458,7 +460,11 @@ export default defineComponent({
           zuggrifval = responseZuggrif['zugriff'];
 
           if (zuggrifval == "true") {
-            getPreparePayCash3();
+            if (idPayment == 1) {
+              getPreparePayCash3();
+            } else if (idPayment == 8) {
+              onDialogPaymentMealCoupon(true);
+            }
         }
       }
     }
@@ -578,7 +584,7 @@ export default defineComponent({
       asyncCall();
     }
 
-    // -- Dialog Method 
+    // -- OnClick Listener 
     const onOkDialog = () => {
       const idPayment = state.data.selectedPayment['id'];
       
@@ -597,7 +603,7 @@ export default defineComponent({
       } else if (idPayment == 7) {
         onDialogPaymentCompliment(true);
       } else if (idPayment == 8) {
-        onDialogPaymentMealCoupon(true);
+        getRestInvGetSaldo();
       }
     }
 
@@ -618,6 +624,16 @@ export default defineComponent({
       emit('onDialogPayment', false);
     }
 
+    const onClickConfirmation = () => {
+      const idPayment = state.data.selectedPayment['id'];
+
+      if (idPayment == 8) {
+        zuggriff(19, 2);
+      }
+    }
+
+
+    // -- On Dialog Method
     const onDialogPaymentCash = (val) => {
       state.data.showPaymentCash = val;
     }
@@ -666,6 +682,8 @@ export default defineComponent({
       onDialogPaymentCompliment, 
       onDialogPaymentMasterFolio,
       onDialogPaymentMealCoupon,
+      getRestInvGetSaldo,
+      onClickConfirmation,
       pagination: { rowsPerPage: 0 },
     };
   },

@@ -151,8 +151,8 @@ export default defineComponent({
             tischnr : state.data.dataSelected['tischnr'],
             bilrecid : bilrecid,
             rechnr : props.dataTable['rechnr'],
-            currWaiter : "01",
-            newWaiter : "01",
+            currWaiter : "1",
+            newWaiter : "1",
           }),
         ]);
 

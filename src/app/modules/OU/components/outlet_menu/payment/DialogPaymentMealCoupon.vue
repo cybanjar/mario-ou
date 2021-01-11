@@ -13,18 +13,8 @@
             </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
               </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
-
-            <div class="col">
-              <SInput outlined  label-text="Payment" :disable="true" readonly/>
-            </div>
           </div>
 
         </q-card-section>
@@ -36,7 +26,7 @@
                     hide-header
                     hide-bottom
                     :loading="isLoading"
-                    :columns="tableHeadersPrint"
+                    :columns="tableHeaders"
                     :data="data.dataTablePayment"
                     row-key="name"
                     separator="cell"
@@ -49,7 +39,7 @@
                     <template v-slot:item="props">
                         <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
                         <q-card>
-                            <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                            <q-card-section @click="onRowClickTable(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                                 <strong>{{ props.row.name }}</strong>
                             </q-card-section>
                         </q-card>
@@ -78,9 +68,9 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
     dataTablePayment: any;
     buttonOkEnable: boolean;
+    balance: any;
   }
   title: string;
 }
@@ -90,7 +80,7 @@ export default defineComponent({
     showPaymentMealCoupon: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataTable: {type: Object, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -98,18 +88,6 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
         dataTablePayment : [
           {
             'name': "Cash",
@@ -153,6 +131,7 @@ export default defineComponent({
           }
         ],
         buttonOkEnable: false,
+        balance: 0,
       },
       title: '',
     });
@@ -162,9 +141,11 @@ export default defineComponent({
         if (props.showPaymentMealCoupon) {
           state.data.buttonOkEnable = false;
           state.title = 'Meal Coupon Payment';
+          state.data.balance = props.dataTable['dataTable']['saldo'];
 
-          console.log("selectedPrint", props.selectedPrint);
-          console.log("selectedPayment", props.selectedPayment);
+          // console.log("selectedPrint", props.selectedPrint);
+          // console.log("selectedPayment", props.selectedPayment);
+          console.log("Mount Meal Coupon : ", props.dataTable);
         }
       }
     );
@@ -176,7 +157,7 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
+    const onRowClickTable = (dataRow) => {
       for (let i = 0; i<state.data.dataTablePayment.length; i++) {
         const datarow = state.data.dataTablePayment[i];
         datarow['selected'] = false;
@@ -192,63 +173,10 @@ export default defineComponent({
           break;
         }
       }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
 
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const tableHeadersPrint = [
+    const tableHeaders = [
       {
             label: "name", 
             field: "name",
@@ -262,34 +190,20 @@ export default defineComponent({
         },
     ];
 
-    // -- 
+    // -- OnClick Listener
     const onOkDialog = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogPaymentMealCoupon', false);
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
+      tableHeaders,
+      onRowClickTable,
       onOkDialog,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },
