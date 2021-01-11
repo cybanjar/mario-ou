@@ -8,7 +8,7 @@
 
         <q-card-section>
           <div class="q-ma-sm q-gutter-xs">
-            <SInput outlined v-model="data.dataInputPrice" label-text="Price" data-layout="numeric" ref="priceBox" @focus="showKeyboard" />
+            <SInput type="number" autofocus outlined v-model="data.dataInputPrice" label-text="Price" data-layout="numeric" ref="priceBox" @focus="showKeyboard" />
           </div>
 
           <div class="q-ma-sm row q-gutter-xs">
@@ -67,7 +67,7 @@ export default defineComponent({
       () => props.showDialogInputPrice, (showDialogInputPrice) => {
         if (props.showDialogInputPrice) {
           state.title = 'Input Price';
-          state.data.dataInputPrice = 0;
+          state.data.dataInputPrice = 1;
         }
       }
     );

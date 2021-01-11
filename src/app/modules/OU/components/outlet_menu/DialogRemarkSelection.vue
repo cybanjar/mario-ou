@@ -7,7 +7,7 @@
 
             <div>
                 <STable
-                    grid
+                    grid                                                            
                     hide-header
                     :loading="isFetching"
                     :data="dataTable"
@@ -17,8 +17,8 @@
                     :rows-per-page-options="[0]"
                     :pagination.sync="pagination" >
                     <template v-slot:item="props">
-                        <div class="q-pa-xs" style="max-width: 200px">
-                            <q-card>
+                        <div class="q-pa-xs q-ml-md" style="min-width: 200px">
+                            <q-card flat bordered >
                                 <q-card-section @click="onClickTable(props.row)" :class="props.row.selected == false ? 'bg-white text-center text-black' : 'bg-cyan text-center text-white'">
                                     <strong>{{ props.row.bezeich }}</strong>
                                 </q-card-section>
@@ -43,8 +43,8 @@
                 <q-separator />
 
                 <q-card-actions align="right">
-                    <q-btn color="primary" label="Cancel" @click="dialogCustomRemark = false"/>
-                    <q-btn color="primary" label="Ok" @click="dialogABC(false)"/>
+                    <q-btn unelevated outline color="primary" label="Cancel" @click="dialogCustomRemark = false"/>
+                    <q-btn unelevated color="primary" label="Ok" @click="dialogABC(false)"/>
                 </q-card-actions>
             </q-card>
         </q-dialog>
