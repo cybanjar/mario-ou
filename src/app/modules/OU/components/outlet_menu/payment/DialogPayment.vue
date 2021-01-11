@@ -116,7 +116,7 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn outline label="Cancel" color="primary" v-close-popup />
+          <q-btn outline label="Cancel" v-close-popup />
           <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -463,7 +463,7 @@ export default defineComponent({
             if (idPayment == 1) {
               getPreparePayCash3();
             } else if (idPayment == 8) {
-              onDialogPaymentMealCoupon(true);
+              getRestInvBtnTransfer();
             }
         }
       }
@@ -533,7 +533,7 @@ export default defineComponent({
       asyncCall();
     }
 
-     const getRestInvGetSaldo = () => {
+    const getRestInvGetSaldo = () => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -571,6 +571,109 @@ export default defineComponent({
           } else {
             state.showConfirmationDialog = true;
           }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+    const getRestInvBtnTransfer = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvBtnTransfer ', {
+            departement : state.data.dataPreparePayment['dataTable']['departement'],
+            rechnr: state.data.dataPreparePayment['dataTable']['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+          const idPayment = state.data.selectedPayment['id'];
+
+          console.log('response btn transfer: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (response['flag'] == 'true') {
+            Notify.create({
+              message: 'Bill has been splitted, use Split Bills Transfer Payment',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            if (idPayment == 8) {
+              getRestInvCheckDiscart();
+            }
+          }
+
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+    const getRestInvCheckDiscart = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('biltransferCheckDiscart ', {
+            dept : state.data.dataPreparePayment['dataTable']['departement'],
+            rechnr: state.data.dataPreparePayment['dataTable']['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response check discount: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (response['itExist'] == 'true') {
+            Notify.create({
+              message: 'Discount exists, posting not possible',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            onDialogPaymentMealCoupon(true);
+          }
+
           state.isLoading = false;
         } else {
           Notify.create({
@@ -684,6 +787,7 @@ export default defineComponent({
       onDialogPaymentMealCoupon,
       getRestInvGetSaldo,
       onClickConfirmation,
+      getRestInvBtnTransfer,
       pagination: { rowsPerPage: 0 },
     };
   },

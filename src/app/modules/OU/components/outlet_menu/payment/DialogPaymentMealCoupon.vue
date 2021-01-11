@@ -20,39 +20,42 @@
         </q-card-section>
 
         <q-card-section>
-            <div class="q-pa-sm">
-                <STable
-                    grid
-                    hide-header
-                    hide-bottom
-                    :loading="isLoading"
-                    :columns="tableHeaders"
-                    :data="data.dataTablePayment"
-                    row-key="name"
-                    separator="cell"
-                    :rows-per-page-options="[0]"
-                    :pagination.sync="pagination">
-                    <template v-slot:loading>
-                        <q-inner-loading showing color="primary" />
-                    </template>
+          <div class="q-pa-sm">
+            <STable
+              flat
+              grid
+              dense
+              hide-header
+              hide-bottom
+              :loading="isLoading"
+              :columns="tableHeaders"
+              :data="data.dataDetail"
+              row-key="name"
+              separator="cell"
+              :rows-per-page-options="[0]"
+              :pagination.sync="pagination">
+              <template v-slot:loading>
+                <q-inner-loading showing color="primary" />
+              </template>
 
-                    <template v-slot:item="props">
-                        <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                        <q-card>
-                            <q-card-section @click="onRowClickTable(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                                <strong>{{ props.row.name }}</strong>
-                            </q-card-section>
-                        </q-card>
-                        </div>
-                    </template>
-                </STable>
+               <template v-slot:item="props">
+                <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
+                  <q-card flat bordered>
+                    <q-card-section @click="onRowClickTable(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                        <strong>{{ props.row.bezeich }}</strong>
+                    </q-card-section>
+                  </q-card>
+                </div>
+              </template>
+
+            </STable>
             </div>
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn unelevated outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
@@ -67,8 +70,7 @@ import { Notify } from 'quasar';
 interface State {
   isLoading: boolean;
   data: {
-    dataDetail: [];
-    dataTablePayment: any;
+    dataDetail: any;
     buttonOkEnable: boolean;
     balance: any;
   }
@@ -88,48 +90,6 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePayment : [
-          {
-            'name': "Cash",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Card",
-            'id': '2',
-            'selected': false,
-          },
-          {
-            'name': "City Ledger",
-            'id': '3',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Guest Folio",
-            'id': '4',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Non Guest Folio",
-            'id': '5',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Master Folio",
-            'id': '6',
-            'selected': false,
-          },
-          {
-            'name': "Compliment",
-            'id': '7',
-            'selected': false,
-          },
-          {
-            'name': "Meal Coupon",
-            'id': '8',
-            'selected': false,
-          }
-        ],
         buttonOkEnable: false,
         balance: 0,
       },
@@ -143,8 +103,8 @@ export default defineComponent({
           state.title = 'Meal Coupon Payment';
           state.data.balance = props.dataTable['dataTable']['saldo'];
 
-          // console.log("selectedPrint", props.selectedPrint);
-          // console.log("selectedPayment", props.selectedPayment);
+          getPrepare();
+
           console.log("Mount Meal Coupon : ", props.dataTable);
         }
       }
@@ -158,37 +118,80 @@ export default defineComponent({
     });
 
     const onRowClickTable = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
+      console.log(dataRow);
+      
+      let dataTable = [];
+      for (let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i] as object;
         datarow['selected'] = false;
+        dataTable.push(datarow);
       }        
 
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
+      const id = dataRow['pos'];
+      for (let i = 0; i<dataTable.length; i++) {
+        const datarow = dataTable[i] as object;
         
-        if (id === datarow['id']) {
+        if (id === datarow['pos']) {
           datarow['selected'] = true;
-          datarow['databaru'] = 1;
           break;
         }
       }
+      state.data.dataDetail = dataTable;
+      console.log(state.data.dataDetail);
     }
-
 
     const tableHeaders = [
       {
             label: "name", 
-            field: "name",
-            name: "name",
+            field: "bezeich",
+            name: "bezeich",
             align: "center",
         }, {
-            label: "id", 
-            field: "id",
-            name: "id",
+            label: "num", 
+            field: "num",
+            name: "num",
             align: "center",
         },
     ];
+
+    const getPrepare = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('mealcouponBuildCompl ', {
+            dept : props.dataTable['dataTable']['departement'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response prepare: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataDetail = response['grpCompl']['grp-compl'];
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
 
     // -- OnClick Listener
     const onOkDialog = () => {
@@ -200,12 +203,13 @@ export default defineComponent({
     }
 
     return {
-      dialogModel,
       ...toRefs(state),
+      dialogModel,
       tableHeaders,
       onRowClickTable,
       onOkDialog,
       onCancelDialog,
+      getPrepare,
       pagination: { rowsPerPage: 0 },
     };
   },
