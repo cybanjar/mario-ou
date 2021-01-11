@@ -1100,6 +1100,8 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getAddKitchpr = () => {}
+
     const getSubgroup = () => {
       state.isLoading = true;
 

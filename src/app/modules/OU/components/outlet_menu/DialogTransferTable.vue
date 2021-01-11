@@ -26,15 +26,15 @@
                     </template>
 
                     <template v-slot:body="props">
-                    <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-black':'bg-white text-black'">
+                      <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-black':'bg-white text-black'">
                         <q-td
-                        v-for="col in props.cols"
-                        :key="col.name"
-                        :props="props"
-                        @click="onRowClick(props.row)">
+                          v-for="col in props.cols"
+                          :key="col.name"
+                          :props="props"
+                          @click="onRowClick(props.row)">
                             {{ col.value }}
                         </q-td>
-                    </q-tr>
+                      </q-tr>
                     </template>
                 </STable>
             </div> 
@@ -42,6 +42,31 @@
           </div>       
 
         </q-card-section>
+
+        <q-dialog v-model="showDialogComfirmation" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section class="row items-center">
+              <div class="row">
+                <div class="col-md-2">
+                  <q-avatar icon="mdi-help" color="negative" text-color="white" />
+                </div>
+                <div class="col-md-10">                  
+                  <p class="q-ml-md">{{msgStrConfirmation}}</p>
+                </div>
+              </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline label="Cancel" color="primary" @click="showDialogComfirmation = false" />
+              <q-btn unelevated label="Ok" color="primary" @click="getRestInvMoveTable()"/>
+              <!-- <q-btn unelevated label="Ok" color="primary" /> -->
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
 
         <q-separator />
 
@@ -68,6 +93,8 @@ interface State {
   layout: string;
   input: null;
   title: string;
+  showDialogComfirmation: boolean,
+  msgStrConfirmation: string,
   
 }
 
@@ -87,7 +114,8 @@ export default defineComponent({
       title: '',
       layout: 'numeric',
       input: null,
-      
+      showDialogComfirmation: false,
+      msgStrConfirmation: "",
     });
 
     watch(
@@ -110,24 +138,28 @@ export default defineComponent({
     const getRestInvMoveTable = () => {
       state.isLoading = true;
 
+      const bilrecid = state.data.dataSelected['tHBill'].length != 0 ? state.data.dataSelected['tHBill']['rec-id'] : 0;
+      console.log('bilrecid : ', bilrecid);
+
       async function asyncCall() {
         const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('readHArtikel', {
-            pax : "",
-            currTischnr : "",
-            recId : "",
-            currDept : "",
-            tischnr : "",
-            bilrecid : "",
-            rechnr : "",
-            currWaiter : "",
-            newWaiter : "",
+          $api.outlet.getOUPrepare('restInvMoveTable', {
+            pax : state.data.dataSelected['belegung'],
+            currTischnr : props.dataTable['tischnr'],
+            recId : props.dataTable['recidBill'],
+            currDept : props.dataTable['departement'],
+            tischnr : state.data.dataSelected['tischnr'],
+            bilrecid : bilrecid,
+            rechnr : props.dataTable['rechnr'],
+            currWaiter : "01",
+            newWaiter : "01",
           }),
         ]);
 
         if (data) {
           const response = data || [];
           const okFlag = response['outputOkFlag'];
+          console.log('response : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -178,6 +210,66 @@ export default defineComponent({
 
           state.data.dataDetail = response['tList']['t-list'];
           state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+    const getTranstischBtnExit = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('transtischBtnExit ', {
+            currDept : props.dataTable['departement'],
+            tableno: state.data.dataSelected['tischnr'],
+            pvILanguage: 0,
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response transtischBtnExit: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataSelected['tHBill'] = response['tHBill']['t-h-bill'];
+          console.log('table : ' , props.dataTable);
+          console.log('table selected : ' , state.data.dataSelected);
+
+          if (response['errCode'] == 1) {
+            Notify.create({
+              message: 'No such table number',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else if (response['errCode'] != 1 ) {
+            if (response['tHBill']['t-h-bill'].length != 0) {
+              state.msgStrConfirmation = "The selected table is already occupied. Are you sure you want to move to this table?";
+              state.showDialogComfirmation = true;
+              state.isLoading = false;
+            } else {
+              getRestInvMoveTable();
+              state.isLoading = false;
+            }
+          } 
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -247,8 +339,6 @@ export default defineComponent({
 
     // -- 
     const onRowClick = (dataRow) => {
-      console.log(dataRow);
-
       for (let i = 0; i<state.data.dataDetail.length; i++) {
           const datarow = state.data.dataDetail[i] as {};
           datarow['selected'] = false;
@@ -267,28 +357,25 @@ export default defineComponent({
 
       dataRow['selected'] = true;
       state.data.dataSelected = dataRow;
+      console.log(state.data.dataSelected);
     }
 
     const onOkDialog = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+      if (state.data.dataSelected['tischnr'] == 0 ) {
+        Notify.create({
+          message: 'No such table number',
+          color: 'red',
+        });
+        return false;      
+      } else {
+        getTranstischBtnExit();
+      }
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogTransferTable', false);
     }
+    
 
     return {
       dialogModel,
@@ -296,6 +383,7 @@ export default defineComponent({
       tableHeaders,
       onOkDialog,
       showKeyboard,
+      getRestInvMoveTable,
       onRowClick,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },

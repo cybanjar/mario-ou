@@ -63,7 +63,7 @@
 
         <q-card-actions align="right">
           <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -263,7 +263,7 @@ export default defineComponent({
     ];
 
     // -- 
-    const onOkDialogSelectUser = () => {
+    const onOkDialog = () => {
       // if (props.dataSelectedOrderTaker != null) {
       //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
       // } 
@@ -290,7 +290,7 @@ export default defineComponent({
       tableHeadersPrint,
       onRowClickTablePayment,
       onRowClickTablePrint,
-      onOkDialogSelectUser,
+      onOkDialog,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },
     };
