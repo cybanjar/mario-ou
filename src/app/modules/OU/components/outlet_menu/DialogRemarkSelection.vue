@@ -39,6 +39,12 @@
         <q-dialog v-model="dialogCustomRemark">
             <q-card class="q-pa-md" style="max-width: 400px;">
                 <SInput outlined label-text="Custom Remark" v-model="customRemark" data-layout="compact" ref="customRemarkBox" @focus="showKeyboard"/>
+                <vue-touch-keyboard
+                    id="keyboardRemark"
+                    :options="options"
+                    v-if="keyboardVisible" 
+                    layout="compact"
+                    :input="input" />
 
                 <q-separator />
 
@@ -116,6 +122,12 @@ export default defineComponent({
       dataTableSelected: [],
       customRemark: "",
       dialogCustomRemark: false,
+      input: null,
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      keyboardVisible: false,
     });
 
     const tableHeaders = [
@@ -233,6 +245,15 @@ export default defineComponent({
         }
     }
 
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+      } 
+      if (!state.keyboardVisible) {
+        state.keyboardVisible = true;
+      } 
+    }
+
     return {
       ...toRefs(state),
       dialogModel,
@@ -244,6 +265,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 0,
       },
+      showKeyboard
     };
   },
 
@@ -274,22 +296,22 @@ export default defineComponent({
   }
 }
 
-// #keyboard {
-// 	position: fixed;
-// 	left: 0;
-// 	right: 0;
-// 	bottom: 0;
+#keyboardRemark {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
 
-// 	z-index: 1000;
-// 	width: 100%;
-// 	max-width: 1000px;
-// 	margin: 0 auto;
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
 
-// 	padding: 1em;
+	padding: 1em;
 
-// 	background-color: #EEE;
-// 	box-shadow: 0px -3px 10px rgba(black, 0.3);
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
 
-// 	border-radius: 10px;
-// }
+	border-radius: 10px;
+}
 </style>

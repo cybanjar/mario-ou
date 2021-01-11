@@ -340,7 +340,7 @@
                                       </q-item-section>
                                     </q-item>
 
-                                    <q-item clickable @click="onVoidItem(datarow)" v-close-popup>
+                                    <q-item clickable @click="onClickVoidItem(datarow)" v-close-popup>
                                       <q-item-section>Void Item</q-item-section>
                                     </q-item>
                                   </q-list>
@@ -568,6 +568,11 @@
             :input="inputbottom"
             :close="hideKeyboard" />
 
+        <dialogVoidItem
+          :showDialogVoidItem="showDialogVoidItem"
+          :dataSelectedVoidItem="dataSelected"
+          @onDialogVoidItem="onDialogVoidItem"/>
+
           <!-- <div>
             <q-circular-progress
               indeterminate
@@ -638,7 +643,8 @@ interface State {
   showDialogCashierTransfer: boolean,
   showDialogChangeOutlet: boolean,
   showDialogCloseBill: boolean,
-  currentState: string;
+  currentState: string,
+  showDialogVoidItem: boolean,
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -695,6 +701,7 @@ export default defineComponent({
       showDialogChangeOutlet: false,
       showDialogCloseBill: false,
       currentState: "",
+      showDialogVoidItem: false,
     });
 
     onMounted(async () => { 
@@ -845,11 +852,6 @@ export default defineComponent({
         onDialogTransferTable(true);
       }
     }
-
-    const onVoidItem = (datarow) => {
-      console.log('onClick Void Item : ', datarow)
-    }
-
 
     // Dialog Listener
     const onDialogSelectOrderTaker = (val) => {
@@ -1867,6 +1869,15 @@ export default defineComponent({
       }
     }
 
+    const onClickVoidItem = () => {
+      onDialogVoidItem(true);
+    }
+
+    const onDialogVoidItem = (datarow) => {
+      console.log('onClick Void Item : ', datarow);
+      state.showDialogVoidItem = datarow;
+    }
+
     return {
       dataStoreLogin,
       ...toRefs(state),
@@ -1925,7 +1936,8 @@ export default defineComponent({
       onClickChangeOutlet,
       onDialogChangeOutlet,
       onClickConfirmation,
-      onVoidItem,
+      onDialogVoidItem,
+      onClickVoidItem,
     };
   },
   components: {
@@ -1946,6 +1958,7 @@ export default defineComponent({
     dialogCashierTransfer:() => import('./components/outlet_menu/DialogCashierTransfer.vue'),
     dialogCloseBill:() => import('./components/outlet_menu/DialogCloseBill.vue'),
     dialogChangeOutlet:() => import('./components/outlet_menu/DialogChangeOutlet.vue'),
+    dialogVoidItem:() => import('./components/outlet_menu/DialogVoidItem.vue'),
   },
 });
 </script>
