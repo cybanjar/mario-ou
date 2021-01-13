@@ -1,7 +1,7 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:500px;">
+      <q-card  style="max-width: 1500px;width:900px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
@@ -13,7 +13,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
               </div>
           </div>
 
@@ -23,7 +23,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Payment" :disable="true" readonly/>
+                <SInput outlined v-model="data.payment" label-text="Payment"/>
               </div>
           </div>
 
@@ -33,7 +33,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Name"/>
+                <SInput outlined v-model="data.name" label-text="Name"/>
               </div>
           </div>
         </q-card-section>
@@ -45,12 +45,10 @@
             </div> -->
 
             <STable
-              grid
-              hide-header
               hide-bottom
               :loading="isLoading"
-              :columns="tableHeadersPrint"
-              :data="data.dataTablePayment"
+              :columns="tableHeaders"
+              :data="data.dataTable"
               row-key="name"
               separator="cell"
               :rows-per-page-options="[0]"
@@ -75,8 +73,8 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -91,10 +89,12 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
+    dataTable: any;
     buttonOkEnable: boolean;
     paymentType: string;
+    balance : any,
+    payment: any,
+    name : string,
   }
   title: string;
 }
@@ -104,7 +104,7 @@ export default defineComponent({
     showPaymentCityLedger: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataTable: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -112,19 +112,7 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
+        dataTable : [
           {
             'name': "Cash",
             'id': '1',
@@ -168,6 +156,9 @@ export default defineComponent({
         ],
         buttonOkEnable: false,
         paymentType: "0",
+        balance : 0,
+        payment: 0,
+        name : '',
       },
       title: '',
     });
@@ -178,8 +169,10 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'City Ledger Payment';
 
-          console.log("selectedPrint", props.selectedPrint);
-          console.log("selectedPayment", props.selectedPayment);
+          state.data.balance = props.dataTable['dataTable']['saldo'];
+          state.data.payment = -state.data.balance;
+
+          console.log("On mount Ciyt Ledegr : ", props.dataTable);
         }
       }
     );
@@ -191,15 +184,39 @@ export default defineComponent({
         },
     });
 
+    const tableHeaders = [
+      {
+            label: "Customer Name", 
+            field: "bezeich",
+            name: "bezeich",
+            align: "center",
+        }, {
+            label: "C/L No", 
+            field: "num",
+            name: "num",
+            align: "center",
+        }, {
+            label: "Description", 
+            field: "desc",
+            name: "desc",
+            align: "center",
+        }, {
+            label: "Address", 
+            field: "address",
+            name: "address",
+            align: "center",
+        },
+    ];
+
     const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
+      for (let i = 0; i<state.data.dataTable.length; i++) {
+        const datarow = state.data.dataTable[i];
         datarow['selected'] = false;
       }        
 
       const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
+      for (let i = 0; i<state.data.dataTable.length; i++) {
+        const datarow = state.data.dataTable[i];
         
         if (id === datarow['id']) {
           datarow['selected'] = true;
@@ -207,106 +224,24 @@ export default defineComponent({
           break;
         }
       }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
+    // -- onClick Listener 
+    const onOkDialog = () => {
 
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const tableHeadersPrint = [
-      {
-            label: "name", 
-            field: "name",
-            name: "name",
-            align: "center",
-        }, {
-            label: "id", 
-            field: "id",
-            name: "id",
-            align: "center",
-        },
-    ];
-
-    // -- 
-    const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogPaymentCityLedger', false);
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
       onRowClickTablePayment,
-      onRowClickTablePrint,
-      onOkDialogSelectUser,
+      onOkDialog,
       onCancelDialog,
+      tableHeaders,
       pagination: { rowsPerPage: 0 },
     };
   },

@@ -91,7 +91,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog" :disable="!data.buttonOkEnable"/>
         </q-card-actions>
       </q-card>
@@ -140,6 +140,7 @@
       :showPaymentCityLedger="data.showPaymentCityLedger"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentCityLedger="onDialogPaymentCityLedger" />
 
     <dialogPaymentGuestFolio
@@ -200,7 +201,8 @@ interface State {
     selectedPrint: {};
     selectedPayment: {};
     dataPreparePayment: {};
-    balance: any
+    balance: any,
+
   }
   title: string;
   showConfirmationDialog: boolean;
@@ -331,7 +333,7 @@ export default defineComponent({
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
           state.data.balance = state.data.dataPreparePayment['dataTable']['dataThBill'][0]['saldo'];
-          console.log('Dialog Payment Mount: ', state.data.dataPreparePayment);
+          console.log('Dialog Payment Mount: ', props.dataTable);
         }
       }
     );
@@ -462,6 +464,8 @@ export default defineComponent({
           if (zuggrifval == "true") {
             if (idPayment == 1) {
               getPreparePayCash3();
+            } else if (idPayment == 3) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 8) {
               getRestInvBtnTransfer();
             }
@@ -621,6 +625,8 @@ export default defineComponent({
           } else {
             if (idPayment == 8) {
               getRestInvCheckDiscart();
+            } else if (idPayment == 3) {
+              onDialogPaymentCityLedger(true);
             }
           }
 
@@ -696,7 +702,8 @@ export default defineComponent({
       } else if (idPayment == 2) {
         onDialogPaymentCard(true);
       } else if (idPayment == 3) {
-        onDialogPaymentCityLedger(true);
+        zuggriff(20, 2);
+        // onDialogPaymentCityLedger(true);
       } else if (idPayment == 4) {
         onDialogPaymentGuestFolio(true);
       } else if (idPayment == 5) {

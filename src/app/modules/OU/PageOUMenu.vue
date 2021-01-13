@@ -3,7 +3,7 @@
         <div class="dialog__restaurant">
           <div class="row">
             <div class="col-md-8" style="margin-top: -34px">
-              <h5 class="q-ml-lg">{{ restaurant }}
+              <h5 class="q-ml-lg text-weight-bolder">{{ restaurant }}
                 <span @click="onDialogTablePlan(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-table-furniture" >
                     <q-tooltip>
@@ -237,7 +237,7 @@
               </div>
 
               <!-- Bill Number -->
-              <q-card class="bg-dark q-pa-md q-ml-lg">
+              <q-card class="bg-dark q-pa-md q-ml-lg q-mt-sm">
                 <div class="row text-white"> 
                   <div class="col-6">
                     <p class="text-subtitle1 text-grey-7">Bill Number : <span class="q-ml-sm text-white text-weight-bold">{{dataTable.rechnr}}</span></p>
@@ -645,6 +645,8 @@ interface State {
   showDialogCloseBill: boolean,
   currentState: string,
   showDialogVoidItem: boolean,
+  restaurant: string,
+  dataPrepareInv: {},
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -702,6 +704,8 @@ export default defineComponent({
       showDialogCloseBill: false,
       currentState: "",
       showDialogVoidItem: false,
+      restaurant: '',
+      dataPrepareInv: {},
     });
 
     onMounted(async () => { 
@@ -924,6 +928,7 @@ export default defineComponent({
 
     const onDialogPayment = (val) => {
       state.dialogPayment = val;
+      state.dataTable['dataPrepareInv'] = state.dataPrepare;
     }
 
     const onDialogSplitBill = (val) => {
@@ -1311,16 +1316,15 @@ export default defineComponent({
       async function asyncCall() {
         const [dataPrepare] = await Promise.all([
           $api.outlet.getOUPrepare('restInvPrepare', {
-            pvlLanguage: 1,
+            pvlLanguage: '1',
             currDept : state.currDept,
-            currPrinter : currPrinter,
+            // currPrinter : currPrinter,
+            currPrinter : '99',
             userInitStr: dataStoreLogin['userInit'],
-            transdate: "",
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
           })
         ]);
         
-        console.log('Menu dataPrepare : ', dataPrepare);
-
         if (dataPrepare) {
           const responsePrepare = dataPrepare || [];
           state.dataPrepare = responsePrepare;
@@ -1349,6 +1353,7 @@ export default defineComponent({
             // return false;
           }
 
+          state.restaurant = responsePrepare['deptname'];
             // true menu order taker dapat di klik/ enable visca versa
           if (responsePrepare['miOrdertaker'] == 'true') {
             state.flagOrderTakerDisable = false
@@ -1886,7 +1891,6 @@ export default defineComponent({
       tabbillnumber: 'neworder',
       lorem: 'Wastern Flavor',
       dense: false,
-      restaurant: 'Resto Barokah',
       zuggriff,
       checkBill,
       getArticle,

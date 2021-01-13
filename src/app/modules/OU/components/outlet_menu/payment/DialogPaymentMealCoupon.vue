@@ -193,6 +193,48 @@ export default defineComponent({
       asyncCall();
     }
 
+    const updateBill1 = () => {
+       state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvUpdateBill1 ', {
+            pvILanguage : 0,
+            recId  : 0,
+            recIdHArtikel: 0,
+            deptname : props.dataTable['dataTable']['departement'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response prepare: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataDetail = response['grpCompl']['grp-compl'];
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
     // -- OnClick Listener
     const onOkDialog = () => {
 
