@@ -868,6 +868,7 @@ export default defineComponent({
     const onDialogMenuOrderTaker = (val, val2) => {
       state.dialogSelectOrderTaker = val;
       state.dataSelectedOrderTaker = val2;
+      state.dataPrepare['dataSelectedOrderTaker'] = state.dataSelectedOrderTaker;
       
       if (!val) {
         // zuggriff(19, 2);

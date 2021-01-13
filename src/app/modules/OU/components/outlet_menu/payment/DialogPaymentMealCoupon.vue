@@ -58,6 +58,31 @@
           <q-btn unelevated outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
+
+        <q-dialog v-model="data.showConfirmationDialog" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Confirm the selection {{data.dataArtSelected['num']}} - {{data.dataArtSelected['bezeich']}}?</p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline color="primary" label="Cancel" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
       </q-card>
     </q-dialog>
   </section>
@@ -65,7 +90,8 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { Notify } from 'quasar';
+import { Notify, date } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -73,6 +99,8 @@ interface State {
     dataDetail: any;
     buttonOkEnable: boolean;
     balance: any;
+    showConfirmationDialog: any;
+    dataArtSelected: {};
   }
   title: string;
 }
@@ -86,12 +114,16 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
         dataDetail: [],
         buttonOkEnable: false,
         balance: 0,
+        showConfirmationDialog: false,
+        dataArtSelected: {},
       },
       title: '',
     });
@@ -119,6 +151,7 @@ export default defineComponent({
 
     const onRowClickTable = (dataRow) => {
       console.log(dataRow);
+      state.data.dataArtSelected = dataRow;
       
       let dataTable = [];
       for (let i = 0; i<state.data.dataDetail.length; i++) {
@@ -202,7 +235,54 @@ export default defineComponent({
             pvILanguage : 0,
             recId  : 0,
             recIdHArtikel: 0,
-            deptname : props.dataTable['dataTable']['departement'],
+            deptname: props.dataTable['dataTable']['departement'],
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            hArtart: '',
+            cancelOrder: '',
+            hArtikelServic: '',
+            amount: '',
+            amountForeign: '',
+            price: '',
+            doubleCurrency: '',
+            qty: '',
+            exchgRate: '',
+            priceDecimal: '',
+            orderTaker: '',
+            tischnr: '',
+            currDept: '',
+            currWaiter: '',
+            gname: '',
+            pax: '',
+            kreditlimit: '',
+            addZeit: '',
+            billart: '',
+            description: '',
+            changeStr: '',
+            ccComment: '',
+            cancelStr: '',
+            reqStr: '',
+            voucherStr: '',
+            hogaCard: '',
+            printToKitchen: '',
+            fromAcct: '',
+            hArtnrfront: '',
+            payType: '',
+            guestnr: '',
+            transferZinr: '',
+            curedeptFlag: '',
+            foreignRate: '',
+            currRoom: '',
+            userInit: dataStoreLogin['userInit'],
+            hogaResnr: '',
+            hogaReslinnr: '',
+            inclVat: '',
+            getPrice: '',
+            mcStr: '',
+            ['submenuList']: {
+              ['submenu-list']: [
+
+              ]
+            }
           })
         ]);
 
@@ -235,13 +315,65 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getInvBtnTransferPaytype56 = () => {
+       state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvBtnTransferPaytype56 ', {
+            recId: props.dataTable['dataThBill'][0]['rec-id'],
+            guestnr: 0,
+            currDept: props.dataTable['departement'],
+            balanceForeign: 0,
+            balance: '',
+            payType: '',
+            transdate: '',
+            doubleCurrency: '',
+            exchgRate: '',
+            priceDecimal: '',
+            userInit: '',
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response restInvBtnTransferPaytype56: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
     // -- OnClick Listener
     const onOkDialog = () => {
-
+      state.data.showConfirmationDialog = true;
     }
 
     const onCancelDialog = () => {
       emit('onDialogPaymentMealCoupon', false);
+    }
+
+    const onClickConfirmation = () => {
+      getInvBtnTransferPaytype56();
     }
 
     return {
@@ -252,6 +384,8 @@ export default defineComponent({
       onOkDialog,
       onCancelDialog,
       getPrepare,
+      onClickConfirmation,
+      getInvBtnTransferPaytype56,
       pagination: { rowsPerPage: 0 },
     };
   },

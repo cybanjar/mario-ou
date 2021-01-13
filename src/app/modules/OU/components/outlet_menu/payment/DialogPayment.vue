@@ -563,7 +563,7 @@ export default defineComponent({
             return false;
           } 
 
-          state.data.dataPreparePayment['dataTable']['saldo'] = response['amount'];
+          state.data.dataPreparePayment['dataTable']['saldo'] = response['amount']; 
 
           if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
             Notify.create({
@@ -702,8 +702,7 @@ export default defineComponent({
       } else if (idPayment == 2) {
         onDialogPaymentCard(true);
       } else if (idPayment == 3) {
-        zuggriff(20, 2);
-        // onDialogPaymentCityLedger(true);
+        getRestInvGetSaldo();
       } else if (idPayment == 4) {
         onDialogPaymentGuestFolio(true);
       } else if (idPayment == 5) {
@@ -739,6 +738,8 @@ export default defineComponent({
 
       if (idPayment == 8) {
         zuggriff(19, 2);
+      } else if (idPayment == 3) {
+        zuggriff(20, 2);
       }
     }
 
