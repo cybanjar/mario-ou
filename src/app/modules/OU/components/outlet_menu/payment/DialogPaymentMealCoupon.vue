@@ -169,6 +169,7 @@ export default defineComponent({
           break;
         }
       }
+      
       state.data.dataDetail = dataTable;
       console.log(state.data.dataDetail);
     }

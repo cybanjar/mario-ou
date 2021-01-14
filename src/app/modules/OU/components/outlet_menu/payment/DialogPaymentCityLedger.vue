@@ -56,16 +56,16 @@
               </template>
 
               <template v-slot:body="props">
-              <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
-                <q-td
-                  v-for="col in props.cols"
-                  :key="col.name"
-                  :props="props"
-                  @click="onRowClick(props.row)">
-                    {{ col.value }}
-                </q-td>
-              </q-tr>
-            </template>
+                <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                  <q-td
+                    v-for="col in props.cols"
+                    :key="col.name"
+                    :props="props"
+                    @click="onRowClick(props.row)">
+                      {{ col.value }}
+                  </q-td>
+                </q-tr>
+              </template>
 
             </STable>
           </div>
@@ -109,7 +109,7 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { Notify } from 'quasar';
+import { Notify, date } from 'quasar';
 
 interface State {
   isLoading: boolean;
@@ -339,6 +339,59 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getPayType1 = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvBtnTransferPaytype1', {
+            pvILanguage : 0,
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            guestnr: 0,
+            currDept: 0,
+            paid: 0,
+            exchgRate: 0,
+            priceDecimal: 0,
+            balance: 0,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            discArt1: 0,
+            discArt2: 0,
+            discArt3: 0,
+            kellnerKellnerNr: 1,
+           })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response prepare: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataTable = response['clguestList']['clguest-list'];
+          state.data.dataTable.sort(function(a, b) { return (a['gname'] > b['gname']) ? 1 : ((b['gname'] > a['gname']) ? -1 : 0);} )
+          state.data.filteredDataTable = state.data.dataTable;
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
     // -- onClick Listener 
     const onRowClick = (dataRow) => {
       for (let i = 0; i<state.data.filteredDataTable.length; i++) {
@@ -387,7 +440,10 @@ export default defineComponent({
       if (state.caseType == 0) {
         if (state.data.dataGuestSelected['kreditlimit'] != 0) {
           getGuestAroutStand();
-        } 
+        } else {
+          console.log('Hit API ?');
+          
+        }
       } else if (state.caseType == 1) {
         state.data.showConfirmationDialog = false;
         emit('onDialogPaymentCityLedger', false);

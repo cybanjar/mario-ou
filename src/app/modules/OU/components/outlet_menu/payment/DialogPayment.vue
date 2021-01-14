@@ -153,6 +153,7 @@
       :showPaymentNonGuestFolio="data.showPaymentNonGuestFolio"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentNonGuestFolio="onDialogPaymentNonGuestFolio" />
 
     <dialogPaymentCompliment
@@ -173,6 +174,12 @@
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
       @onDialogPaymentMealCoupon="onDialogPaymentMealCoupon" />
+
+    <dialogSelectDepartment 
+      :showDialogChangeOutlet="data.showDepartment"
+      :flagActivity="flag"
+      @onDialogDepartment="onDialogDepartment"
+      />
 
   </section>
 </template>
@@ -198,13 +205,15 @@ interface State {
     showPaymentCompliment: boolean;
     showPaymentMasterFolio: boolean;
     showPaymentMealCoupon: boolean;
+    showDepartment: boolean,
     selectedPrint: {};
     selectedPayment: {};
     dataPreparePayment: {};
     balance: any,
-
+    dataRestInvBillTransfer: {};
   }
   title: string;
+  flag: string
   showConfirmationDialog: boolean;
 }
 
@@ -287,42 +296,16 @@ export default defineComponent({
         showPaymentCompliment: false,
         showPaymentMasterFolio: false,
         showPaymentMealCoupon: false,
+        showDepartment: false,
         dataPreparePayment: {},
         balance: 0,
+        dataRestInvBillTransfer: {},
       },
       title: '',
+      flag: 'payment',
       showConfirmationDialog: false,
     });
 
-  {
-    // const initDataUser = () => {
-    //   state.isLoading = true;
-      
-    //   async function asyncCall() {
-    //     const [dataOrderTaker] = await Promise.all([
-    //       $api.outlet.getOUPrepare('getOrderTaker', { }),
-    //     ]);
-
-    //     if (dataOrderTaker) {
-    //       const responseDataOrderTaker = dataOrderTaker || [];
-    //       const okFlag = responseDataOrderTaker['outputOkFlag'];
-
-    //       if (!okFlag) {
-    //         Notify.create({
-    //           message: 'Failed when retrive data, please try again',
-    //           color: 'red',
-    //         });
-    //         state.isLoading = false;
-    //         return false;
-    //       } 
-    //       state.data.dataDetail = [];
-    //       state.data.dataDetail = responseDataOrderTaker['queasyList']['queasy-list'];
-    //       state.isLoading = false;
-    //     }
-    //   }
-    //   asyncCall();
-    // }
-  }
     watch(
       () => props.dialogPayment, (dialogPayment) => {
         if (props.dialogPayment) {
@@ -341,7 +324,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.dialogPayment,
         set: (val) => {
-            emit('onDialogMenuOrderTaker', val, null);
+            emit('onDialogPayment', val, null);
         },
     });
 
@@ -466,14 +449,18 @@ export default defineComponent({
               getPreparePayCash3();
             } else if (idPayment == 3) {
               getRestInvBtnTransfer();
+            } else if (idPayment == 4) { 
+              getRestInvBtnTransfer();
+            } else if (idPayment == 5) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 8) {
               getRestInvBtnTransfer();
             }
+          }
         }
       }
+      asyncCall();
     }
-    asyncCall();
-  }
 
     const getPreparePayCash3 = () => {
       async function asyncCall() {
@@ -627,9 +614,60 @@ export default defineComponent({
               getRestInvCheckDiscart();
             } else if (idPayment == 3) {
               onDialogPaymentCityLedger(true);
+            } else if (idPayment == 4) {
+              getRestInvBillTransfer();
+            } else if (idPayment == 5) {
+              getRestInvBillTransfer();
+              // onDialogDepartment(true, null);
             }
           }
 
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+    const getRestInvBillTransfer = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('biltransferPrepare ', {
+            hRecid : state.data.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+          const idPayment = state.data.selectedPayment['id'];
+
+          console.log('response bill transfer: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataRestInvBillTransfer = response;
+
+          if (idPayment == 4) {
+            getBillTransferCheckVAT();
+          } else if (idPayment == 5) {
+            getBillTransferCheckVAT();
+          }
           state.isLoading = false;
         } else {
           Notify.create({
@@ -693,6 +731,66 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getBillTransferCheckVAT = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('biltransferCheckVAT ', {
+            recId : state.data.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            multiVat: state.data.dataRestInvBillTransfer['multiVat'],
+            balance: state.data.dataPreparePayment['dataTable']['saldo'],
+            closed: false,
+            splitted: state.data.dataRestInvBillTransfer['splitted'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+          const idPayment = state.data.selectedPayment['id'];
+
+          console.log('response getBillTransferCheckVAT: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (response['flCode'] == 0) {
+            if (idPayment == 4) {
+              
+            } else if (idPayment == 5) {
+              onDialogDepartment(true, null);
+            }
+            state.isLoading = false;
+          } else {
+            Notify.create({
+              message: 'Transfer not allowed: Other Payment found',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+    
+
+
     // -- OnClick Listener 
     const onOkDialog = () => {
       const idPayment = state.data.selectedPayment['id'];
@@ -704,9 +802,10 @@ export default defineComponent({
       } else if (idPayment == 3) {
         getRestInvGetSaldo();
       } else if (idPayment == 4) {
-        onDialogPaymentGuestFolio(true);
+        getRestInvGetSaldo();
+        // onDialogPaymentGuestFolio(true);
       } else if (idPayment == 5) {
-        onDialogPaymentNonGuestFolio(true);
+        getRestInvGetSaldo();
       } else if (idPayment == 6) {
         onDialogPaymentMasterFolio(true);
       } else if (idPayment == 7) {
@@ -730,6 +829,7 @@ export default defineComponent({
       state.data.selectedPrint = {};
       state.data.selectedPayment = {};
       state.data.buttonOkEnable = false;
+      state.isLoading = false;
       emit('onDialogPayment', false);
     }
 
@@ -739,6 +839,10 @@ export default defineComponent({
       if (idPayment == 8) {
         zuggriff(19, 2);
       } else if (idPayment == 3) {
+        zuggriff(20, 2);
+      } else if (idPayment == 4) {
+        zuggriff(20, 2);
+      } else if (idPayment == 5) {
         zuggriff(20, 2);
       }
     }
@@ -777,6 +881,15 @@ export default defineComponent({
       state.data.showPaymentMealCoupon = val;
     }
 
+    const onDialogDepartment = (val, data) => {
+      state.data.showDepartment = val;
+
+      if (!val && data != null) {
+        state.data.dataPreparePayment['dataHotelSelected'] = data;
+        onDialogPaymentNonGuestFolio(true);
+      }
+    }
+
     return {
       dialogModel,
       ...toRefs(state),
@@ -796,6 +909,7 @@ export default defineComponent({
       getRestInvGetSaldo,
       onClickConfirmation,
       getRestInvBtnTransfer,
+      onDialogDepartment,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -808,6 +922,7 @@ export default defineComponent({
     dialogPaymentCompliment:() => import('./DialogPaymentCompliment.vue'),
     dialogPaymentMasterFolio:() => import('./DialogPaymentMasterFolio.vue'),
     dialogPaymentMealCoupon:() => import('./DialogPaymentMealCoupon.vue'),
+    dialogSelectDepartment: () => import('./../DialogChangeOutlet.vue')
   }
 });
 </script>

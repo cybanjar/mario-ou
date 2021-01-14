@@ -26,7 +26,7 @@
                     </q-tooltip>
                   </q-icon>
                 </span>
-                <span @click="onDialogChangeOutlet(true)" class="q-mr-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                <span @click="onClickChangeOutlet()" class="q-mr-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-account-convert" >
                     <q-tooltip>
                       Change Outlet
@@ -556,6 +556,7 @@
         <dialogChangeOutlet
           :showDialogChangeOutlet="showDialogChangeOutlet"
           :dataSelectedChangeOutlet="dataSelected"
+          flagActivity="changeoutlet"
           @onDialogChangeOutlet="onDialogChangeOutlet" />
 
         <vue-touch-keyboard 
