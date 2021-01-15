@@ -1,29 +1,19 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:500px;">
+      <q-card style="max-width: 1500px;width:650px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section>
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
-
-              <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
-              </div>
-          </div>
-
+        <q-card-section class="q-ma-none">
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col">
               <q-space />
             </div>
 
             <div class="col">
-              <SInput outlined  label-text="Payment" :disable="true" readonly/>
+              <SInput v-model="data.balance" outlined  label-text="Balance" :disable="true" readonly/>
             </div>
           </div>
 
@@ -33,22 +23,28 @@
             </div>
 
             <div class="col">
-              <SInput outlined  label-text="Room"/>
+              <SInput outlined v-model="data.room" label-text="Room" @change="(v) => { getReturnZinr(data.zinr); }" data-layout="numeric" ref="paymentRoom" @focus="showKeyboard"/>
+            </div>
+          </div>
+
+          <div class="q-ma-sm row q-gutter-xs">
+            <div class="col">
+              <q-space />
+            </div>
+
+            <div class="col">
+              <SInput outlined v-model="data.remark" label-text="Remark" :disable="true" readonly/>
             </div>
           </div>
         </q-card-section>
 
         <q-card-section>
           <div class="q-pa-sm">
-            <!-- <div class="full-width bg-grey">
-              <p><strong> Pay </strong></p>
-            </div> -->
-
             <STable
               hide-bottom
               :loading="isLoading"
-              :columns="tableHeadersPrint"
-              :data="data.dataTablePayment"
+              :columns="tableHeaders"
+              :data="data.dataDetail"
               row-key="name"
               separator="cell"
               :rows-per-page-options="[0]"
@@ -57,24 +53,37 @@
                 <q-inner-loading showing color="primary" />
               </template>
 
-              <template v-slot:item="props">
-                <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                  <q-card>
-                    <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                        <strong>{{ props.row.name }}</strong>
-                    </q-card-section>
-                  </q-card>
-                </div>
+              <template v-slot:body="props">
+                <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                  <q-td
+                    v-for="col in props.cols"
+                    :key="col.name"
+                    :props="props"
+                    @click="onRowClickTable(props.row)">
+                      {{ col.value }}
+                  </q-td>
+                </q-tr>
               </template>
             </STable>
           </div>
+
+          <vue-touch-keyboard 
+            id="keyboard"
+            :options="options" 
+            v-if="numpadVisible" 
+            :layout="layout" 
+            :cancel="hideKeyboard" 
+            :accept="acceptKeyboard" 
+            :next="acceptKeyboard"
+            :input="input"
+            :close="hideKeyboard" />
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -89,11 +98,18 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
+    dataResponse: {};
     buttonOkEnable: boolean;
+    balance: any;
+    room: string;
+    remark: string;
+    dataSelected: {};
   }
   title: string;
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -101,7 +117,7 @@ export default defineComponent({
     showPaymentGuestFolio: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataTable: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -109,63 +125,21 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
-          {
-            'name': "Cash",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Card",
-            'id': '2',
-            'selected': false,
-          },
-          {
-            'name': "City Ledger",
-            'id': '3',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Guest Folio",
-            'id': '4',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Non Guest Folio",
-            'id': '5',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Master Folio",
-            'id': '6',
-            'selected': false,
-          },
-          {
-            'name': "Compliment",
-            'id': '7',
-            'selected': false,
-          },
-          {
-            'name': "Meal Coupon",
-            'id': '8',
-            'selected': false,
-          }
-        ],
+        dataResponse: {},
         buttonOkEnable: false,
+        balance: 0,
+        room: '',
+        remark: '',
+        dataSelected: {},
       },
       title: '',
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: 'numeric',
+      input: null,
+      numpadVisible: false,
     });
 
     watch(
@@ -173,9 +147,9 @@ export default defineComponent({
         if (props.showPaymentGuestFolio) {
           state.data.buttonOkEnable = false;
           state.title = 'Guest Folio Payment';
-
-          console.log("selectedPrint", props.selectedPrint);
-          console.log("selectedPayment", props.selectedPayment);
+          state.data.balance = props.dataTable['dataTable']['saldo']
+          getPrepare();
+          console.log('data table : ', props.dataTable);
         }
       }
     );
@@ -187,122 +161,220 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        datarow['selected'] = false;
-      }        
+    // -- HTTP Request method
+    const getPrepare = () => {
+      state.isLoading = true;
 
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          datarow['databaru'] = 1;
-          break;
-        }
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('rzinrPrepare ', {
+            pvILanguage: 1,
+            dept:props.dataTable['dataPrepare']['currDept'],
+            zinr: ' ',
+            hResnr: 0,
+            hReslinnr:0,
+            balance: props.dataTable['dataTable']['saldo'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response rzinrPrepare: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataResponse = response;
+
+          let dataTable = response['q1List']['q1-list'];
+          // for (let i = 0; i<dataTable.length; i++) {
+          //   const datarow = dataTable[i] as {};
+          //   datarow['pos'] = i;
+          //   dataTable.push(datarow);
+          // }
+          
+          state.data.dataDetail = dataTable.slice();
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
       }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      asyncCall();
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
+    const getReturnZinr = () => {
+      state.isLoading = true;
+
+      console.log({
+        pvILanguage: 0,
+        dept:props.dataTable['dataPrepare']['currDept'],
+        room: state.data.room,
+        caseType: 1,
+        deptMbar: state.data.dataResponse['deptMbar'],
+        deptLdry: state.data.dataResponse['deptLdry'],
+      })
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('rzinrPrepare ', {
+            pvILanguage: 1,
+            dept:props.dataTable['dataPrepare']['currDept'],
+            room: state.data.room,
+            caseType: 1,
+            deptMbar: state.data.dataResponse['deptMbar'],
+            deptLdry: state.data.dataResponse['deptLdry'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response return: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          let dataTable = response['q1List']['q1-list'];
+          // for (let i = 0; i<dataTable.length; i++) {
+          //   const datarow = dataTable[i] as {};
+          //   datarow['pos'] = i;
+          //   dataTable.push(datarow);
+          // }
+          
+          state.data.dataDetail = dataTable;
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
       }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      asyncCall();
     }
+    
 
-    const tableHeadersPrint = [
+    const tableHeaders = [
       {
-            label: "name", 
-            field: "name",
-            name: "name",
-            align: "center",
+            label: "RmNo", 
+            field: "zinr",
+            name: "zinr",
+            align: "left",
         }, {
-            label: "id", 
-            field: "id",
-            name: "id",
-            align: "center",
+            label: "No", 
+            field: "billnr",
+            name: "billnr",
+            align: "right",
+        },{
+            label: "Guest Name", 
+            field: "g-name",
+            name: "g-name",
+            align: "left",
+        },{
+            label: "Arrival", 
+            field: "ankunft",
+            name: "ankunft",
+            align: "left",
+        },{
+            label: "Depart", 
+            field: "depart",
+            name: "depart",
+            align: "left",
+        },{
+            label: "Nation", 
+            field: "nation1",
+            name: "nation1",
+            align: "left",
         },
     ];
 
-    // -- 
-    const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+    // -- onClick listener 
+    const onRowClickTable = (dataRow) => {
+     for (let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i] as {};
+        datarow['selected'] = false;
+      }
+
+      const dataTable = [] as any;
+      for (let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i] as {};
+        if (state.data.dataDetail[i]['resnr'] == dataRow['resnr'] && 
+            state.data.dataDetail[i]['billnr'] == dataRow['billnr'] && 
+            state.data.dataDetail[i]['zinr'] == dataRow['zinr'] && 
+            state.data.dataDetail[i]['reslinnr'] == dataRow['reslinnr']) {
+          datarow['selected'] = true;
+        }
+        dataTable.push(datarow);
+      }
+      state.data.dataDetail = [];
+      state.data.dataDetail = dataTable;
+
+      dataRow['selected'] = true;
+      state.data.dataSelected = dataRow;
+      state.data.remark = state.data.dataSelected['bemerk'];
+      state.data.room = state.data.dataSelected['zinr'];
+      state.data.buttonOkEnable = true;
+    }
+
+    const onOkDialog = () => {
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogPaymentGuestFolio', false);
+    }
+
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+        state.layout = e.target.dataset.layout;
+      } 
+
+      if (!state.numpadVisible) {
+        state.numpadVisible = true;
+      }      
+    }
+
+    const hideKeyboard = () => {
+      state.numpadVisible = false;
+    }
+
+    const acceptKeyboard = () => {
+      hideKeyboard();
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
-      onOkDialogSelectUser,
+      tableHeaders,
+      onRowClickTable,
+      onOkDialog,
       onCancelDialog,
+      getReturnZinr,
+      showKeyboard,
+      hideKeyboard,
+      acceptKeyboard,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -331,6 +403,25 @@ export default defineComponent({
       text-align: right;
     }
   }
+}
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
 }
 </style>
 

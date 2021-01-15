@@ -87,7 +87,7 @@
 
         <q-card-actions align="right">
           <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
+          <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -264,7 +264,7 @@ export default defineComponent({
     ];
 
     // -- 
-    const onOkDialogSelectUser = () => {
+    const onOkDialog = () => {
       // if (props.dataSelectedOrderTaker != null) {
       //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
       // } 
@@ -307,7 +307,7 @@ export default defineComponent({
       ...toRefs(state),
       tableHeadersPrint,
       onRowClickTablePayment,
-      onOkDialogSelectUser,
+      onOkDialog,
       onCancelDialog,
       showKeyboard,
       hideKeyboard,

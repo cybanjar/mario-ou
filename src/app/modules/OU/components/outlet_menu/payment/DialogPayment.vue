@@ -147,6 +147,7 @@
       :showPaymentGuestFolio="data.showPaymentGuestFolio"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentGuestFolio="onDialogPaymentGuestFolio" />
 
     <dialogPaymentNonGuestFolio
@@ -764,7 +765,7 @@ export default defineComponent({
 
           if (response['flCode'] == 0) {
             if (idPayment == 4) {
-              
+              onDialogPaymentGuestFolio(true);
             } else if (idPayment == 5) {
               onDialogDepartment(true, null);
             }
@@ -788,8 +789,6 @@ export default defineComponent({
       }
       asyncCall();
     }
-    
-
 
     // -- OnClick Listener 
     const onOkDialog = () => {
@@ -803,7 +802,6 @@ export default defineComponent({
         getRestInvGetSaldo();
       } else if (idPayment == 4) {
         getRestInvGetSaldo();
-        // onDialogPaymentGuestFolio(true);
       } else if (idPayment == 5) {
         getRestInvGetSaldo();
       } else if (idPayment == 6) {

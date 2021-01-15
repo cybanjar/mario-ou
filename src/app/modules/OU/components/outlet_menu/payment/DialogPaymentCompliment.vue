@@ -9,7 +9,6 @@
         <q-card-section>
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <p class="q-mt-lg">Cash</p>
               </div>
 
               <div class="col">
@@ -19,21 +18,10 @@
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col">
-                <p class="q-mt-lg">Voucher</p>
               </div>
 
               <div class="col">
-                <SInput outlined  label-text="Payment" :disable="true" readonly/>
-              </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-              <div class="col">
-                <SInput class="q-mr-md" outlined  label-text="Voucher Number" :disable="true" readonly/>
-              </div>
-
-              <div class="col">
-                <SInput outlined  label-text="Changed" :disable="true" readonly/>
+                <SInput class="q-mr-md" outlined  label-text="Voucher Number"/>
               </div>
           </div>
         </q-card-section>
@@ -49,8 +37,8 @@
               hide-header
               hide-bottom
               :loading="isLoading"
-              :columns="tableHeadersPrint"
-              :data="data.dataTablePayment"
+              :columns="tableHeaders"
+              :data="data.dataDetail"
               row-key="name"
               separator="cell"
               :rows-per-page-options="[0]"
@@ -62,7 +50,7 @@
               <template v-slot:item="props">
                 <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
                   <q-card>
-                    <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                    <q-card-section @click="onRowClickTable(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
                         <strong>{{ props.row.name }}</strong>
                     </q-card-section>
                   </q-card>
@@ -76,7 +64,7 @@
 
         <q-card-actions align="right">
           <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -91,8 +79,6 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
     buttonOkEnable: boolean;
   }
   title: string;
@@ -111,60 +97,6 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
-          {
-            'name': "Cash",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Card",
-            'id': '2',
-            'selected': false,
-          },
-          {
-            'name': "City Ledger",
-            'id': '3',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Guest Folio",
-            'id': '4',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Non Guest Folio",
-            'id': '5',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Master Folio",
-            'id': '6',
-            'selected': false,
-          },
-          {
-            'name': "Compliment",
-            'id': '7',
-            'selected': false,
-          },
-          {
-            'name': "Meal Coupon",
-            'id': '8',
-            'selected': false,
-          }
-        ],
         buttonOkEnable: false,
       },
       title: '',
@@ -189,79 +121,11 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        datarow['selected'] = false;
-      }        
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          datarow['databaru'] = 1;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+    const onRowClickTable = (dataRow) => {
+      
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const tableHeadersPrint = [
+    const tableHeaders = [
       {
             label: "name", 
             field: "name",
@@ -276,34 +140,19 @@ export default defineComponent({
     ];
 
     // -- 
-    const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+    const onOkDialog = () => {
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogPaymentCompliment', false);
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
-      onOkDialogSelectUser,
+      tableHeaders,
+      onRowClickTable,
+      onOkDialog,
       onCancelDialog,
       pagination: { rowsPerPage: 0 },
     };

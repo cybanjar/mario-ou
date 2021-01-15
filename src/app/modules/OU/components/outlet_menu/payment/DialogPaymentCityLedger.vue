@@ -18,7 +18,7 @@
 
           <div class="q-ma-sm row q-gutter-xs">
               <div class="col q-mr-sm">
-                <SInput outlined v-model="data.payment" label-text="Payment"/>
+                <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentPayment" @focus="showKeyboard"/>
               </div>
 
               <div class="col">
@@ -31,7 +31,10 @@
                   v-model="data.name" 
                   type="search"
                   @change="(v) => { onChangeSearchInput(data.name); }"
-                  label-text="Name"/>
+                  label-text="Name"
+                  data-layout="compact" 
+                  ref="paymentName" 
+                  @focus="showKeyboard"/>
               </div>
 
               <div class="col">
@@ -68,6 +71,17 @@
               </template>
 
             </STable>
+
+            <vue-touch-keyboard 
+              id="keyboard"
+              :options="options" 
+              v-if="numpadVisible" 
+              :layout="layout" 
+              :cancel="hideKeyboard" 
+              :accept="acceptKeyboard" 
+              :next="acceptKeyboard"
+              :input="input"
+              :close="hideKeyboard" />
           </div>
         </q-card-section>
 
@@ -127,7 +141,10 @@ interface State {
   }
   title: string;
   caseType:any,
-
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -155,6 +172,13 @@ export default defineComponent({
       },
       title: '',
       caseType: 0,
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: '',
+      input: null,
+      numpadVisible: false,
     });
     
     watch(
@@ -164,7 +188,6 @@ export default defineComponent({
         }
       }
     );
-
 
     watch(
       () => props.showPaymentCityLedger, (showPaymentCityLedger) => {
@@ -319,13 +342,14 @@ export default defineComponent({
           } 
           state.isLoading = false;
 
-          if (response['outstand'] < state.data.dataGuestSelected['kreditlimit']) {
+          if (response['outstand'] > state.data.dataGuestSelected['kreditlimit']) {
             state.data.titleConfirmation = 'Credit Limit Overdrawn: \nGiven Limit : ' + state.data.dataGuestSelected['kreditlimit'] + '\n' 
                         + 'Total A/R Outstanding = ' + response['outstand'] + '\nDo you wish to CANCEL the C/L transfer?';
             state.caseType = 1;
             state.data.showConfirmationDialog = true;
+          } else {
+            getPayType1();
           }
-
           state.isLoading = false;
         } else {
           Notify.create({
@@ -348,15 +372,15 @@ export default defineComponent({
             pvILanguage : 0,
             recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
             guestnr: 0,
-            currDept: 0,
-            paid: 0,
+            currDept: props.dataTable['dataPrepare']['currDept'],
+            paid: state.data.payment,
             exchgRate: 0,
             priceDecimal: 0,
-            balance: 0,
+            balance: state.data.balance,
             transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            discArt1: 0,
-            discArt2: 0,
-            discArt3: 0,
+            discArt1: props.dataTable['dataPrepare']['discArt1'],
+            discArt2: props.dataTable['dataPrepare']['discArt2'],
+            discArt3: props.dataTable['dataPrepare']['discArt3'],
             kellnerKellnerNr: 1,
            })
         ]);
@@ -365,7 +389,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response prepare: ', response);
+          console.log('response restInvBtnTransferPaytype1: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -375,10 +399,6 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-
-          state.data.dataTable = response['clguestList']['clguest-list'];
-          state.data.dataTable.sort(function(a, b) { return (a['gname'] > b['gname']) ? 1 : ((b['gname'] > a['gname']) ? -1 : 0);} )
-          state.data.filteredDataTable = state.data.dataTable;
           state.isLoading = false;
         } else {
           Notify.create({
@@ -441,10 +461,12 @@ export default defineComponent({
         if (state.data.dataGuestSelected['kreditlimit'] != 0) {
           getGuestAroutStand();
         } else {
-          console.log('Hit API ?');
-          
+          getPayType1();
+          console.log('Hit API ? 0');          
         }
       } else if (state.caseType == 1) {
+        console.log('Hit API ? 1');          
+
         state.data.showConfirmationDialog = false;
         emit('onDialogPaymentCityLedger', false);
       }
@@ -468,6 +490,30 @@ export default defineComponent({
       }
     }
 
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+        state.layout = e.target.dataset.layout;
+      } 
+
+      if (!state.numpadVisible) {
+        state.numpadVisible = true;
+      }      
+    }
+
+    const hideKeyboard = () => {
+      state.numpadVisible = false;
+
+      if (state.layout == 'compact') {
+        onChangeSearchInput(state.data.dataGuestSelected);
+        // console.log(state.layout);
+      }
+    }
+
+    const acceptKeyboard = () => {
+      hideKeyboard();
+    }
+
     return {
       dialogModel,
       ...toRefs(state),
@@ -480,6 +526,11 @@ export default defineComponent({
       onChangeSearchInput,
       onClickConfirmation,
       getGuestAroutStand, 
+      getPayType1,
+      showKeyboard,
+      hideKeyboard,
+      acceptKeyboard,
+
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -508,6 +559,25 @@ export default defineComponent({
       text-align: right;
     }
   }
+}
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
 }
 </style>
 

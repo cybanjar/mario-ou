@@ -7,7 +7,7 @@
         </q-toolbar>
 
         <q-card-section>
-            <SInput outlined v-model="data.name" label-text="Name"/>
+            <SInput outlined v-model="data.name" label-text="Name" data-layout="compact" ref="paymentName" @focus="showKeyboard"/>
         </q-card-section>
 
         <q-card-section>
@@ -37,6 +37,17 @@
                 </q-tr>
               </template>
             </STable>
+
+            <vue-touch-keyboard 
+              id="keyboard"
+              :options="options" 
+              v-if="numpadVisible" 
+              :layout="layout" 
+              :cancel="hideKeyboard" 
+              :accept="acceptKeyboard" 
+              :next="acceptKeyboard"
+              :input="input"
+              :close="hideKeyboard" />
           </div>
         </q-card-section>
 
@@ -92,6 +103,10 @@ interface State {
   }
   showConfirmationDialog: boolean;
   title: string;
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -115,6 +130,13 @@ export default defineComponent({
       },
       title: '',
       showConfirmationDialog: false,
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: '',
+      input: null,
+      numpadVisible: false,
     });
 
     watch(
@@ -318,6 +340,30 @@ export default defineComponent({
       getCheckCreditLimit();
     }
 
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+        state.layout = e.target.dataset.layout;
+      } 
+
+      if (!state.numpadVisible) {
+        state.numpadVisible = true;
+      }      
+    }
+
+    const hideKeyboard = () => {
+      state.numpadVisible = false;
+
+      if (state.layout == 'compact') {
+        // onChangeSearchInput(state.data.dataGuestSelected);
+        // console.log(state.layout);
+      }
+    }
+
+    const acceptKeyboard = () => {
+      hideKeyboard();
+    }
+
     return {
       dialogModel,
       ...toRefs(state),
@@ -327,6 +373,9 @@ export default defineComponent({
       onCancelDialog,
       getPrepare,
       onClickConfirmation,
+      showKeyboard,
+      hideKeyboard,
+      acceptKeyboard,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -355,6 +404,25 @@ export default defineComponent({
       text-align: right;
     }
   }
+}
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
 }
 </style>
 
