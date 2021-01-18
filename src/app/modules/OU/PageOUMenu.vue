@@ -812,7 +812,7 @@ export default defineComponent({
             onDialogTablePlan(true);
             return false;
         } else {
-          onDialogPayment(true);
+          onDialogPayment(true, '', {});
         }
       } else {
         Notify.create({
@@ -928,9 +928,14 @@ export default defineComponent({
 
     }
 
-    const onDialogPayment = (val) => {
+    const onDialogPayment = (val, flag, data) => {
       state.dialogPayment = val;
       state.dataTable['dataPrepareInv'] = state.dataPrepare;
+
+      if (!val && flag == 'ok') {
+        state.dataTable['dataPayment'] = data;
+        console.log('should refresh menu : ', state.dataTable)
+      } 
     }
 
     const onDialogSplitBill = (val) => {
@@ -1752,6 +1757,89 @@ export default defineComponent({
       }
 
       initDataClickMenu();
+    }
+
+    const restInvUpdateBill1 = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvUpdateBill1 ', {
+            pvILanguage : 0,
+            recId:'',
+            recIdHArtikel:'',
+            deptname :'',
+            transdate :'',
+            hArtart :'',
+            cancelOrder :'',
+            hArtikelServic:'',
+            amount:'',
+            amountForeign:'',
+            price:'',
+            doubleCurrency:'',
+            qty:'',
+            exchgRate:'',
+            priceDecimal:'',
+            orderTaker:'',
+            tischnr:'',
+            currDept:'',
+            currWaiter:'',
+            gname:'',
+            pax:'',
+            kreditlimit:'',
+            addZeit:'',
+            billart:'',
+            description:'',
+            changeStr:'',
+            ccComment:'',
+            cancelStr:'',
+            reqStr:'',
+            voucherStr:'',
+            hogaCard:'',
+            printToKitchen:'',
+            fromAcct:'',
+            hArtnrfront:'',
+            payType:'',
+            guestnr:'',
+            transferZinr:'',
+            curedeptFlag:'',
+            foreignRate:'',
+            currRoom:'',
+            userInit:'',
+            hogaResnr:'',
+            hogaReslinnr:'',
+            inclVat:'',
+            getPrice:'',
+            mcStr:'',
+            'submenu-list': {'submenuList' : []},
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response restInvUpdateBill1 : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
     }
 
     const initDataClickMenu = () => {

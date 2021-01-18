@@ -440,11 +440,11 @@ export default defineComponent({
     const onOkDialog = () => {
       if (state.data.name.trim() == "") {
         Notify.create({
-              message: 'Name not yet selected',
-              color: 'red',
-            });
-            state.isLoading = false;
-            return false;
+          message: 'Name not yet selected',
+          color: 'red',
+        });
+        state.isLoading = false;
+        return false;
       } else {
         state.caseType = 0;
         state.data.showConfirmationDialog = true;

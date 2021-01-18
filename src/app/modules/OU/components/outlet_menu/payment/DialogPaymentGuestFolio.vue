@@ -85,6 +85,30 @@
           <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
+
+        <q-dialog v-model="showConfirmationDialog" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm selection ?</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Confirm your selection? </p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline color="primary" label="Cancel" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog> 
       </q-card>
     </q-dialog>
   </section>
@@ -92,6 +116,7 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
+import { stat } from 'fs';
 import { Notify } from 'quasar';
 
 interface State {
@@ -110,6 +135,7 @@ interface State {
   input: null;
   layout: string,
   numpadVisible: boolean,
+  showConfirmationDialog: boolean,
 }
 
 export default defineComponent({
@@ -140,6 +166,7 @@ export default defineComponent({
       layout: 'numeric',
       input: null,
       numpadVisible: false,
+      showConfirmationDialog: false,
     });
 
     watch(
@@ -157,7 +184,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentGuestFolio,
         set: (val) => {
-            emit('onDialogPaymentGuestFolio', val, null);
+            emit('onDialogPaymentGuestFolio', val, '', {});
         },
     });
 
@@ -274,6 +301,105 @@ export default defineComponent({
       }
       asyncCall();
     }
+
+    const getBtnExit = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('rzinrBtnExit', {
+            pvILanguage: 1,
+            flCode: state.data.dataResponse['flcode'],
+            code: state.data.dataSelected['code'],
+            resnr: state.data.dataSelected['resnr'],
+            reslinnr: state.data.dataSelected['reslinnr'],
+            balance: state.data.balance,
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response rzinrBtnExit: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (response['msgStr'] == '' && response['msgStr1'] == '' && response['msgStr2'] == '') {
+            state.showConfirmationDialog = true;
+          } else {
+            Notify.create({
+              message: response['msgStr'] + "\n" + response['msgStr1'] + "\n" + response['msgStr2'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+    const getMicrosBtn = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvMicrosBtnTransfer', {
+            hBillRecid : props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            balanceForeign : props.dataTable['dataTable']['dataopentable']['balanceForeign'],
+            balance : state.data.balance,
+            transfStr: ' ',
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response restInvMicrosBtnTransfer: ', response);
+
+          props.dataTable['dataPayment'] = response;
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          emit('onDialogPaymentGuestFolio', false, 'ok', response);
+          
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
     
 
     const tableHeaders = [
@@ -311,6 +437,10 @@ export default defineComponent({
     ];
 
     // -- onClick listener 
+    const onClickConfirmation = () => {
+      getMicrosBtn();
+    }
+
     const onRowClickTable = (dataRow) => {
      for (let i = 0; i<state.data.dataDetail.length; i++) {
         const datarow = state.data.dataDetail[i] as {};
@@ -339,10 +469,24 @@ export default defineComponent({
     }
 
     const onOkDialog = () => {
+      console.log(state.data.dataSelected);
+
+      let flCode = 0;
+      if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptLdry'])) {
+        flCode = 1;
+        state.data.dataResponse['flcode'] = flCode;
+        console.log('flCode', flCode);
+        getBtnExit();
+      } else if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptLdry'])) {
+        flCode = 2;
+        state.data.dataResponse['flcode'] = flCode;
+        console.log('flCode', flCode);
+        getBtnExit();
+      }
     }
 
     const onCancelDialog = () => {
-      emit('onDialogPaymentGuestFolio', false);
+      emit('onDialogPaymentGuestFolio', false, '', {});
     }
 
     const showKeyboard = (e) => {
@@ -375,6 +519,7 @@ export default defineComponent({
       showKeyboard,
       hideKeyboard,
       acceptKeyboard,
+      onClickConfirmation,
       pagination: { rowsPerPage: 0 },
     };
   },

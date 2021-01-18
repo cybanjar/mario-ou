@@ -161,6 +161,7 @@
       :showPaymentCompliment="data.showPaymentCompliment"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentCompliment="onDialogPaymentCompliment" />
 
     <dialogPaymentMasterFolio
@@ -325,7 +326,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.dialogPayment,
         set: (val) => {
-            emit('onDialogPayment', val, null);
+            emit('onDialogPayment', val, '', '');
         },
     });
 
@@ -454,6 +455,8 @@ export default defineComponent({
               getRestInvBtnTransfer();
             } else if (idPayment == 5) {
               getRestInvBtnTransfer();
+            } else if (idPayment == 7) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 8) {
               getRestInvBtnTransfer();
             }
@@ -581,7 +584,7 @@ export default defineComponent({
 
       async function asyncCall() {
         const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvBtnTransfer ', {
+          $api.outlet.getOUPrepare('restInvBtnTransfer', {
             departement : state.data.dataPreparePayment['dataTable']['departement'],
             rechnr: state.data.dataPreparePayment['dataTable']['rechnr'],
           })
@@ -619,7 +622,8 @@ export default defineComponent({
               getRestInvBillTransfer();
             } else if (idPayment == 5) {
               getRestInvBillTransfer();
-              // onDialogDepartment(true, null);
+            } else if (idPayment == 7) {
+              getRestInvBillTransfer();
             }
           }
 
@@ -668,6 +672,8 @@ export default defineComponent({
             getBillTransferCheckVAT();
           } else if (idPayment == 5) {
             getBillTransferCheckVAT();
+          } else if (idPayment == 7) {
+            getRestInvCheckDiscart();
           }
           state.isLoading = false;
         } else {
@@ -716,7 +722,13 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } else {
-            onDialogPaymentMealCoupon(true);
+            const idPayment = state.data.selectedPayment['id'];
+
+            if (idPayment == 7) {
+             onDialogPaymentCompliment(true);
+            } else if (idPayment == 8) {
+              onDialogPaymentMealCoupon(true);
+            }
           }
 
           state.isLoading = false;
@@ -765,7 +777,7 @@ export default defineComponent({
 
           if (response['flCode'] == 0) {
             if (idPayment == 4) {
-              onDialogPaymentGuestFolio(true);
+              onDialogPaymentGuestFolio(true, '', {});
             } else if (idPayment == 5) {
               onDialogDepartment(true, null);
             }
@@ -807,7 +819,7 @@ export default defineComponent({
       } else if (idPayment == 6) {
         onDialogPaymentMasterFolio(true);
       } else if (idPayment == 7) {
-        onDialogPaymentCompliment(true);
+        getRestInvGetSaldo();
       } else if (idPayment == 8) {
         getRestInvGetSaldo();
       }
@@ -828,7 +840,7 @@ export default defineComponent({
       state.data.selectedPayment = {};
       state.data.buttonOkEnable = false;
       state.isLoading = false;
-      emit('onDialogPayment', false);
+      emit('onDialogPayment', false, '', '');
     }
 
     const onClickConfirmation = () => {
@@ -841,6 +853,8 @@ export default defineComponent({
       } else if (idPayment == 4) {
         zuggriff(20, 2);
       } else if (idPayment == 5) {
+        zuggriff(20, 2);
+      } else if (idPayment == 7) {
         zuggriff(20, 2);
       }
     }
@@ -859,8 +873,17 @@ export default defineComponent({
       state.data.showPaymentCityLedger = val;
     }
 
-    const onDialogPaymentGuestFolio = (val) => {
+    const onDialogPaymentGuestFolio = (val, flag, data) => {
       state.data.showPaymentGuestFolio = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data);
+      }
     }
 
     const onDialogPaymentNonGuestFolio = (val) => {
