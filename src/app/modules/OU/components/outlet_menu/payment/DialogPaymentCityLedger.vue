@@ -69,7 +69,6 @@
                   </q-td>
                 </q-tr>
               </template>
-
             </STable>
 
             <vue-touch-keyboard 
@@ -530,7 +529,6 @@ export default defineComponent({
       showKeyboard,
       hideKeyboard,
       acceptKeyboard,
-
       pagination: { rowsPerPage: 0 },
     };
   },

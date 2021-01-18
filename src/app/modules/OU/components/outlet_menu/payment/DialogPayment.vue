@@ -168,6 +168,7 @@
       :showPaymentMasterFolio="data.showPaymentMasterFolio"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
+      :dataTable="data.dataPreparePayment"
       @onDialogPaymentMasterFolio="onDialogPaymentMasterFolio" />
 
     <dialogPaymentMealCoupon
@@ -455,6 +456,8 @@ export default defineComponent({
               getRestInvBtnTransfer();
             } else if (idPayment == 5) {
               getRestInvBtnTransfer();
+            } else if (idPayment == 6) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 7) {
               getRestInvBtnTransfer();
             } else if (idPayment == 8) {
@@ -622,6 +625,8 @@ export default defineComponent({
               getRestInvBillTransfer();
             } else if (idPayment == 5) {
               getRestInvBillTransfer();
+            } else if (idPayment == 6) {
+              getRestInvBillTransfer();
             } else if (idPayment == 7) {
               getRestInvBillTransfer();
             }
@@ -671,6 +676,8 @@ export default defineComponent({
           if (idPayment == 4) {
             getBillTransferCheckVAT();
           } else if (idPayment == 5) {
+            getBillTransferCheckVAT();
+          } else if (idPayment == 6) {
             getBillTransferCheckVAT();
           } else if (idPayment == 7) {
             getRestInvCheckDiscart();
@@ -780,6 +787,8 @@ export default defineComponent({
               onDialogPaymentGuestFolio(true, '', {});
             } else if (idPayment == 5) {
               onDialogDepartment(true, null);
+            } else if (idPayment == 6) {
+              onDialogPaymentMasterFolio(true);
             }
             state.isLoading = false;
           } else {
@@ -817,7 +826,7 @@ export default defineComponent({
       } else if (idPayment == 5) {
         getRestInvGetSaldo();
       } else if (idPayment == 6) {
-        onDialogPaymentMasterFolio(true);
+        getRestInvGetSaldo();
       } else if (idPayment == 7) {
         getRestInvGetSaldo();
       } else if (idPayment == 8) {
@@ -853,6 +862,8 @@ export default defineComponent({
       } else if (idPayment == 4) {
         zuggriff(20, 2);
       } else if (idPayment == 5) {
+        zuggriff(20, 2);
+      } else if (idPayment == 6) {
         zuggriff(20, 2);
       } else if (idPayment == 7) {
         zuggriff(20, 2);

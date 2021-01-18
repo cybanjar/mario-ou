@@ -57,7 +57,10 @@ interface State {
   }
   title: string;
   bill: any,
-  input: null,
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -73,8 +76,14 @@ export default defineComponent({
         buttonOkEnable: false,
       },
       title: '',
-    bill: 1,
-    input: null,
+      bill: 1,
+       options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: 'numeric',
+      input: null,
+      numpadVisible: false,
     });
 
     watch(

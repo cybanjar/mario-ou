@@ -1,7 +1,7 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:500px;">
+      <q-card  style="max-width: 1500px;width:600px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
@@ -13,29 +13,24 @@
             </div>
 
               <div class="col">
-                <SInput outlined  label-text="Balance" :disable="true" readonly/>
+                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
               </div>
           </div>
 
           <div class="q-ma-sm row q-gutter-xs">
             <div class="col">
-              <q-space />
+            
             </div>
 
             <div class="col">
-              <SInput outlined  label-text="Payment" :disable="true" readonly/>
+              <SInput outlined v-model="data.name" label-text="Name" @change="(v) => { onChangeSearchInput(); }" data-layout="compact" ref="paymentName" @focus="showKeyboard"/>
             </div>
           </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
-
-            <div class="col">
-              <SInput outlined  label-text="Name"/>
-            </div>
-          </div>
+          <q-btn
+            color="primary"
+            label="View Member"
+            @click="onClickMember()" />
         </q-card-section>
 
         <q-card-section>
@@ -44,8 +39,8 @@
             <STable
               hide-bottom
               :loading="isLoading"
-              :columns="tableHeadersPrint"
-              :data="data.dataTablePayment"
+              :columns="tableHeaders"
+              :data="data.filteredDataTable"
               row-key="name"
               separator="cell"
               :rows-per-page-options="[0]"
@@ -54,24 +49,78 @@
                 <q-inner-loading showing color="primary" />
               </template>
 
-              <template v-slot:item="props">
-                <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                  <q-card>
-                    <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                        <strong>{{ props.row.name }}</strong>
-                    </q-card-section>
-                  </q-card>
-                </div>
+              <template v-slot:body="props">
+                <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                  <q-td
+                    v-for="col in props.cols"
+                    :key="col.name"
+                    :props="props"
+                    @click="onRowClickTable(props.row)">
+                      {{ col.value }}
+                  </q-td>
+                </q-tr>
               </template>
             </STable>
           </div>
+
+          <vue-touch-keyboard 
+              id="keyboard"
+              :options="options" 
+              v-if="numpadVisible" 
+              :layout="layout" 
+              :cancel="hideKeyboard" 
+              :accept="acceptKeyboard" 
+              :next="acceptKeyboard"
+              :input="input"
+              :close="hideKeyboard" />
         </q-card-section>
 
         <q-separator />
 
+        <q-dialog v-model="showDialogConfirmation" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Confirm selection?</p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline label="Cancel" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <q-dialog v-model="showDialogMemberDetail" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Member of Master Bill</q-toolbar-title>
+            </q-toolbar>
+
+            <q-card-section class="row items-center">
+            
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline label="Cancel" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmationDetail()" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -86,11 +135,19 @@ interface State {
   isLoading: boolean;
   data: {
     dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
     buttonOkEnable: boolean;
+    balance: any;
+    name: any;
+    filteredDataTable: any,
+    dataSelected: null,
   }
   title: string;
+  showDialogMemberDetail: boolean;
+  showDialogConfirmation: boolean;
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -98,7 +155,7 @@ export default defineComponent({
     showPaymentMasterFolio: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
-    // dataSelectedOrderTaker: {type: null, required: true},
+    dataTable: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -106,63 +163,22 @@ export default defineComponent({
       isLoading: false,
       data: {
         dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
-          {
-            'name': "Cash",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Card",
-            'id': '2',
-            'selected': false,
-          },
-          {
-            'name': "City Ledger",
-            'id': '3',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Guest Folio",
-            'id': '4',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Non Guest Folio",
-            'id': '5',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Master Folio",
-            'id': '6',
-            'selected': false,
-          },
-          {
-            'name': "Compliment",
-            'id': '7',
-            'selected': false,
-          },
-          {
-            'name': "Meal Coupon",
-            'id': '8',
-            'selected': false,
-          }
-        ],
         buttonOkEnable: false,
+        balance: 0,
+        name: '',
+        filteredDataTable: [],
+        dataSelected: null,
       },
       title: '',
+      showDialogMemberDetail: false,
+      showDialogConfirmation: false,
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: '',
+      input: null,
+      numpadVisible: false,
     });
 
     watch(
@@ -170,9 +186,12 @@ export default defineComponent({
         if (props.showPaymentMasterFolio) {
           state.data.buttonOkEnable = false;
           state.title = 'Master Folio Payment';
+          state.data.balance = props.dataTable['dataTable']['saldo'];
+          state.data.dataSelected = null;
 
-          console.log("selectedPrint", props.selectedPrint);
-          console.log("selectedPayment", props.selectedPayment);
+          getRMaster();
+
+          console.log("On Mount Master Folio : ", props.dataTable);
         }
       }
     );
@@ -184,122 +203,228 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        datarow['selected'] = false;
-      }        
+    // HTTP Request Method
+    const getRMaster = () => {
+      state.isLoading = true;
 
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          datarow['databaru'] = 1;
-          break;
-        }
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('rmaster', {
+            hRecid: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response rmaster: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.data.dataDetail = response['q1List']['q1-list'];
+          state.data.filteredDataTable = state.data.dataDetail;
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
       }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      asyncCall();
     }
 
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
+    const getCheckCreditLimit = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('rmasterCheckCreditlimit', {
+            billGastnr: state.data.dataSelected['gastnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response rmasterCheckCreditlimit: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (state.data.dataSelected['saldo'] > response['klimit']) {
+            Notify.create({
+              message: 'OVER Credit Limit found!! \nGiven Limit = ' + response['klimit'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+          });
+          state.isLoading = false;
+          return false;
+          }
       }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
+      asyncCall();
     }
 
-    const tableHeadersPrint = [
+
+    const tableHeaders = [
       {
-            label: "name", 
-            field: "name",
-            name: "name",
-            align: "center",
+            label: "Bill Number", 
+            field: "rechnr",
+            name: "rechnr",
+            align: "right",
         }, {
-            label: "id", 
-            field: "id",
-            name: "id",
-            align: "center",
+            label: "Bill Receiver", 
+            field: "bill-name",
+            name: "bill-name",
+            align: "left",
+        }, {
+            label: "Group Name", 
+            field: "groupname",
+            name: "groupname",
+            align: "left",
         },
     ];
 
-    // -- 
-    const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+    // -- On Click Listener
+    const onClickConfirmationDetail = () => {
+      
+    }
+
+    const onClickConfirmation = () => {
+      getCheckCreditLimit();
+    }
+
+    const onClickMember = () => {
+      if ((state.data.dataSelected) != null ) {
+        state.showDialogMemberDetail = true;
+      } else {
+        Notify.create({
+          message: 'Select guest first',
+          color: 'red',
+        });
+      }
+    }
+
+    const onOkDialog = () => {
+      if ((state.data.dataSelected) != null ) {
+        state.showDialogConfirmation = true;
+      } else {
+        Notify.create({
+          message: 'Select guest first',
+          color: 'red',
+        });
+      }
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
+      state.data.dataSelected = null;
+      state.data.name = '';
+      state.data.balance = 0;
       emit('onDialogPaymentMasterFolio', false);
+    }
+
+    const onRowClickTable = (dataRow) => {
+      for (let i = 0; i<state.data.filteredDataTable.length; i++) {
+        const datarow = state.data.filteredDataTable[i] as {};
+        datarow['selected'] = false;
+      }
+
+      const dataTable = [] as any;
+      for (let i = 0; i<state.data.filteredDataTable.length; i++) {
+        const datarow = state.data.filteredDataTable[i] as {};          
+        if (state.data.filteredDataTable[i]['gastnr'] == dataRow['gastnr'] 
+              && state.data.filteredDataTable[i]['rec-id'] == dataRow['rec-id']) {
+          datarow['selected'] = true;
+        }
+        dataTable.push(datarow);
+      }
+      state.data.filteredDataTable = [];
+      state.data.filteredDataTable = dataTable;
+
+      dataRow['selected'] = true;
+      state.data.dataSelected = dataRow;
+      state.data.name = state.data.dataSelected['bill-name'];
+      state.data.buttonOkEnable = true;
+    }
+
+    const onChangeSearchInput = (input) => {
+      state.data.filteredDataTable = [];
+
+      if (state.data.name.length > 0) {
+        for(let i = 0; i<state.data.dataDetail.length; i++) {
+          const datarow = state.data.dataDetail[i];
+          const bezeich = state.data.dataDetail[i]['bill-name'] as string;
+
+          if (bezeich.toLocaleLowerCase().includes(state.data.name.toLocaleLowerCase())) {
+            state.data.filteredDataTable.push(datarow);
+          }
+        }
+      } else {
+        state.data.filteredDataTable = state.data.dataDetail;
+      }
+    }
+
+    const showKeyboard = (e) => {
+      if (e.target.localName == "input") {
+        state.input = e.target; 
+        state.layout = e.target.dataset.layout;
+      } 
+
+      if (!state.numpadVisible) {
+        state.numpadVisible = true;
+      }      
+    }
+
+    const hideKeyboard = () => {
+      state.numpadVisible = false;
+
+      if (state.layout == 'compact') {
+        onChangeSearchInput(state.data.dataSelected);
+      }
+    }
+
+    const acceptKeyboard = () => {
+      hideKeyboard();
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
-      onOkDialogSelectUser,
+      tableHeaders,
+      onRowClickTable,
+      onClickConfirmation,
+      onOkDialog,
+      onClickMember,
       onCancelDialog,
+      onChangeSearchInput,
+      showKeyboard,
+      hideKeyboard,
+      acceptKeyboard,
+      onClickConfirmationDetail,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -328,6 +453,25 @@ export default defineComponent({
       text-align: right;
     }
   }
+}
+
+#keyboard {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: 1000;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+
+	padding: 1em;
+
+	background-color: #EEE;
+	box-shadow: 0px -3px 10px rgba(black, 0.3);
+
+	border-radius: 10px;
 }
 </style>
 

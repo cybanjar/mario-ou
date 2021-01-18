@@ -85,7 +85,10 @@ interface State {
   }
   title: string;
   qty: any,
-  input: null,
+  options: {};
+  input: null;
+  layout: string,
+  numpadVisible: boolean,
 }
 
 export default defineComponent({
@@ -130,7 +133,13 @@ export default defineComponent({
       },
       title: '',
       qty: 1,
+      options: {
+        useKbEvents: false,
+        preventClickEvent: false
+      },
+      layout: 'numeric',
       input: null,
+      numpadVisible: false,    
     });
 
     watch(
