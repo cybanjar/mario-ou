@@ -7,6 +7,12 @@
         transition-show="slide-up"
         transition-hide="slide-down">
         <q-card class="bg-white text-black">
+         
+         <q-btn class="q-ma-md" size="14px" flat round icon="mdi-chevron-left" v-close-popup>
+            <q-tooltip>
+              Back
+            </q-tooltip>
+         </q-btn>
             <STable
               grid
               hide-header
