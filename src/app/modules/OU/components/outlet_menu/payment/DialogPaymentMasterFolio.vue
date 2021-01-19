@@ -35,7 +35,6 @@
 
         <q-card-section>
           <div class="q-pa-sm">
-
             <STable
               hide-bottom
               :loading="isLoading"
@@ -102,13 +101,38 @@
         </q-dialog>
 
         <q-dialog v-model="showDialogMemberDetail" persistent>
-          <q-card style="max-width: 1500px;width:450px;">
+          <q-card style="max-width: 1500px;width:550px;">
             <q-toolbar>
               <q-toolbar-title class="text-white text-weight-medium">Member of Master Bill</q-toolbar-title>
             </q-toolbar>
 
             <q-card-section class="row items-center">
-            
+              <div class="q-pa-sm">
+                <STable
+                  hide-bottom
+                  :loading="isLoading"
+                  :columns="tableHeadersMemberDetail"
+                  :data="data.dataDetailMember"
+                  row-key="name"
+                  separator="cell"
+                  :rows-per-page-options="[0]"
+                  :pagination.sync="pagination">
+                  <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                  </template>
+
+                  <template v-slot:body="props">
+                    <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                      <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props">
+                          {{ col.value }}
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </STable>
+              </div>
             </q-card-section>
 
             <q-card-actions align="right">
@@ -140,6 +164,7 @@ interface State {
     name: any;
     filteredDataTable: any,
     dataSelected: null,
+    dataDetailMember: any;
   }
   title: string;
   showDialogMemberDetail: boolean;
@@ -168,6 +193,7 @@ export default defineComponent({
         name: '',
         filteredDataTable: [],
         dataSelected: null,
+        dataDetailMember: [],
       },
       title: '',
       showDialogMemberDetail: false,
@@ -289,6 +315,46 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getMasterMemberPrepare = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('mastmemberPrepare', {
+            billno: state.data.dataSelected['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response mastmemberPrepare: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.data.dataDetailMember = response['q1List']['q1-list'];
+          state.isLoading = false;
+          state.showDialogMemberDetail = true;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+
 
     const tableHeaders = [
       {
@@ -309,6 +375,35 @@ export default defineComponent({
         },
     ];
 
+    const tableHeadersMemberDetail = [
+      {
+            label: "RmNo", 
+            field: "zinr",
+            name: "zinr",
+            align: "left",
+        }, {
+            label: "Guest Name", 
+            field: "name",
+            name: "name",
+            align: "left",
+        }, {
+            label: "Guest Status", 
+            field: "resstatus",
+            name: "resstatus",
+            align: "left",
+        }, {
+            label: "Arrival", 
+            field: "ankunft",
+            name: "ankunft",
+            align: "left",
+        }, {
+            label: "Departure", 
+            field: "abreise",
+            name: "abreise",
+            align: "left",
+        },
+    ];
+
     // -- On Click Listener
     const onClickConfirmationDetail = () => {
       
@@ -320,7 +415,7 @@ export default defineComponent({
 
     const onClickMember = () => {
       if ((state.data.dataSelected) != null ) {
-        state.showDialogMemberDetail = true;
+        getMasterMemberPrepare();
       } else {
         Notify.create({
           message: 'Select guest first',
@@ -425,6 +520,7 @@ export default defineComponent({
       hideKeyboard,
       acceptKeyboard,
       onClickConfirmationDetail,
+      tableHeadersMemberDetail,
       pagination: { rowsPerPage: 0 },
     };
   },

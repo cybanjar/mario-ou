@@ -18,7 +18,7 @@
           </div>
         </q-card-section>
 
-        <q-card-section class="q-pa-none">
+        <!-- <q-card-section class="q-pa-none">
           <div>
             <div class="full-width bg-grey-3">
               <p class="q-pa-md"><strong> Print </strong></p>
@@ -51,7 +51,7 @@
               </template>
             </STable>
           </div>
-        </q-card-section>
+        </q-card-section> -->
 
         <q-card-section class="q-pa-none q-mt-sm">
           <div>
@@ -92,7 +92,7 @@
 
         <q-card-actions align="right">
           <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialog" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -831,6 +831,8 @@ export default defineComponent({
         getRestInvGetSaldo();
       } else if (idPayment == 8) {
         getRestInvGetSaldo();
+      } else {
+        
       }
     }
 

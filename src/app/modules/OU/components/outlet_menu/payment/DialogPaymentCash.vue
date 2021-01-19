@@ -123,7 +123,6 @@ export default defineComponent({
   props: {
     showPaymentCash: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataPreparePayment: {type: null, required: true},
   },
 
@@ -209,6 +208,7 @@ export default defineComponent({
           state.data.change = 0;
 
           console.log("dialog cash mounted, data prepare : ", props.dataPreparePayment);
+          console.log("selected payment : ", props.selectedPayment);
         }
       }
     );

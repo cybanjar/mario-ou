@@ -427,6 +427,8 @@
         <dialogSplitBill
           :showDialogSplitBill="showDialogSplitBill"
           :dataSelectedSplitBill="dataSelected"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           @onDialogSplitBill="onDialogSplitBill"/>
 
         <dialogDiscountBill 

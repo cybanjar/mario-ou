@@ -319,20 +319,34 @@ export default defineComponent({
     const getInvBtnTransferPaytype56 = () => {
        state.isLoading = true;
 
+       console.log({
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            guestnr: 0,
+            currDept: props.dataTable['dataPrepare']['departement'],
+            balanceForeign: 0,
+            balance: state.data.balance,
+            payType: 6,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            doubleCurrency: false,
+            exchgRate: 1,
+            priceDecimal: 2,
+            userInit: dataStoreLogin['userInit'],
+          })
+
       async function asyncCall() {
         const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvBtnTransferPaytype56 ', {
-            recId: props.dataTable['dataThBill'][0]['rec-id'],
+          $api.outlet.getOUPrepare('restInvBtnTransferPaytype56', {
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
             guestnr: 0,
-            currDept: props.dataTable['departement'],
+            currDept: props.dataTable['dataPrepare']['departement'],
             balanceForeign: 0,
-            balance: '',
-            payType: '',
-            transdate: '',
-            doubleCurrency: '',
-            exchgRate: '',
-            priceDecimal: '',
-            userInit: '',
+            balance: state.data.balance,
+            payType: 6,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            doubleCurrency: false,
+            exchgRate: 1,
+            priceDecimal: 2,
+            userInit: dataStoreLogin['userInit'],
           })
         ]);
 
