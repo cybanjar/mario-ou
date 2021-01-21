@@ -521,7 +521,7 @@ export default defineComponent({
           } else {
             Notify.create({
               message: responsePrepare['msgStr'],
-              type: 'warning',
+              color: 'red',
             });
             state.isLoading = false;
             return false;
@@ -816,7 +816,7 @@ export default defineComponent({
       const idPayment = state.data.selectedPayment['id'];
       
       if (idPayment == 1) {
-        zuggriff(20, 2);
+        getRestInvGetSaldo();
       } else if (idPayment == 2) {
         onDialogPaymentCard(true);
       } else if (idPayment == 3) {
@@ -832,7 +832,7 @@ export default defineComponent({
       } else if (idPayment == 8) {
         getRestInvGetSaldo();
       } else {
-        
+
       }
     }
 
@@ -868,6 +868,8 @@ export default defineComponent({
       } else if (idPayment == 6) {
         zuggriff(20, 2);
       } else if (idPayment == 7) {
+        zuggriff(20, 2);
+      } else if (idPayment == 1) {
         zuggriff(20, 2);
       }
     }

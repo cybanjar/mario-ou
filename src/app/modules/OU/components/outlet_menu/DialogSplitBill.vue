@@ -10,7 +10,7 @@
           <div
             class="row items-center q-gutter-sm q-mx-sm"
           >
-            <q-card flat bordered>
+            <q-card flat bordered @click="data.balance !=0 ? onDialogPaymentCash(true) : null">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -22,7 +22,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered>
+            <q-card flat bordered @click="data.balance !=0 ? onDialogPaymentCard(true) : null">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -212,12 +212,19 @@
       :selectedPayment="data.selectedPayment"
       :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCash="onDialogPaymentCash" />
+
+    <dialogPaymentCard 
+      :showPaymentCard="showPaymentCard"
+      :selectedPayment="data.selectedPayment"
+      :dataPreparePayment="data.dataPreparePayment"
+      @onDialogPaymentCard="onDialogPaymentCard" />
   </section>
 </template>
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -228,14 +235,14 @@ interface State {
     buttonOkEnable: boolean;
     counter: any,
     balance: any,
-    selectedPayment: {
-      id:any,
-      name: string,
-      selected: boolean
-    }
+    selectedPayment: {},
+    dataPreparePayment: {},
+    dataTablePayment: any,
+
   }
   title: string;
   showPaymentCash: boolean;
+  showPaymentCard: boolean;
 }
 
 export default defineComponent({
@@ -247,6 +254,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -256,14 +265,54 @@ export default defineComponent({
         buttonOkEnable: false,
         counter: 1,
         balance: 0,
-        selectedPayment: {
-          id:0,
-          name: '',
-          selected: false
-        }
+        dataTablePayment : [
+          {
+            'name': "Cash",
+            'id': '1',
+            'selected': false,
+          },
+          {
+            'name': "Card",
+            'id': '2',
+            'selected': false,
+          },
+          {
+            'name': "City Ledger",
+            'id': '3',
+            'selected': false,
+          },
+          {
+            'name': "Transfer To Guest Folio",
+            'id': '4',
+            'selected': false,
+          },
+          {
+            'name': "Transfer To Non Guest Folio",
+            'id': '5',
+            'selected': false,
+          },
+          {
+            'name': "Transfer To Master Folio",
+            'id': '6',
+            'selected': false,
+          },
+          {
+            'name': "Compliment",
+            'id': '7',
+            'selected': false,
+          },
+          {
+            'name': "Meal Coupon",
+            'id': '8',
+            'selected': false,
+          }
+        ],
+        selectedPayment: {},
+        dataPreparePayment: {},
       },
       title: '',
       showPaymentCash: false,
+      showPaymentCard: false,
     });
 
     watch(
@@ -272,9 +321,10 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Split Bill';
 
+          state.data.dataPreparePayment['dataTable'] = props.dataTable;
+          state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
+
           console.log('On Mount Split Bill');
-          console.log('dataTable' , props.dataTable);
-          console.log('dataPrepare' , props.dataPrepare);
 
           state.data.dataTableMainBill = state.data.dataTableMain.slice()
           getPrepare();
@@ -290,6 +340,55 @@ export default defineComponent({
     });
 
     // -- HTTP Request method
+    const zuggriff = (arrayNr, expectedNr) => {
+      let zuggrifval = "false";
+      async function asyncCall() {
+        const [dataZuggrif] = await Promise.all([
+          $api.outlet.getZugriff('checkPermission', {
+            arrayNr: arrayNr,
+            expectedNr: expectedNr,
+            userInit:  dataStoreLogin['userInit']
+          }),
+        ]);
+
+        if (dataZuggrif) {
+          const responseZuggrif = dataZuggrif || [];
+          const okFlag = responseZuggrif['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('responseZuggrif : ', responseZuggrif);
+          zuggrifval = responseZuggrif['zugriff'];
+
+          if (zuggrifval == "true") {
+            // if (idPayment == 1) {
+            //   getPreparePayCash3();
+            // } else if (idPayment == 3) {
+            //   getRestInvBtnTransfer();
+            // } else if (idPayment == 4) { 
+            //   getRestInvBtnTransfer();
+            // } else if (idPayment == 5) {
+            //   getRestInvBtnTransfer();
+            // } else if (idPayment == 6) {
+            //   getRestInvBtnTransfer();
+            // } else if (idPayment == 7) {
+            //   getRestInvBtnTransfer();
+            // } else if (idPayment == 8) {
+            //   getRestInvBtnTransfer();
+            // }
+          }
+        }
+      }
+      asyncCall();
+    }
+
     const getPrepare = () => {
       state.isLoading = true;
 
@@ -406,23 +505,16 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getSplitBuildRMenu = () => {
+    const getSplitBuildLMenu = (dataRow) => {
       state.isLoading = true;
-
-      console.log('request : ',{
-        dept: props.dataPrepare['currDept'],
-        // recId: props.dataTable['dataThBill'][0]['rec-id'],
-        recId: 3624448,
-        currSelect: state.data.counter
-      })
 
       async function asyncCall() {
         const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('splitbillBuildRmenu', {
+          $api.outlet.getOUPrepare('splitbillSelectLmenu', {
             dept: props.dataPrepare['currDept'],
-            // recId: props.dataTable['dataThBill'][0]['rec-id'],
-            recId: 3624448,
-            currSelect: state.data.counter
+            recId: props.dataTable['dataThBill'][0]['rec-id'],
+            recIdHBillLine: dataRow['rec-id'],
+            currSelect: state.data.counter,
           })
         ]);
 
@@ -441,6 +533,139 @@ export default defineComponent({
             return false;
           } 
 
+          state.data.dataTableMainBill.forEach(function(item, index, object) {
+            if (item['rec-id'] == dataRow['rec-id']) {
+              item['selected'] = !item['selected'];
+            }
+          });
+
+          var dataTable = state.data.dataTableMainBill.slice()
+          let index = dataTable.length - 1;
+
+          while (index >= 0) {
+            if (dataTable[index]['selected']) {
+              dataTable[index]['waehrungsnr'] = state.data.counter;
+              state.data.dataTableSplitBill.push(dataTable[index]);
+              dataTable.splice(index, 1);
+            }
+            index -= 1;
+          }
+
+          // Assign Counter to Native Data
+          for (let i = 0; i<state.data.dataTableMain.length; i++) {
+            const dataRowI = state.data.dataTableMain[i];
+            for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
+              const dataRowX = state.data.dataTableMainBill[x];
+              if (dataRowI['rec-id'] == dataRowX['rec-id']) {
+                dataRowI['waehrungsnr'] = dataRowX['waehrungsnr'];
+              }
+            }
+
+            for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
+              const dataRowY = state.data.dataTableSplitBill[y];
+              if (dataRowI['rec-id'] == dataRowY['rec-id']) {
+                dataRowI['waehrungsnr'] = dataRowY['waehrungsnr'];
+              }
+            }
+          }
+    
+          state.data.dataTableSplitBill.forEach(function(item, index, object) {
+            item['selected'] = false;
+          });
+          state.data.dataTableMainBill = dataTable;
+
+          getCalBalance(false);
+
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
+     const getSplitBuildRMenu = (dataRow) => {
+      state.isLoading = true;
+
+      console.log({
+            dept: props.dataPrepare['currDept'],
+            recId: props.dataTable['dataThBill'][0]['rec-id'],
+            currSelect: state.data.counter,
+            recIDhBillLine: dataRow['rec-id']
+          })
+      
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillSelectRmenu', {
+            dept: props.dataPrepare['currDept'],
+            recId: props.dataTable['dataThBill'][0]['rec-id'],
+            currSelect: state.data.counter,
+            recIdHBillLine: dataRow['rec-id']
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response splitbillSelectRmenu: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.data.dataTableSplitBill.forEach(function(item, index, object) {
+            if (item['rec-id'] == dataRow['rec-id']) {
+              item['selected'] = !item['selected'];
+            }
+          });
+
+          var dataTable = state.data.dataTableSplitBill.slice()
+          let index = dataTable.length - 1;
+
+          while (index >= 0) {
+            if (dataTable[index]['selected']) {
+              dataTable[index]['waehrungsnr'] = 0;
+              state.data.dataTableMainBill.push(dataTable[index]);
+              dataTable.splice(index, 1);
+            }
+            index -= 1;
+          }
+
+          // Assign Counter to Native Data
+          for (let i = 0; i<state.data.dataTableMain.length; i++) {
+            const dataRowI = state.data.dataTableMain[i];
+            for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
+              const dataRowX = state.data.dataTableMainBill[x];
+              if (dataRowI['rec-id'] == dataRowX['rec-id']) {
+                dataRowI['waehrungsnr'] = dataRowX['waehrungsnr'];
+              }
+            }
+
+            for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
+              const dataRowY = state.data.dataTableSplitBill[y];
+              if (dataRowI['rec-id'] == dataRowY['rec-id']) {
+                dataRowI['waehrungsnr'] = dataRowY['waehrungsnr'];
+              }
+            }
+          }
+    
+          state.data.dataTableSplitBill.forEach(function(item, index, object) {
+            item['selected'] = false;
+          });
+          state.data.dataTableSplitBill = dataTable;
+
+          getCalBalance(false);
 
           state.isLoading = false;
         } else {
@@ -484,51 +709,9 @@ export default defineComponent({
       }
 
       console.log('dataRow : ' , dataRow);
-      getSplitBuildRMenu();
 
       if (flag) {
-        /*
-        state.data.dataTableMainBill.forEach(function(item, index, object) {
-          if (item['rec-id'] == dataRow['rec-id']) {
-            item['selected'] = !item['selected'];
-          }
-        });
-
-        var dataTable = state.data.dataTableMainBill.slice()
-        let index = dataTable.length - 1;
-
-        while (index >= 0) {
-          if (dataTable[index]['selected']) {
-            dataTable[index]['waehrungsnr'] = state.data.counter;
-            state.data.dataTableSplitBill.push(dataTable[index]);
-            dataTable.splice(index, 1);
-          }
-          index -= 1;
-        }
-
-        // Assign Counter to Native Data
-        for (let i = 0; i<state.data.dataTableMain.length; i++) {
-          const dataRowI = state.data.dataTableMain[i];
-          for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
-            const dataRowX = state.data.dataTableMainBill[x];
-            if (dataRowI['rec-id'] == dataRowX['rec-id']) {
-              dataRowI['waehrungsnr'] = dataRowX['waehrungsnr'];
-            }
-          }
-
-          for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
-            const dataRowY = state.data.dataTableSplitBill[y];
-            if (dataRowI['rec-id'] == dataRowY['rec-id']) {
-              dataRowI['waehrungsnr'] = dataRowY['waehrungsnr'];
-            }
-          }
-        }
-  
-        state.data.dataTableSplitBill.forEach(function(item, index, object) {
-          item['selected'] = false;
-        });
-        state.data.dataTableMainBill = dataTable;
-        */
+        getSplitBuildLMenu(dataRow);
       } else {
          Notify.create({
           message: 'PAID: Split Bill No ' + state.data.counter + "\Select other one",
@@ -539,46 +722,47 @@ export default defineComponent({
 
     const onClickMoveLeft = (dataRow) => {
       if (dataRow['paid-flag'] == 0) {
-        state.data.dataTableSplitBill.forEach(function(item, index, object) {
-          if (item['rec-id'] == dataRow['rec-id']) {
-            item['selected'] = !item['selected'];
-          }
-        });
+        getSplitBuildRMenu(dataRow);
+        // state.data.dataTableSplitBill.forEach(function(item, index, object) {
+        //   if (item['rec-id'] == dataRow['rec-id']) {
+        //     item['selected'] = !item['selected'];
+        //   }
+        // });
 
-        var dataTable = state.data.dataTableSplitBill.slice()
-        let index = dataTable.length - 1;
+        // var dataTable = state.data.dataTableSplitBill.slice()
+        // let index = dataTable.length - 1;
 
-        while (index >= 0) {
-          if (dataTable[index]['selected']) {
-            dataTable[index]['waehrungsnr'] = 0;
-            state.data.dataTableMainBill.push(dataTable[index]);
-            dataTable.splice(index, 1);
-          }
-          index -= 1;
-        }
+        // while (index >= 0) {
+        //   if (dataTable[index]['selected']) {
+        //     dataTable[index]['waehrungsnr'] = 0;
+        //     state.data.dataTableMainBill.push(dataTable[index]);
+        //     dataTable.splice(index, 1);
+        //   }
+        //   index -= 1;
+        // }
 
-        // Assign Counter to Native Data
-        for (let i = 0; i<state.data.dataTableMain.length; i++) {
-          const dataRowI = state.data.dataTableMain[i];
-          for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
-            const dataRowX = state.data.dataTableMainBill[x];
-            if (dataRowI['rec-id'] == dataRowX['rec-id']) {
-              dataRowI['waehrungsnr'] = dataRowX['waehrungsnr'];
-            }
-          }
+        // // Assign Counter to Native Data
+        // for (let i = 0; i<state.data.dataTableMain.length; i++) {
+        //   const dataRowI = state.data.dataTableMain[i];
+        //   for (let x = 0; x<state.data.dataTableMainBill.length; x++) {
+        //     const dataRowX = state.data.dataTableMainBill[x];
+        //     if (dataRowI['rec-id'] == dataRowX['rec-id']) {
+        //       dataRowI['waehrungsnr'] = dataRowX['waehrungsnr'];
+        //     }
+        //   }
 
-          for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
-            const dataRowY = state.data.dataTableSplitBill[y];
-            if (dataRowI['rec-id'] == dataRowY['rec-id']) {
-              dataRowI['waehrungsnr'] = dataRowY['waehrungsnr'];
-            }
-          }
-        }
+        //   for (let y = 0; y<state.data.dataTableSplitBill.length; y++) {
+        //     const dataRowY = state.data.dataTableSplitBill[y];
+        //     if (dataRowI['rec-id'] == dataRowY['rec-id']) {
+        //       dataRowI['waehrungsnr'] = dataRowY['waehrungsnr'];
+        //     }
+        //   }
+        // }
   
-        state.data.dataTableSplitBill.forEach(function(item, index, object) {
-          item['selected'] = false;
-        });
-        state.data.dataTableSplitBill = dataTable;
+        // state.data.dataTableSplitBill.forEach(function(item, index, object) {
+        //   item['selected'] = false;
+        // });
+        // state.data.dataTableSplitBill = dataTable;
       }  else {
         Notify.create({
           message: 'PAID: Split Bill No ' + dataRow['waehrungsnr'] + "\nDeselecting no longer posible",
@@ -640,7 +824,21 @@ export default defineComponent({
 
     // -- On Dialog Listener
     const onDialogPaymentCash = (val) => {
+      state.data.selectedPayment = state.data.dataTablePayment[1];
       state.showPaymentCash = val;
+
+      if (!val) {
+        state.data.selectedPayment = {};
+      }
+    }
+
+    const onDialogPaymentCard = (val) => {
+      state.data.selectedPayment = state.data.dataTablePayment[0];
+      state.showPaymentCard = val;
+
+      if (!val) {
+        state.data.selectedPayment = {}
+      }
     }
 
     return {
@@ -657,12 +855,13 @@ export default defineComponent({
       onClickChangeCounter,
       getCalBalance,
       onDialogPaymentCash,
+      onDialogPaymentCard,
       pagination: { rowsPerPage: 0 },
     };
   },
   components: {
     dialogPaymentCash: () => import('./payment/DialogPaymentCash.vue'),
-    // dialogPaymentCard: () => import('./DialogPaymentCard.vue'),
+    dialogPaymentCard: () => import('./payment/DialogPaymentCard.vue'),
     // dialogPaymentCityLedger: () => import('./DialogPaymentCityLedger.vue'),
     // dialogPaymentGuestFolio: () => import('./DialogPaymentGuestFolio.vue'),
     // dialogPaymentNonGuestFolio: () => import('./DialogPaymentNonGuestFolio.vue'),
