@@ -50,6 +50,42 @@
               <q-card-section>                          
                 <q-img
                   class="img-collage"
+                  src="../../../../icons/OU/collage/TransferRoom.svg"
+                >
+                <q-tooltip>
+                  Transfer To Guest Folio
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/GuestStayBillPayment.svg"
+                >
+                <q-tooltip>
+                  Transfer To Non Guest Folio
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
+                  src="../../../../icons/OU/collage/MasterBill.svg"
+                >
+                <q-tooltip>
+                  Transfer To Master Folio
+                </q-tooltip>
+                </q-img>                          
+              </q-card-section>
+            </q-card>
+            <q-card flat bordered>
+              <q-card-section>                          
+                <q-img
+                  class="img-collage"
                   src="../../../../icons/OU/collage/rePrintBill1.svg"
                 >
                 <q-tooltip>
@@ -165,7 +201,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
         </q-card-actions>
       </q-card>
