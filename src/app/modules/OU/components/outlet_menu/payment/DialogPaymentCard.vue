@@ -101,7 +101,6 @@ export default defineComponent({
   props: {
     showPaymentCard: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataPreparePayment: {type: null, required: true},
   },
 
@@ -180,7 +179,6 @@ export default defineComponent({
           state.data.payment = -props.dataPreparePayment['dataTable']['saldo'];
 
 
-          console.log("selectedPrint", props.selectedPrint);
           console.log("selectedPayment", props.selectedPayment);
         }
       }
