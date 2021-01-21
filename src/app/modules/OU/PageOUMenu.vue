@@ -714,34 +714,11 @@ export default defineComponent({
     onMounted(async () => { 
       state.isLoading = true;
 
-      //const ouStore = {'Ou': true };
-      // store.state['ou'] = ouStore;
-      // sessionStorage.setItem('OU_isFisrtLoad', 'true');
-      // 0 true || 1 false
-      // let isFirstLoad = "0" as any;
-
-      // let ouFirstLoad = Cookies.get('OU_isFisrtLoad'); 
-
-      state.flagFirstLoad = Cookies.get('OU_isFisrtLoad');
-
-      if (state.flagFirstLoad == undefined) {
-        state.flagFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
-      }
-
-      // if (state.flagFirstLoad == 0) {
-      //   state.flagFirstLoad = 1;
-      //   // ouFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
-      //   // // isFirstLoad = "0"
-      // } 
-
-      // const test = Cookies.get('OU_isFisrtLoad');
-      // Cookies.remove('OU_isFisrtLoad');
-      // console.log(test,"git");
-      
-      // const flagFirstLoad = store;
-      // const flagFirstLoad = Cookies.get("OU_isFisrtLoad");
-
-      console.log('flagFirstLoad', state.flagFirstLoad);
+      // state.flagFirstLoad = Cookies.get('OU_isFisrtLoad');
+      // if (state.flagFirstLoad == undefined) {
+      //   state.flagFirstLoad = Cookies.set('OU_isFisrtLoad', "0") as any;
+      // }
+      // console.log('flagFirstLoad', state.flagFirstLoad);
 
       setTimeout(() => {
         getHTParam(4, 60);
@@ -936,7 +913,9 @@ export default defineComponent({
 
       if (!val && flag == 'ok') {
         state.dataTable['dataPayment'] = data;
-        console.log('should refresh menu : ', state.dataTable)
+        state.flagFirstLoad = 1;
+        checkBill();
+        // console.log('should refresh menu : ', state.dataTable)
       } 
     }
 
@@ -1385,10 +1364,10 @@ export default defineComponent({
 
             zuggriff(19, 2, "getPrepare");
 
-            if (state.flagFirstLoad == undefined) {
-              onDialogTablePlan(true);
-            }
-            // onDialogTablePlan(true);
+            onDialogTablePlan(true);
+            // if (state.flagFirstLoad == undefined) {
+            //   onDialogTablePlan(true);
+            // }
           }
         } else {
           Notify.create({
@@ -1432,7 +1411,14 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-          onDialogMenuOrderTaker(true, null);
+
+          if (state.flagFirstLoad == 0) {
+            onDialogMenuOrderTaker(true, null);          
+          } else {
+            if (state.dataOrdered.length == 0) {
+              onDialogTablePlan(true);
+            }
+          }
           state.isLoading = false;
         } else {
           Notify.create({
@@ -1889,6 +1875,10 @@ export default defineComponent({
       console.log('result table plan: ', result);
       state.dataTable = result;
       checkBill();
+
+      if (state.dataSubGroup.length == 0 || state.dataArticle.length == 0) {
+        getSubgroup();
+      }
     }
 
     // Private Utils 

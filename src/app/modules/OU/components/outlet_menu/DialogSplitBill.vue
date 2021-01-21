@@ -555,13 +555,21 @@ export default defineComponent({
 
      const getSplitBuildRMenu = (dataRow) => {
       state.isLoading = true;
-      
-      async function asyncCall() {
-        const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('splitbillBuildRmenu', {
+
+      console.log({
             dept: props.dataPrepare['currDept'],
             recId: props.dataTable['dataThBill'][0]['rec-id'],
             currSelect: state.data.counter,
+            recIDhBillLine: dataRow['rec-id']
+          })
+      
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillSelectRmenu', {
+            dept: props.dataPrepare['currDept'],
+            recId: props.dataTable['dataThBill'][0]['rec-id'],
+            currSelect: state.data.counter,
+            recIdHBillLine: dataRow['rec-id']
           })
         ]);
 
@@ -569,7 +577,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response splitbillBuildRmenu: ', response);
+          console.log('response splitbillSelectRmenu: ', response);
 
           if (!okFlag) {
             Notify.create({
