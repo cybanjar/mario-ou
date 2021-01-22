@@ -71,7 +71,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
         </q-card-actions>
       </q-card>
@@ -187,7 +187,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentCard,
         set: (val) => {
-            emit('onDialogPaymentCard', val, null);
+            emit('onDialogPaymentCard', val, '', {});
         },
     });
 
@@ -233,26 +233,13 @@ export default defineComponent({
         },
     ];
 
-    // -- 
+    // -- On Clik Listener 
     const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+      emit('onDialogPaymentCard', false, 'ok', {});
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
-      emit('onDialogPaymentCard', false);
+      emit('onDialogPaymentCard', false, '', {});
     }
 
     return {

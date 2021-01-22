@@ -327,7 +327,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.dialogPayment,
         set: (val) => {
-            emit('onDialogPayment', val, '', '');
+            emit('onDialogPayment', val, '', '', 0);
         },
     });
 
@@ -500,7 +500,9 @@ export default defineComponent({
 
           if (responsePrepare['msgStr'] == "") {
             state.isLoading = false;
-            onDialogPaymentCash(true);
+            onDialogPaymentCash(true, '', {});
+
+            state.data.dataPreparePayment['prepareCash'] = responsePrepare;
 
             if (state.data.dataPreparePayment['dataPrepare']['doubleCurrency'] == "true") {
               // state.isLoading = false;
@@ -620,7 +622,7 @@ export default defineComponent({
             if (idPayment == 8) {
               getRestInvCheckDiscart();
             } else if (idPayment == 3) {
-              onDialogPaymentCityLedger(true);
+              onDialogPaymentCityLedger(true, '', {});
             } else if (idPayment == 4) {
               getRestInvBillTransfer();
             } else if (idPayment == 5) {
@@ -732,9 +734,9 @@ export default defineComponent({
             const idPayment = state.data.selectedPayment['id'];
 
             if (idPayment == 7) {
-             onDialogPaymentCompliment(true);
+             onDialogPaymentCompliment(true, '', {});
             } else if (idPayment == 8) {
-              onDialogPaymentMealCoupon(true);
+              onDialogPaymentMealCoupon(true, '', {});
             }
           }
 
@@ -788,7 +790,7 @@ export default defineComponent({
             } else if (idPayment == 5) {
               onDialogDepartment(true, null);
             } else if (idPayment == 6) {
-              onDialogPaymentMasterFolio(true);
+              onDialogPaymentMasterFolio(true, '', {});
             }
             state.isLoading = false;
           } else {
@@ -818,7 +820,7 @@ export default defineComponent({
       if (idPayment == 1) {
         getRestInvGetSaldo();
       } else if (idPayment == 2) {
-        onDialogPaymentCard(true);
+        onDialogPaymentCard(true, '', {});
       } else if (idPayment == 3) {
         getRestInvGetSaldo();
       } else if (idPayment == 4) {
@@ -851,7 +853,7 @@ export default defineComponent({
       state.data.selectedPayment = {};
       state.data.buttonOkEnable = false;
       state.isLoading = false;
-      emit('onDialogPayment', false, '', '');
+      emit('onDialogPayment', false, '', '', 0);
     }
 
     const onClickConfirmation = () => {
@@ -876,16 +878,44 @@ export default defineComponent({
 
 
     // -- On Dialog Method
-    const onDialogPaymentCash = (val) => {
+    const onDialogPaymentCash = (val, flag, data) => {
       state.data.showPaymentCash = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 1);
+      }
+
     }
 
-    const onDialogPaymentCard = (val) => {
+    const onDialogPaymentCard = (val, flag, data) => {
       state.data.showPaymentCard = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 2);
+      }
     }
 
-    const onDialogPaymentCityLedger = (val) => {
+    const onDialogPaymentCityLedger = (val, flag, data) => {
       state.data.showPaymentCityLedger = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 3);
+      }
     }
 
     const onDialogPaymentGuestFolio = (val, flag, data) => {
@@ -897,24 +927,60 @@ export default defineComponent({
         state.data.buttonOkEnable = false;
         state.isLoading = false;
         console.log('payment data : ', data);
-        emit('onDialogPayment', false, 'ok', data);
+        emit('onDialogPayment', false, 'ok', data, 4);
       }
     }
 
-    const onDialogPaymentNonGuestFolio = (val) => {
+    const onDialogPaymentNonGuestFolio = (val, flag, data) => {
       state.data.showPaymentNonGuestFolio = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 5);
+      }
     }
 
-    const onDialogPaymentCompliment = (val) => {
+    const onDialogPaymentCompliment = (val, flag, data) => {
       state.data.showPaymentCompliment = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 7);
+      }
     }
 
-    const onDialogPaymentMasterFolio = (val) => {
+    const onDialogPaymentMasterFolio = (val, flag, data) => {
       state.data.showPaymentMasterFolio = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 6);
+      }
     }
 
-    const onDialogPaymentMealCoupon = (val) => {
+    const onDialogPaymentMealCoupon = (val, flag, data) => {
       state.data.showPaymentMealCoupon = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 8);
+      }
     }
 
     const onDialogDepartment = (val, data) => {
@@ -922,7 +988,7 @@ export default defineComponent({
 
       if (!val && data != null) {
         state.data.dataPreparePayment['dataHotelSelected'] = data;
-        onDialogPaymentNonGuestFolio(true);
+        onDialogPaymentNonGuestFolio(true, '', {});
       }
     }
 

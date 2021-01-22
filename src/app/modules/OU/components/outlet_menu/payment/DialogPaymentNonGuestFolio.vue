@@ -155,7 +155,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentNonGuestFolio,
         set: (val) => {
-            emit('onDialogPaymentNonGuestFolio', val, null);
+            emit('onDialogPaymentNonGuestFolio', val, '', {});
         },
     });
 
@@ -269,7 +269,9 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+
           state.isLoading = false;
+          emit('onDialogPaymentNonGuestFolio', false, 'ok', response);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -332,7 +334,7 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      emit('onDialogPaymentNonGuestFolio', false);
+      emit('onDialogPaymentNonGuestFolio', false, '', {});
     }
 
     const onClickConfirmation = () => {

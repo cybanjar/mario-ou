@@ -11,7 +11,7 @@
                     </q-tooltip>
                   </q-icon>
                 </span>
-                <span @click="onDialogCashierTransfer(true)" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                <span @click="onClickCashierTransfer" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-account-switch" >
                     <q-tooltip>
                       Cashier Transfer
@@ -791,7 +791,7 @@ export default defineComponent({
             onDialogTablePlan(true);
             return false;
         } else {
-          onDialogPayment(true, '', {});
+          onDialogPayment(true, '', {}, 0);
         }
       } else {
         Notify.create({
@@ -803,7 +803,8 @@ export default defineComponent({
     }
 
     const onClickSplitBill = () => {
-      onDialogSplitBill(true);
+      state.currentState = 'splitbill';
+      getRestInvCheckSaldo(state.currentState);
     }
 
     const confirmNewOrder = () => {
@@ -816,9 +817,8 @@ export default defineComponent({
     }
    
     const onClickTableTransfer = () => {
-      console.log("On Click Table Transfer");
       state.currentState = "tabletransfer";
-      getRestInvCheckSaldo();
+      getRestInvCheckSaldo(state.currentState);
     }
 
     const onClickDialogSelectOrderTaker = () => {
@@ -907,15 +907,32 @@ export default defineComponent({
 
     }
 
-    const onDialogPayment = (val, flag, data) => {
+    const onDialogPayment = (val, flag, data, payType) => {
       state.dialogPayment = val;
       state.dataTable['dataPrepareInv'] = state.dataPrepare;
 
       if (!val && flag == 'ok') {
         state.dataTable['dataPayment'] = data;
         state.flagFirstLoad = 1;
-        checkBill();
-        // console.log('should refresh menu : ', state.dataTable)
+
+        if (payType == 1) {
+          console.log('should refresh , Cash : ', state.dataTable)
+        } else if (payType == 2) {
+          console.log('should refresh , Card : ', state.dataTable)
+        } else if (payType == 3) {
+          console.log('should refresh , City Legder : ', state.dataTable)
+        } else if (payType == 4) {
+          console.log('should refresh , Transfer to Guest Folio : ', state.dataTable)
+        } else if (payType == 5) {
+          console.log('should refresh , Transfer to Non Guest Folio : ', state.dataTable)
+        } else if (payType == 6) {
+          console.log('should refresh , Transfer to Master Folio : ', state.dataTable)
+        } else if (payType == 7) {
+          console.log('should refresh , Compliment : ', state.dataTable)
+        } else if (payType == 8) {
+          console.log('should refresh , Meal Coupon : ', state.dataTable)
+        }
+        // checkBill();
       } 
     }
 
@@ -1554,7 +1571,7 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getRestInvCheckSaldo = () => {
+    const getRestInvCheckSaldo = (flag) => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -1580,7 +1597,7 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-          getRestInvGetSaldo();
+          getRestInvGetSaldo(flag);
           state.isLoading = true;
         } else {
           Notify.create({
@@ -1594,7 +1611,7 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getRestInvGetSaldo = () => {
+    const getRestInvGetSaldo = (flag) => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -1630,7 +1647,11 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } else {
-            state.showConfirmationDialog = true;
+            if (flag == 'tabletransfer') {
+              state.showConfirmationDialog = true;
+            } else if (flag == 'splitbill') {
+              onDialogSplitBill(true);
+            }
           }
           state.isLoading = false;
         } else {
@@ -1930,7 +1951,7 @@ export default defineComponent({
     }
 
     const onClickCashierTransfer = () => {
-      onDialogSplitBill(true);
+      onDialogCashierTransfer(true);
     }
 
     const onDialogCashierTransfer = (val) => {

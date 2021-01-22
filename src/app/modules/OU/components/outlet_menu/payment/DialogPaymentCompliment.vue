@@ -140,7 +140,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentCompliment,
         set: (val) => {
-            emit('onDialogPaymentCompliment', val, null);
+            emit('onDialogPaymentCompliment', val, '', {});
         },
     });
 
@@ -375,7 +375,7 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      emit('onDialogPaymentCompliment', false);
+      emit('onDialogPaymentCompliment', false, '', {});
     }
 
      const showKeyboard = (e) => {
