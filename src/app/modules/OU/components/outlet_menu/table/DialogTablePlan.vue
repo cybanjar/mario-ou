@@ -13,6 +13,7 @@
               Back
             </q-tooltip>
          </q-btn>
+         <div class="q-mx-md">           
             <STable
               grid
               hide-header
@@ -42,6 +43,7 @@
                 </q-input>
               </template>
             </STable>
+         </div>
 
             <dialogOpenTable :showDialogOpenTable="showDialogOpenTable" @onDialog="onDialog" @onResultOpenTable="onResultOpenTable" :dataTableSelected="dataTableSelected" />
                 <!-- <dialogOpenMenu :dialogOpenMenu="dialogOpenMenu" :dataTableSelected="dataTableSelected" @onDialogMenu="onDialogMenu"/> -->            
