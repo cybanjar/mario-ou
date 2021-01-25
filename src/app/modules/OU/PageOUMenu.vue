@@ -601,7 +601,6 @@ import { defineComponent, computed, watch, reactive, toRefs, ref, onMounted, } f
 import { date, Notify, Cookies } from 'quasar';
 import Vue from 'vue';
 import { store } from '~/store';
-import { dataTable } from '../GC/utils/params.cashAdvance';
 
 interface State {
   isLoading: boolean;
@@ -763,7 +762,15 @@ export default defineComponent({
           message: 'Quantity cannot be 0',
         });
       } else {
-        getHBLineSelectItem(datarows);
+        if (state.dataTable['tischnr'] == undefined) {
+          Notify.create({
+            color: "red",
+            message: 'Select table first',
+          });
+          onDialogTablePlan(true);
+        } else {
+          getHBLineSelectItem(datarows);
+        }
       }
     }
 
@@ -968,7 +975,7 @@ export default defineComponent({
       if (!state.showDialogInputPrice && result != null) {
         if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['bezaendern']) {
           state.dataValidationSelectArticle['tempPrice'] = result;
-          onDialogInputDescription(true, "");
+          onDialogInputDescription(true, null);
         } else {
           state.tempDataRowSelectedArticle['epreis1'] = result;
           initDataClickMenu();
@@ -1001,12 +1008,13 @@ export default defineComponent({
       state.showDialogSelectMenuItem = val;
 
       if (!state.showDialogSelectMenuItem && result != null) {
-
+        initDataClickMenu();
       }
     }
 
-    const onDialogInputDescription = (val, result) => {
-      state.showDialogInputDescription = val;
+    const onDialogInputDescription = (e, result) => {
+      console.log('onDialogInputDescription');
+      state.showDialogInputDescription = e;
 
       if (!state.showDialogInputDescription && result != null) {
         if (state.dataValidationSelectArticle['tempPrice'] != null) {
@@ -1117,7 +1125,7 @@ export default defineComponent({
         const [dataSubgroup] = await Promise.all([
           $api.outlet.getOUPrepare('hblinePrepare', {
             userInit : dataStoreLogin['userInit'],
-            dept : 1,
+            dept : state.currDept,
             currRechnr : 0,
           }),
         ]);
@@ -1766,7 +1774,7 @@ export default defineComponent({
       }
 
       if (state.dataValidationSelectArticle['responseSelectItem2']['tHArtikel']['t-h-artikel'][0]['bezaendern']) {
-        onDialogInputDescription(true, "");
+        onDialogInputDescription(true, null);
         return false;
       }
 

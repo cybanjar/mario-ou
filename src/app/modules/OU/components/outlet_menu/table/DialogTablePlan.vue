@@ -60,7 +60,7 @@ import { store } from '~/store';
 interface State {
   userInit: any,
   isFetching: Boolean,
-  dataPrepare: {},
+  dataPrepareS: {},
   dataTable: any,
   dataTableSelected: null,
   dataFilteredTable: any,
@@ -81,7 +81,7 @@ export default defineComponent({
     const state=reactive<State>({
       userInit: dataStoreLogin['userInit'],
       isFetching: false,
-      dataPrepare: {},
+      dataPrepareS: {},
       dataTable: [],
       dataTableSelected: null,
       dataFilteredTable: [],
@@ -133,14 +133,14 @@ export default defineComponent({
     }
 
     const onClickTable = (data) => {
-      const tQueasy33 = state.dataPrepare['tQueasy33']['t-queasy33'];
-      const tQueasy31 = state.dataPrepare['tQueasy31']['t-queasy31'];
-      const tQueasy = state.dataPrepare['tQueasy']['t-queasy'];
-      const tHBill = state.dataPrepare['tHBill']['t-h-bill'];
+      const tQueasy33 = state.dataPrepareS['tQueasy33']['t-queasy33'];
+      const tQueasy31 = state.dataPrepareS['tQueasy31']['t-queasy31'];
+      const tQueasy = state.dataPrepareS['tQueasy']['t-queasy'];
+      const tHBill = state.dataPrepareS['tHBill']['t-h-bill'];
       const dataSelected = data;
 
       let tableOk = true;
-      tableOk = state.dataPrepare['tKellner']['t-kellner'][0]['masterkey'];
+      tableOk = state.dataPrepareS['tKellner']['t-kellner'][0]['masterkey'];
 
       if (!tableOk) {
         for (let i = 0; i<tHBill.length; i++) {
@@ -358,9 +358,9 @@ export default defineComponent({
 
             if (dataPrepare) {
                 const responsePrepare = dataPrepare || [];
-                state.dataPrepare = responsePrepare;   
+                state.dataPrepareS = responsePrepare;   
 
-                const okFlag = state.dataPrepare['outputOkFlag'];
+                const okFlag = state.dataPrepareS['outputOkFlag'];
                 if (!okFlag) {
                 Notify.create({
                     message: 'Failed when retrive data, please try again',
@@ -372,10 +372,10 @@ export default defineComponent({
 
                 state.dataTable = [];
                 state.dataFilteredTable = [];
-                state.dataTable = state.dataPrepare['tTisch']['t-tisch'];
+                state.dataTable = state.dataPrepareS['tTisch']['t-tisch'];
                 state.dataFilteredTable = state.dataTable;
 
-                const tHBill = state.dataPrepare['tHBill']['t-h-bill'];
+                const tHBill = state.dataPrepareS['tHBill']['t-h-bill'];
                 for (let i = 0; i<state.dataFilteredTable.length; i++) {
                     const tischnrTable = state.dataFilteredTable[i]['tischnr'];
                     state.dataFilteredTable[i]['rechnr'] = 0;
@@ -390,8 +390,8 @@ export default defineComponent({
                     }
                 }
 
-                // console.log("dataPrepare : " , dataPrepare);
-                // console.log("dataTable: " , state);
+                console.log("dataPrepare : " , dataPrepare);
+                console.log("dataTable: " , state);
             
                 state.isFetching = false;
             } else {

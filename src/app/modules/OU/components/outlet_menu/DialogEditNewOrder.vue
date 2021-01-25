@@ -28,8 +28,8 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn color="primary" label="Cancel this order" @click="onCancelOrder()" />
-        <q-btn color="primary" label="Cancel" @click="onCancel()" />
+        <q-btn outline color="primary" label="Cancel this order" @click="onCancelOrder()" />
+        <q-btn outline color="primary" label="Cancel" @click="onCancel()" />
         <q-btn color="primary" label="Ok" @click="onConfirm()"/>
       </q-card-actions>
     </q-card>

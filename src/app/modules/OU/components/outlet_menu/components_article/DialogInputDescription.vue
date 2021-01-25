@@ -25,8 +25,8 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialog" />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog()"  />
+          <q-btn unelevated color="primary" label="OK" @click="onOkDialog()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -76,7 +76,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showDialogInputDescription,
         set: (val) => {
-            emit('onDialogInputDescription', val, state.data.dataInputDescription);
+            emit('onDialogInputDescription', val, null);
         },
     });
 

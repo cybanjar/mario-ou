@@ -15,19 +15,19 @@
             <div class="col q-pr-md">
               <q-card flat bordered>
                 <q-card-section>
-                  <p>List bisa di select</p>
+                  <p> </p> 
                 </q-card-section>
               </q-card>
             </div>
             <div class="col">
               <q-card flat bordered>
                 <q-card-section>
-                  <p>Deskripsi</p>
+                  <p> </p>
                 </q-card-section>
               </q-card>
               <q-card class="q-mt-md" flat bordered>
                 <q-card-section>
-                  <p>Request</p>
+                  <p> </p>
                 </q-card-section>
               </q-card>
             </div>
@@ -38,8 +38,8 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialog" />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog()"/>
+          <q-btn unelevated color="primary" label="OK" @click="onOkDialog()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -86,8 +86,8 @@ export default defineComponent({
 
     const dialogModel = computed({
         get: () => props.showDialogSelectMenuItem,
-        set: (val) => {
-            emit('onDialogInputDescription', val, state.data);
+        set: (e) => {
+            emit('onDialogSelectMenuItem', e, null);
         },
     });
 
@@ -100,17 +100,16 @@ export default defineComponent({
 
     // -- 
     const onOkDialog = () => {
-      emit('onDialogInputDescription', false, state.data);
+      emit('onDialogSelectMenuItem', false, {});
     }
 
     const onCancelDialog = () => {
-      state.data = {};
-      emit('onDialogInputDescription', false, {});
+      emit('onDialogSelectMenuItem', false, null);
     }
 
     return {
-      dialogModel,
       ...toRefs(state),
+      dialogModel,
       onOkDialog,
       showKeyboard,
       onCancelDialog,

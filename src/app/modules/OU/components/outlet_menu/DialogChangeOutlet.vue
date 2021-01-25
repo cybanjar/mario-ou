@@ -44,6 +44,7 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -67,6 +68,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -88,7 +91,6 @@ export default defineComponent({
             state.title = 'Select Outlet';
             getDataHotel();
           } else if (props.flagActivity == 'changeoutlet') {
-            console.log("Selected Data : ", props.dataPrepare);
             state.title = 'Change Outlet';
             getDataHotel();
           }
@@ -127,7 +129,6 @@ export default defineComponent({
           state.data.name = state.data.dataDetail[0]['depart'];
           state.data.dataOutletSelected = state.data.dataDetail[0];
           state.isLoading = false;
-          console.log('response load data hotel : ', response);
         }
       }
       asyncCall();
@@ -149,8 +150,6 @@ export default defineComponent({
           const responsePrepare = dataPrepare || [];
           const okFlag = responsePrepare['outputOkFlag'];
           const msgStr = responsePrepare['msgStr'];
-
-          console.log('restInvNewPos : ', responsePrepare);
 
           if (!okFlag) {
             Notify.create({
@@ -180,6 +179,54 @@ export default defineComponent({
             return false;
         }
         state.isLoading = false;
+      }
+      asyncCall();
+    }
+
+    const zuggriff = (arrayNr, expectedNr) => {
+      let zuggrifval = "false";
+      async function asyncCall() {
+        const [dataZuggrif] = await Promise.all([
+          $api.outlet.getZugriff('checkPermission', {
+            arrayNr: arrayNr,
+            expectedNr: expectedNr,
+            userInit:  dataStoreLogin['userInit']
+          }),
+        ]);
+
+        if (dataZuggrif) {
+          const responseZuggrif = dataZuggrif || [];
+          const okFlag = responseZuggrif['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          zuggrifval = responseZuggrif['zugriff'];
+
+          if (zuggrifval == "true") {
+            postDept();           
+          } else {
+            Notify.create({
+              message: responseZuggrif['messStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
       }
       asyncCall();
     }
@@ -214,7 +261,12 @@ export default defineComponent({
       if (props.flagActivity == 'payment') {
         emit('onDialogDepartment', false, state.data.dataOutletSelected);
       } else if (props.flagActivity == 'changeoutlet') {
-        postDept();
+        if (state.data.num > 0) {
+          zuggriff(18, 1);
+        } else {
+          postDept();
+        }
+
       }
     }
 
