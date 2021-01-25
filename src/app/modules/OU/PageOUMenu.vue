@@ -1,6 +1,11 @@
 <template>
     <div class="q-pa-sm">
-        <div class="dialog__restaurant">
+        <div v-if="isLoading">
+          <q-inner-loading :showing="true">
+            <q-spinner-gears size="50px" color="primary" />
+          </q-inner-loading>
+        </div>
+        <div v-else class="dialog__restaurant">
           <div class="row">
             <div class="col-md-8" style="margin-top: -34px">
               <h5 class="q-ml-lg text-weight-bolder">{{ restaurant }}
