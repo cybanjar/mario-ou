@@ -61,6 +61,8 @@ export default defineComponent({
   props: {
     showDialogChangeOutlet: { type: Boolean, required: true },
     dataSelectedChangeOutlet: { type: Object, required: false },
+    dataPrepare: { type: null, required: false },
+    dataTable: { type: null, required: false },
     flagActivity: { type: String, required: true },
   },
 
@@ -86,7 +88,7 @@ export default defineComponent({
             state.title = 'Select Outlet';
             getDataHotel();
           } else if (props.flagActivity == 'changeoutlet') {
-            console.log("Selected Data : ", props.dataSelectedChangeOutlet);
+            console.log("Selected Data : ", props.dataPrepare);
             state.title = 'Change Outlet';
             getDataHotel();
           }
@@ -131,6 +133,57 @@ export default defineComponent({
       asyncCall();
     }
 
+    const postDept = () => {
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvNewPos', {
+            pvlLanguage: '1',
+            currWaiter : 1,
+            newDept: state.data.num,
+            zugriff : true,
+            exchgRate: props.dataPrepare['exchgRate'],
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+          const msgStr = responsePrepare['msgStr'];
+
+          console.log('restInvNewPos : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (msgStr != "") {
+            Notify.create({
+              message: msgStr,
+              color: 'red',
+            });
+            state.isLoading = false;
+          }
+          responsePrepare['currDept'] = state.data.num;
+          emit('onDialogChangeOutlet', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+        state.isLoading = false;
+      }
+      asyncCall();
+    }
+
 
     // -- OnClick Listener
     const onClickTable = (dataRow) => {
@@ -161,7 +214,7 @@ export default defineComponent({
       if (props.flagActivity == 'payment') {
         emit('onDialogDepartment', false, state.data.dataOutletSelected);
       } else if (props.flagActivity == 'changeoutlet') {
-        emit('onDialogChangeOutlet', false, '');
+        postDept();
       }
     }
 

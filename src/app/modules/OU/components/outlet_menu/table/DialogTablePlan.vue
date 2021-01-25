@@ -72,6 +72,7 @@ interface State {
 export default defineComponent({
     props: {
       showDialogTablePlan: { type: Boolean, required: true },
+      dataPrepare: { type: null, required: false },
     },
     setup(props, { emit, root: { $api, $root } }) {
 
@@ -93,6 +94,8 @@ export default defineComponent({
       () => props.showDialogTablePlan, (showDialogTablePlan) => {
 
         if (props.showDialogTablePlan) {
+          console.log('Prepare on mount : ', props.dataPrepare);
+          state.currDept = props.dataPrepare['currDept'];
           state.isFetching = true;
           getDataPrepareTable();
 
@@ -317,7 +320,7 @@ export default defineComponent({
           $api.outlet.getOUAction('restInvCheckBill', {
             caseType: 1,
             tischnr: data['tischnr'],
-            currDept: '1'
+            currDept: state.currDept,
           }),
         ]);
 

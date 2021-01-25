@@ -522,6 +522,7 @@
 
         <dialogTablePlan
           :showDialogTablePlan="showDialogTablePlan"
+          :dataPrepare="dataPrepare"
           @onDialogTablePlan="onDialogTablePlan"
           @onResultTablePlan="onResultTablePlan"/>
 
@@ -558,6 +559,8 @@
         <dialogChangeOutlet
           :showDialogChangeOutlet="showDialogChangeOutlet"
           :dataSelectedChangeOutlet="dataSelected"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           flagActivity="changeoutlet"
           @onDialogChangeOutlet="onDialogChangeOutlet" />
 
@@ -1326,7 +1329,6 @@ export default defineComponent({
           $api.outlet.getOUPrepare('restInvPrepare', {
             pvlLanguage: '1',
             currDept : state.currDept,
-            // currPrinter : currPrinter,
             currPrinter : '99',
             userInitStr: dataStoreLogin['userInit'],
             transdate: date.formatDate((new Date), 'MM/DD/YY'),
@@ -1906,6 +1908,53 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getRestInvNotBalance = () => {
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvNotBalanceBill', {
+            pvlLanguage: '1',
+            currDept : state.currDept,
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+          const msgStr = responsePrepare['msgStr'];
+
+          console.log('restInvNotBalanceBill : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (msgStr != "") {
+            Notify.create({
+              message: msgStr,
+              color: 'red',
+            });
+            state.isLoading = false;
+          }
+          onDialogChangeOutlet(true, '');
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+        state.isLoading = false;
+      }
+      asyncCall();
+    }
+
     const initDataClickMenu = () => {
       state.dataNewOrder.push({
           'abbuchung' : state.tempDataRowSelectedArticle['abbuchung'],
@@ -2022,13 +2071,25 @@ export default defineComponent({
     }
 
     const onClickChangeOutlet = () => {
-      onDialogChangeOutlet(true, '');
+      getRestInvNotBalance();
     }
 
-    const onDialogChangeOutlet = (val, flag) => {
+    const onDialogChangeOutlet = (val, flag, data) => {
       state.showDialogChangeOutlet = val;
       if(!val && flag == 'ok') {
-        onDialogTablePlan(true);
+        state.currDept = data['currDept'];
+        state.dataPrepare['currDept'] = data['currDept'];
+        state.dataPrepare['deptname'] = data['deptname'];
+        state.dataPrepare['bTitle'] = data['bTitle'];
+        state.restaurant = state.dataPrepare['deptname'];
+        state.dataNewOrder = [];
+        state.dataOrdered = [];
+        state.dataTable = {};
+
+        getHTParam(4, 60);
+
+        console.log('on result change outlet : ', state.dataPrepare);
+        // onDialogTablePlan(true);
       }
     }
 
@@ -2100,6 +2161,7 @@ export default defineComponent({
       onClickConfirmation,
       onDialogVoidItem,
       onClickVoidItem,
+      getRestInvNotBalance,
     };
   },
   components: {
