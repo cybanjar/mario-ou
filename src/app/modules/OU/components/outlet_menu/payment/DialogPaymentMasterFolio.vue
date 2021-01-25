@@ -178,6 +178,7 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentMasterFolio: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
@@ -225,7 +226,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentMasterFolio,
         set: (val) => {
-            emit('onDialogPaymentMasterFolio', val, null);
+            emit('onDialogPaymentMasterFolio', val, '', {});
         },
     });
 
@@ -302,6 +303,7 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
+          emit('onDialogPaymentMasterFolio', false, 'ok', response);
           state.isLoading = false;
         } else {
           Notify.create({
@@ -406,7 +408,6 @@ export default defineComponent({
 
     // -- On Click Listener
     const onClickConfirmationDetail = () => {
-      
     }
 
     const onClickConfirmation = () => {
@@ -439,7 +440,7 @@ export default defineComponent({
       state.data.dataSelected = null;
       state.data.name = '';
       state.data.balance = 0;
-      emit('onDialogPaymentMasterFolio', false);
+      emit('onDialogPaymentMasterFolio', false, '', {});
     }
 
     const onRowClickTable = (dataRow) => {

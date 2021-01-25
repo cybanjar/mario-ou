@@ -11,7 +11,7 @@
                     </q-tooltip>
                   </q-icon>
                 </span>
-                <span @click="onDialogCashierTransfer(true)" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                <span @click="onClickCashierTransfer" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-account-switch" >
                     <q-tooltip>
                       Cashier Transfer
@@ -598,6 +598,7 @@ import { defineComponent, computed, watch, reactive, toRefs, ref, onMounted, } f
 import { date, Notify, Cookies } from 'quasar';
 import Vue from 'vue';
 import { store } from '~/store';
+import { dataTable } from '../GC/utils/params.cashAdvance';
 
 interface State {
   isLoading: boolean;
@@ -791,7 +792,7 @@ export default defineComponent({
             onDialogTablePlan(true);
             return false;
         } else {
-          onDialogPayment(true, '', {});
+          onDialogPayment(true, '', {}, 0);
         }
       } else {
         Notify.create({
@@ -803,7 +804,8 @@ export default defineComponent({
     }
 
     const onClickSplitBill = () => {
-      onDialogSplitBill(true);
+      state.currentState = 'splitbill';
+      getRestInvCheckSaldo(state.currentState);
     }
 
     const confirmNewOrder = () => {
@@ -816,9 +818,8 @@ export default defineComponent({
     }
    
     const onClickTableTransfer = () => {
-      console.log("On Click Table Transfer");
       state.currentState = "tabletransfer";
-      getRestInvCheckSaldo();
+      getRestInvCheckSaldo(state.currentState);
     }
 
     const onClickDialogSelectOrderTaker = () => {
@@ -907,15 +908,34 @@ export default defineComponent({
 
     }
 
-    const onDialogPayment = (val, flag, data) => {
+    const onDialogPayment = (val, flag, data, payType) => {
       state.dialogPayment = val;
       state.dataTable['dataPrepareInv'] = state.dataPrepare;
 
       if (!val && flag == 'ok') {
         state.dataTable['dataPayment'] = data;
         state.flagFirstLoad = 1;
-        checkBill();
-        // console.log('should refresh menu : ', state.dataTable)
+
+        if (payType == 1) {
+          console.log('should refresh , Cash : ', state.dataTable)
+        } else if (payType == 2) {
+          console.log('should refresh , Card : ', state.dataTable)
+          // (hArtart, billart, description, hArtnrfront)
+          restInvUpdateBill1(data['dataSelected']['artart'], data['billart'], data['dataSelected']['bezeich'], data['dataSelected']['artnrfront']);
+        } else if (payType == 3) {
+          console.log('should refresh , City Legder : ', state.dataTable)
+        } else if (payType == 4) {
+          console.log('should refresh , Transfer to Guest Folio : ', state.dataTable)
+        } else if (payType == 5) {
+          console.log('should refresh , Transfer to Non Guest Folio : ', state.dataTable)
+        } else if (payType == 6) {
+          console.log('should refresh , Transfer to Master Folio : ', state.dataTable)
+        } else if (payType == 7) {
+          console.log('should refresh , Compliment : ', state.dataTable)
+        } else if (payType == 8) {
+          console.log('should refresh , Meal Coupon : ', state.dataTable)
+        }
+        // checkBill();
       } 
     }
 
@@ -1554,7 +1574,7 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getRestInvCheckSaldo = () => {
+    const getRestInvCheckSaldo = (flag) => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -1580,7 +1600,7 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-          getRestInvGetSaldo();
+          getRestInvGetSaldo(flag);
           state.isLoading = true;
         } else {
           Notify.create({
@@ -1594,7 +1614,7 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getRestInvGetSaldo = () => {
+    const getRestInvGetSaldo = (flag) => {
       state.isLoading = true;
 
       async function asyncCall() {
@@ -1630,7 +1650,11 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } else {
-            state.showConfirmationDialog = true;
+            if (flag == 'tabletransfer') {
+              state.showConfirmationDialog = true;
+            } else if (flag == 'splitbill') {
+              onDialogSplitBill(true);
+            }
           }
           state.isLoading = false;
         } else {
@@ -1747,58 +1771,110 @@ export default defineComponent({
       initDataClickMenu();
     }
 
-    const restInvUpdateBill1 = () => {
+    const restInvUpdateBill1 = (hArtart, billart, description, hArtnrfront) => {
       state.isLoading = true;
+
+      console.log({
+            pvILanguage : 0,
+            recId: state.dataTable['dataThBill'][0]['rec-id'],
+            recIdArtikel :state.dataOrdered[0]['rec-id'],
+            deptname :state.dataPrepare['deptname'],
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            hArtart :hArtart,
+            cancelOrder :'false',
+            serviceCode :'0',
+            amount: -state.dataTable['dataThBill'][0]['saldo'],
+            amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
+            price:'0',
+            doubleCurrency: state.dataPrepare['doubleCurrency'],
+            qty: '1',
+            exchgRate:state.dataPrepare['exchgRate'],
+            priceDecimal:state.dataPrepare['priceDecimal'],
+            orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
+            // orderTaker:state.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
+            tischnr:state.dataTable['tischnr'],
+            currDept:state.dataPrepare['currDept'],
+            currWaiter:state.dataPrepare['currWaiter'],
+            gname:state.dataTable['bilname'],
+            pax:state.dataTable['belegung'],
+            kreditlimit: 0,
+            addZeit: 1,
+            billart: billart,
+            description: description,
+            changeStr:' ',
+            ccComment:' ',
+            cancelStr:' ',
+            reqStr:' ',
+            voucherStr:' ',
+            hogaCard:' ',
+            printToKitchen:'true',
+            fromAcct:'false',
+            hArtnrfront: hArtnrfront,
+            payType:'0',
+            guestnr:'0',
+            transferZinr:' ',
+            curedeptFlag:'false',
+            foreignRate:'false',
+            currRoom:' ',
+            userInit:dataStoreLogin['userInit'],
+            hogaResnr:'0',
+            hogaReslinnr:'0',
+            inclVat:'false',
+            getPrice:'0',
+            mcStr:'0',
+            'submenu-list': {'submenuList' : []},
+          })
 
       async function asyncCall() {
         const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvUpdateBill1 ', {
+          $api.outlet.getOUPrepare('restInvUpdateBill1', {
             pvILanguage : 0,
-            recId:'',
-            recIdHArtikel:'',
-            deptname :'',
-            transdate :'',
-            hArtart :'',
-            cancelOrder :'',
-            hArtikelServic:'',
-            amount:'',
-            amountForeign:'',
-            price:'',
-            doubleCurrency:'',
-            qty:'',
-            exchgRate:'',
-            priceDecimal:'',
-            orderTaker:'',
-            tischnr:'',
-            currDept:'',
-            currWaiter:'',
-            gname:'',
-            pax:'',
-            kreditlimit:'',
-            addZeit:'',
-            billart:'',
-            description:'',
-            changeStr:'',
-            ccComment:'',
-            cancelStr:'',
-            reqStr:'',
-            voucherStr:'',
-            hogaCard:'',
-            printToKitchen:'',
-            fromAcct:'',
-            hArtnrfront:'',
-            payType:'',
-            guestnr:'',
-            transferZinr:'',
-            curedeptFlag:'',
-            foreignRate:'',
-            currRoom:'',
-            userInit:'',
-            hogaResnr:'',
-            hogaReslinnr:'',
-            inclVat:'',
-            getPrice:'',
-            mcStr:'',
+            recId: state.dataTable['dataThBill'][0]['rec-id'],
+            recIdHArtikel :state.dataOrdered[0]['rec-id'],
+            deptname :state.dataPrepare['deptname'],
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            hArtart :hArtart,
+            cancelOrder :'false',
+            serviceCode :'0',
+            amount: -state.dataTable['dataThBill'][0]['saldo'],
+            amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
+            price:'0',
+            doubleCurrency: state.dataPrepare['doubleCurrency'],
+            qty: '1',
+            exchgRate:state.dataPrepare['exchgRate'],
+            priceDecimal:state.dataPrepare['priceDecimal'],
+            orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
+            // orderTaker:state.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
+            tischnr:state.dataTable['tischnr'],
+            currDept:state.dataPrepare['currDept'],
+            currWaiter:state.dataPrepare['currWaiter'],
+            gname:state.dataTable['bilname'],
+            pax:state.dataTable['belegung'],
+            kreditlimit: 0,
+            addZeit: 1,
+            billart: billart,
+            description: description,
+            changeStr:' ',
+            ccComment:' ',
+            cancelStr:' ',
+            reqStr:' ',
+            voucherStr:' ',
+            hogaCard:' ',
+            printToKitchen:'true',
+            fromAcct:'false',
+            hArtnrfront: hArtnrfront,
+            payType:'0',
+            guestnr:'0',
+            transferZinr:' ',
+            curedeptFlag:'false',
+            foreignRate:'false',
+            currRoom:' ',
+            userInit:dataStoreLogin['userInit'],
+            hogaResnr:'0',
+            hogaReslinnr:'0',
+            inclVat:'false',
+            getPrice:'0',
+            mcStr:'0',
             'submenu-list': {'submenuList' : []},
           })
         ]);
@@ -1930,7 +2006,7 @@ export default defineComponent({
     }
 
     const onClickCashierTransfer = () => {
-      onDialogSplitBill(true);
+      onDialogCashierTransfer(true);
     }
 
     const onDialogCashierTransfer = (val) => {

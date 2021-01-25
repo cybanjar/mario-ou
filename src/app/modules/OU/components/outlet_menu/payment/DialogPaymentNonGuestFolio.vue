@@ -121,6 +121,7 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentNonGuestFolio: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
@@ -164,7 +165,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentNonGuestFolio,
         set: (val) => {
-            emit('onDialogPaymentNonGuestFolio', val, null);
+            emit('onDialogPaymentNonGuestFolio', val, '', {});
         },
     });
 
@@ -278,7 +279,9 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+
           state.isLoading = false;
+          emit('onDialogPaymentNonGuestFolio', false, 'ok', response);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -341,7 +344,7 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      emit('onDialogPaymentNonGuestFolio', false);
+      emit('onDialogPaymentNonGuestFolio', false, '', {});
     }
 
     const onClickConfirmation = () => {

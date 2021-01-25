@@ -365,6 +365,7 @@ export default defineComponent({
             return false;
           } 
 
+          emit('onDialogPaymentMealCoupon', false, 'ok', {});
           state.isLoading = false;
         } else {
           Notify.create({
@@ -384,7 +385,7 @@ export default defineComponent({
     }
 
     const onCancelDialog = () => {
-      emit('onDialogPaymentMealCoupon', false);
+      emit('onDialogPaymentMealCoupon', false, '', {});
     }
 
     const onClickConfirmation = () => {

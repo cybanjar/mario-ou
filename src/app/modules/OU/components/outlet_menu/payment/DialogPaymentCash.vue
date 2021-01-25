@@ -23,7 +23,7 @@
               </div>
 
               <div class="col">
-                <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentBox" @focus="showKeyboard" @input="onChangePaymentInput(text)"/>
+                <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentBox" @focus="showKeyboard" @input="onChangePaymentInput()"/>
               </div>
           </div>
 
@@ -96,7 +96,7 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { Notify } from 'quasar';
+import { Notify, date } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
 
 interface State {
@@ -122,6 +122,7 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentCash: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     dataPreparePayment: {type: null, required: true},
   },
@@ -186,7 +187,7 @@ export default defineComponent({
         voucherNr: "",
         payment: 0,
         balance: 0,
-        change: 0
+        change: 0,
       },
       title: '',
       layout: 'numeric',
@@ -216,10 +217,91 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentCash,
         set: (val) => {
-            emit('onDialogMenuOrderTaker', val, null);
+            emit('onDialogPaymentCash', val, '', {});
         },
     });
 
+    // -- HTTP Request 
+    const getPreparePayCash4 = () => {
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvPayCash4', {
+            recId: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            currDept: props.dataPreparePayment['dataPrepare']['currDept'],
+            discArt1: props.dataPreparePayment['dataPrepare']['discArt1'],
+            discArt2: props.dataPreparePayment['dataPrepare']['discArt2'],
+            discArt3: props.dataPreparePayment['dataPrepare']['discArt3'],
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('restInvPayCash4 : ', responsePrepare);
+          emit('onDialogPaymentCash', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getPreparePayCash5 = () => {
+
+      console.log( {
+            multiCash: false,
+            cashArtno: props.dataPreparePayment['prepareCash']['tHArtikel']['t-h-artikel'][0]['artnr'],
+            currDept: props.dataPreparePayment['dataPrepare']['currDept'],
+            cashForeign: false,
+            payVoucher : false,
+            voucherNr : state.data.voucherNr == '' ? '0' : state.data.voucherNr,
+            amount  : state.data.payment,
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvPayCash5', {
+            multiCash: false,
+            cashArtno: props.dataPreparePayment['prepareCash']['tHArtikel']['t-h-artikel'][0]['artnr'],
+            currDept: props.dataPreparePayment['dataPrepare']['currDept'],
+            cashForeign: false,
+            payVoucher: false,
+            voucherNr: state.data.voucherNr == '' ? '0' : state.data.voucherNr,
+            amount: state.data.payment,
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('restInvPayCash5 : ', responsePrepare);
+          state.isLoading = false;
+        }
+      }
+      asyncCall();
+    }
+    
+    // -- On Click listener
     const onRowClickTablePayment = (dataRow) => {
       for (let i = 0; i<state.data.dataTablePayment.length; i++) {
         const datarow = state.data.dataTablePayment[i];
@@ -256,6 +338,24 @@ export default defineComponent({
 
     // -- 
     const onOkDialog = () => {
+      // const fullpaid = -state.data.payment - state.data.balance >= 0 ? true : false;
+      const fullpaid = true;
+      const amount = -state.data.payment - state.data.balance;
+      console.log('amount : ', amount);
+      console.log('fullpaid : ', fullpaid);
+
+      if (amount == 0 && fullpaid) {
+        getPreparePayCash4();
+      } else if (amount != 0 || fullpaid) { 
+        getPreparePayCash5();
+        console.log('paycash 5');
+      } else if (amount != 0 && fullpaid) {
+      // paycash6
+      console.log('paycash 6');
+      }
+
+      // getPreparePayCash3();
+      
       // if (props.dataSelectedOrderTaker != null) {
       //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
       // } 
@@ -266,11 +366,11 @@ export default defineComponent({
         const datarow = state.data.dataTablePayment[i];
         datarow['selected'] = false;
       }     
-      emit('onDialogPaymentCash', false);
+      emit('onDialogPaymentCash', false, '', {});
     }
 
     // --
-    const onChangePaymentInput = (input) => {
+    const onChangePaymentInput = () => {
       state.data.change = ((state.data.payment * -1) - state.data.balance);
     }
 

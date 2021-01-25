@@ -34,7 +34,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered>
+            <q-card flat bordered @click="data.balance != 0 ? onDialogPaymentCityLedger(true) : null">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -211,15 +211,24 @@
 
     <dialogPaymentCash
       :showPaymentCash="showPaymentCash"
+      :flagSplit="true"
       :selectedPayment="data.selectedPayment"
       :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCash="onDialogPaymentCash" />
 
     <dialogPaymentCard 
       :showPaymentCard="showPaymentCard"
+      :flagSplit="true"
       :selectedPayment="data.selectedPayment"
       :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCard="onDialogPaymentCard" />
+
+    <dialogPaymentCityLedger
+      :showPaymentCityLedger="showPaymentCityLedger"
+      :flagSplit="true"
+      :selectedPayment="data.selectedPayment"
+      :dataTable="data.dataPreparePayment"
+      @onDialogPaymentCityLedger="onDialogPaymentCityLedger" />
   </section>
 </template>
 
@@ -245,6 +254,7 @@ interface State {
   title: string;
   showPaymentCash: boolean;
   showPaymentCard: boolean;
+  showPaymentCityLedger: boolean;
 }
 
 export default defineComponent({
@@ -315,6 +325,7 @@ export default defineComponent({
       title: '',
       showPaymentCash: false,
       showPaymentCard: false,
+      showPaymentCityLedger: false,
     });
 
     watch(
@@ -843,6 +854,15 @@ export default defineComponent({
       }
     }
 
+    const onDialogPaymentCityLedger = (val) => {
+      state.data.selectedPayment = state.data.dataTablePayment[2];
+      state.showPaymentCityLedger = val;
+
+       if (!val) {
+        state.data.selectedPayment = {}
+      }
+    }
+
     return {
       dialogModel,
       ...toRefs(state),
@@ -858,12 +878,15 @@ export default defineComponent({
       getCalBalance,
       onDialogPaymentCash,
       onDialogPaymentCard,
+      onDialogPaymentCityLedger,
       pagination: { rowsPerPage: 0 },
     };
   },
   components: {
     dialogPaymentCash: () => import('./payment/DialogPaymentCash.vue'),
     dialogPaymentCard: () => import('./payment/DialogPaymentCard.vue'),
+    dialogPaymentCityLedger: () => import('./payment/DialogPaymentCityLedger.vue'),
+
     // dialogPaymentCityLedger: () => import('./DialogPaymentCityLedger.vue'),
     // dialogPaymentGuestFolio: () => import('./DialogPaymentGuestFolio.vue'),
     // dialogPaymentNonGuestFolio: () => import('./DialogPaymentNonGuestFolio.vue'),

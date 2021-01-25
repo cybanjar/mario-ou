@@ -124,6 +124,7 @@
 
     <dialogPaymentCash
       :showPaymentCash="data.showPaymentCash"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataPreparePayment="data.dataPreparePayment"
@@ -131,6 +132,7 @@
 
     <dialogPaymentCard 
       :showPaymentCard="data.showPaymentCard"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataPreparePayment="data.dataPreparePayment"
@@ -138,6 +140,7 @@
 
     <dialogPaymentCityLedger
       :showPaymentCityLedger="data.showPaymentCityLedger"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -145,6 +148,7 @@
 
     <dialogPaymentGuestFolio
       :showPaymentGuestFolio="data.showPaymentGuestFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -152,6 +156,7 @@
 
     <dialogPaymentNonGuestFolio
       :showPaymentNonGuestFolio="data.showPaymentNonGuestFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -166,6 +171,7 @@
 
     <dialogPaymentMasterFolio
       :showPaymentMasterFolio="data.showPaymentMasterFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -181,6 +187,7 @@
     <dialogSelectDepartment 
       :showDialogChangeOutlet="data.showDepartment"
       :flagActivity="flag"
+      :flagSplit="false"
       @onDialogDepartment="onDialogDepartment"
       />
 
@@ -319,6 +326,11 @@ export default defineComponent({
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
           state.data.balance = state.data.dataPreparePayment['dataTable']['dataThBill'][0]['saldo'];
+
+          for (let i = 0; i<state.data.dataTablePayment.length; i++) {
+            const datarow = state.data.dataTablePayment[i];
+            datarow['selected'] = false;
+          }       
           console.log('Dialog Payment Mount: ', props.dataTable);
         }
       }
@@ -327,7 +339,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.dialogPayment,
         set: (val) => {
-            emit('onDialogPayment', val, '', '');
+            emit('onDialogPayment', val, '', '', 0);
         },
     });
 
@@ -450,6 +462,8 @@ export default defineComponent({
           if (zuggrifval == "true") {
             if (idPayment == 1) {
               getPreparePayCash3();
+            } else if (idPayment == 2) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 3) {
               getRestInvBtnTransfer();
             } else if (idPayment == 4) { 
@@ -500,7 +514,9 @@ export default defineComponent({
 
           if (responsePrepare['msgStr'] == "") {
             state.isLoading = false;
-            onDialogPaymentCash(true);
+            onDialogPaymentCash(true, '', {});
+
+            state.data.dataPreparePayment['prepareCash'] = responsePrepare;
 
             if (state.data.dataPreparePayment['dataPrepare']['doubleCurrency'] == "true") {
               // state.isLoading = false;
@@ -620,7 +636,7 @@ export default defineComponent({
             if (idPayment == 8) {
               getRestInvCheckDiscart();
             } else if (idPayment == 3) {
-              onDialogPaymentCityLedger(true);
+              onDialogPaymentCityLedger(true, '', {});
             } else if (idPayment == 4) {
               getRestInvBillTransfer();
             } else if (idPayment == 5) {
@@ -629,6 +645,8 @@ export default defineComponent({
               getRestInvBillTransfer();
             } else if (idPayment == 7) {
               getRestInvBillTransfer();
+            } else if (idPayment == 2) {
+              onDialogPaymentCard(true, '', {});
             }
           }
 
@@ -732,9 +750,9 @@ export default defineComponent({
             const idPayment = state.data.selectedPayment['id'];
 
             if (idPayment == 7) {
-             onDialogPaymentCompliment(true);
+             onDialogPaymentCompliment(true, '', {});
             } else if (idPayment == 8) {
-              onDialogPaymentMealCoupon(true);
+              onDialogPaymentMealCoupon(true, '', {});
             }
           }
 
@@ -788,7 +806,7 @@ export default defineComponent({
             } else if (idPayment == 5) {
               onDialogDepartment(true, null);
             } else if (idPayment == 6) {
-              onDialogPaymentMasterFolio(true);
+              onDialogPaymentMasterFolio(true, '', {});
             }
             state.isLoading = false;
           } else {
@@ -818,7 +836,7 @@ export default defineComponent({
       if (idPayment == 1) {
         getRestInvGetSaldo();
       } else if (idPayment == 2) {
-        onDialogPaymentCard(true);
+        getRestInvGetSaldo();
       } else if (idPayment == 3) {
         getRestInvGetSaldo();
       } else if (idPayment == 4) {
@@ -851,7 +869,7 @@ export default defineComponent({
       state.data.selectedPayment = {};
       state.data.buttonOkEnable = false;
       state.isLoading = false;
-      emit('onDialogPayment', false, '', '');
+      emit('onDialogPayment', false, '', '', 0);
     }
 
     const onClickConfirmation = () => {
@@ -871,21 +889,51 @@ export default defineComponent({
         zuggriff(20, 2);
       } else if (idPayment == 1) {
         zuggriff(20, 2);
+      } else if (idPayment == 2) {
+        zuggriff(20, 2);
       }
     }
 
 
     // -- On Dialog Method
-    const onDialogPaymentCash = (val) => {
+    const onDialogPaymentCash = (val, flag, data) => {
       state.data.showPaymentCash = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 1);
+      }
+
     }
 
-    const onDialogPaymentCard = (val) => {
+    const onDialogPaymentCard = (val, flag, data) => {
       state.data.showPaymentCard = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 2);
+      }
     }
 
-    const onDialogPaymentCityLedger = (val) => {
+    const onDialogPaymentCityLedger = (val, flag, data) => {
       state.data.showPaymentCityLedger = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 3);
+      }
     }
 
     const onDialogPaymentGuestFolio = (val, flag, data) => {
@@ -897,24 +945,60 @@ export default defineComponent({
         state.data.buttonOkEnable = false;
         state.isLoading = false;
         console.log('payment data : ', data);
-        emit('onDialogPayment', false, 'ok', data);
+        emit('onDialogPayment', false, 'ok', data, 4);
       }
     }
 
-    const onDialogPaymentNonGuestFolio = (val) => {
+    const onDialogPaymentNonGuestFolio = (val, flag, data) => {
       state.data.showPaymentNonGuestFolio = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 5);
+      }
     }
 
-    const onDialogPaymentCompliment = (val) => {
+    const onDialogPaymentCompliment = (val, flag, data) => {
       state.data.showPaymentCompliment = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 7);
+      }
     }
 
-    const onDialogPaymentMasterFolio = (val) => {
+    const onDialogPaymentMasterFolio = (val, flag, data) => {
       state.data.showPaymentMasterFolio = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 6);
+      }
     }
 
-    const onDialogPaymentMealCoupon = (val) => {
+    const onDialogPaymentMealCoupon = (val, flag, data) => {
       state.data.showPaymentMealCoupon = val;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPrint = {};
+        state.data.selectedPayment = {};
+        state.data.buttonOkEnable = false;
+        state.isLoading = false;
+        console.log('payment data : ', data);
+        emit('onDialogPayment', false, 'ok', data, 8);
+      }
     }
 
     const onDialogDepartment = (val, data) => {
@@ -922,7 +1006,7 @@ export default defineComponent({
 
       if (!val && data != null) {
         state.data.dataPreparePayment['dataHotelSelected'] = data;
-        onDialogPaymentNonGuestFolio(true);
+        onDialogPaymentNonGuestFolio(true, '', {});
       }
     }
 

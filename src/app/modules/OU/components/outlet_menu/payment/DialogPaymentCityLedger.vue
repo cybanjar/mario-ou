@@ -150,8 +150,8 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentCityLedger: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
   },
 
@@ -208,7 +208,7 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showPaymentCityLedger,
         set: (val) => {
-            emit('onDialogPaymentCityLedger', val, null);
+            emit('onDialogPaymentCityLedger', val, '', {});
         },
     });
 
@@ -453,7 +453,7 @@ export default defineComponent({
 
     const onCancelDialog = () => {
       state.caseType = 0;
-      emit('onDialogPaymentCityLedger', false);
+      emit('onDialogPaymentCityLedger', false, '', {});
     }
 
     const onClickConfirmation = () => {
@@ -468,7 +468,7 @@ export default defineComponent({
         console.log('Hit API ? 1');          
 
         state.data.showConfirmationDialog = false;
-        emit('onDialogPaymentCityLedger', false);
+        emit('onDialogPaymentCityLedger', false, 'ok', {});
       }
 
     }
