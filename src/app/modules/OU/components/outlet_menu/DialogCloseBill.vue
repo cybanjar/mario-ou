@@ -30,7 +30,7 @@
 
         <q-card-actions align="right">
           <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn unelevated color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -66,6 +66,8 @@ interface State {
 export default defineComponent({
   props: {
     showDialogCloseBill: { type: Boolean, required: true },
+    dataTable: { type: null, required: true },
+    dataPrepare: { type: null, required: true },
   },
 
   setup(props, { emit, root: { $api } }) {
@@ -92,7 +94,8 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Select Close Bill';
 
-        //   console.log("Selected Data : ", props.dataSelectedCloseBill);
+          console.log("On Mount : ", props.dataTable);
+          console.log("On Mount : ", props.dataPrepare);
         }
       }
     );
@@ -104,41 +107,11 @@ export default defineComponent({
         },
     });
 
-
-    const tableHeadersPrint = [
-      {
-            label: "Name", 
-            field: "name",
-            name: "name",
-            align: "center",
-        }, 
-        // {
-        //     label: "id", 
-        //     field: "id",
-        //     name: "id",
-        //     align: "center",
-        // },
-    ];
-
     // -- 
-    const onOkDialogSelectUser = () => {
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
+    const onOkDialog = () => {
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogCloseBill', false);
     }
 
@@ -149,13 +122,12 @@ export default defineComponent({
     }
 
     return {
-      dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onOkDialogSelectUser,
+      dialogModel,
+      onOkDialog,
       onCancelDialog,
-      pagination: { rowsPerPage: 0 },
       showKeyboardBill,
+      pagination: { rowsPerPage: 0 },
     };
   },
 });

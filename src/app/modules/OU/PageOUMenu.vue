@@ -24,7 +24,7 @@
                   </q-icon>
                 </span>
 
-                <span @click="onDialogCloseBill(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                <span @click="zugriff(49, 1, 'closebill')" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-account-cash" >
                     <q-tooltip>
                       Close Bill
@@ -559,6 +559,8 @@
         
         <dialogCloseBill
           :showDialogCloseBill="showDialogCloseBill"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           @onDialogCloseBill="onDialogCloseBill" />
 
         <dialogChangeOutlet
@@ -1100,6 +1102,8 @@ export default defineComponent({
                     type: 'warning',
                   });
               }
+            } else if ('closebill') {
+              onDialogCloseBill(true, null);
             }
           } else {
             Notify.create({
@@ -1468,7 +1472,7 @@ export default defineComponent({
     }
 
     const getHBLineSelectItem = (datarows) => {
-      state.isLoading = true;
+      // state.isLoading = true;
 
       async function asyncCall() {
         const [dataSelectItem] = await Promise.all([
@@ -1491,7 +1495,7 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
           state.dataValidationSelectArticle['responseSelectItem'] = responseSelectItem;
@@ -1502,7 +1506,7 @@ export default defineComponent({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
       }
@@ -1530,7 +1534,7 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
 
@@ -1541,7 +1545,7 @@ export default defineComponent({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
       }
@@ -1549,7 +1553,7 @@ export default defineComponent({
     }
 
     const getHBLineSelectItem1 = (datarows) => {
-      state.isLoading = true;
+      // state.isLoading = true;
 
       async function asyncCall() {
         const [dataSelectItem] = await Promise.all([
@@ -1571,7 +1575,7 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
 
@@ -1582,7 +1586,7 @@ export default defineComponent({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
       }
@@ -1590,7 +1594,7 @@ export default defineComponent({
     }
 
     const getRestInvCheckSaldo = (flag) => {
-      state.isLoading = true;
+      // state.isLoading = true;
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -1612,17 +1616,17 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
           getRestInvGetSaldo(flag);
-          state.isLoading = true;
+          // state.isLoading = true;
         } else {
           Notify.create({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
       }
@@ -1630,7 +1634,7 @@ export default defineComponent({
     }
 
     const getRestInvGetSaldo = (flag) => {
-      state.isLoading = true;
+      // state.isLoading = true;
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -1662,7 +1666,7 @@ export default defineComponent({
               message: 'Bill not found or balance already 0',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } else {
             if (flag == 'tabletransfer') {
@@ -1671,13 +1675,13 @@ export default defineComponent({
               onDialogSplitBill(true);
             }
           }
-          state.isLoading = false;
+          // state.isLoading = false;
         } else {
           Notify.create({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           }
       }
@@ -1685,7 +1689,7 @@ export default defineComponent({
     }
 
     const getHBLineSelectItem2 = (datarows) => {
-      state.isLoading = true;
+      // state.isLoading = true;
 
       async function asyncCall() {
         const [dataSelectItem] = await Promise.all([
@@ -1706,7 +1710,7 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
           state.dataValidationSelectArticle['responseSelectItem2'] = responseSelectItem;
@@ -1716,7 +1720,7 @@ export default defineComponent({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
       }
@@ -1942,7 +1946,7 @@ export default defineComponent({
               message: 'Failed when retrive data, please try again',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
           } 
 
@@ -1951,19 +1955,18 @@ export default defineComponent({
               message: msgStr,
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
           }
-          onDialogChangeOutlet(true, '');
+          onDialogChangeOutlet(true, '', 'closebill');
           state.isLoading = false;
         } else {
           Notify.create({
               message: 'Please check your internet connection',
               color: 'red',
             });
-            state.isLoading = false;
+            // state.isLoading = false;
             return false;
         }
-        state.isLoading = false;
       }
       asyncCall();
     }
@@ -2075,12 +2078,12 @@ export default defineComponent({
       state.showDialogCashierTransfer = val;
     }
 
-    const onClickCloseBill = () => {
-      onDialogCloseBill(true);
-    }
-
-    const onDialogCloseBill = (val) => {
+    const onDialogCloseBill = (val, data) => {
       state.showDialogCloseBill = val;
+
+      if (!val && data != null) {
+
+      }
     }
 
     const onClickChangeOutlet = () => {
@@ -2167,7 +2170,6 @@ export default defineComponent({
       onDialogInputPassword,
       onDialogCashierTransfer,
       onClickCashierTransfer,
-      onClickCloseBill,
       onDialogCloseBill,
       onClickChangeOutlet,
       onDialogChangeOutlet,
