@@ -1,31 +1,28 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:550px;">
+      <q-card  style="max-width: 1500px;width:1100px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section>
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col q-mr-md">
+        <q-card-section style="max-height: 70vh" class="scroll">
+          <div class="row q-ma-md">
+            <div class="col-4 q-gutter-sm q-pr-md">
                 <SInput outlined label-text="Discount (%)" v-model="data.discountPercent" :data-layout="layout" ref="discountPercent" @focus="showKeyboard" @input="onChangeDiscount()" />
+                <SInput outlined  label-text="Voucher" :disable="true" readonly/>
+                <SInput outlined label-text="Discount" v-model="data.discountValue" :data-layout="layout" ref="discountValue" @focus="showKeyboard" :disable="true" readonly />
+                <SInput outlined label-text="Amount" v-model="data.discountAmount" :data-layout="layout" ref="discountAmount" @focus="showKeyboard" :disable="true" readonly />
+                <SInput outlined label-text="Balance" v-model="data.discountBalance" :data-layout="layout" ref="discountBalance" @focus="showKeyboard" :disable="true" readonly />
             </div>
 
-            <div class="col">
-              <SInput outlined  label-text="Voucher" :disable="true" readonly/>
-            </div>
-          </div>
-
-          <div class="q-gutter-sm">
-            <q-checkbox v-model="data.checkBoxSelection" val="1" label="All Food" />
-            <q-checkbox v-model="data.checkBoxSelection" val="2" label="All Beverage" />
-            <q-checkbox v-model="data.checkBoxSelection" val="3" label="All Other" />
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-list bordered padding>
+            <div class="col-8">
+              <div class="q-gutter-sm">
+                <q-checkbox v-model="data.checkBoxSelection" val="1" label="All Food" />
+                <q-checkbox v-model="data.checkBoxSelection" val="2" label="All Beverage" />
+                <q-checkbox v-model="data.checkBoxSelection" val="3" label="All Other" />
+              </div>
+              <q-list style="max-height: 50vh" class="scroll" bordered padding>
                 <template v-for="datarow in data.dataDetail">
                   <q-item :class="(datarow.selected)?'bg-cyan text-white':'bg-white text-black'" clickable v-ripple :key="datarow['position']" @click="onClickItem(datarow)">
                     <q-item-section side top>
@@ -41,26 +38,8 @@
             </div>
           </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col q-mr-md">
-                <SInput outlined label-text="Discount" v-model="data.discountValue" :data-layout="layout" ref="discountValue" @focus="showKeyboard" :disable="true" readonly />
-            </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col q-mr-md">
-                <SInput outlined label-text="Amount" v-model="data.discountAmount" :data-layout="layout" ref="discountAmount" @focus="showKeyboard" :disable="true" readonly />
-            </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col q-mr-md">
-                <SInput outlined label-text="Balance" v-model="data.discountBalance" :data-layout="layout" ref="discountBalance" @focus="showKeyboard" :disable="true" readonly />
-            </div>
-          </div>
-
-          <q-dialog v-model="showDialogComfirmation" persistent>
-          <q-card style="max-width: 1500px;width:450px;">
+        <q-dialog v-model="showDialogComfirmation" persistent>
+          <q-card>
             <q-toolbar>
               <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
             </q-toolbar>

@@ -1,7 +1,7 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:600px;">
+      <q-card  style="max-width: 1500px;width:1100px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>

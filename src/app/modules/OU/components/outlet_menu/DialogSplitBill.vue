@@ -6,9 +6,9 @@
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section>
+        <q-card-section style="max-height: 70vh" class="scroll">
           <div
-            class="row items-center q-gutter-sm q-mx-sm"
+            class="row q-gutter-sm q-mx-sm"
           >
             <q-card flat bordered @click="data.balance !=0 ? onDialogPaymentCash(true) : null">
               <q-card-section>                          
@@ -109,80 +109,82 @@
           </div>
         </q-card-section>
 
-        <q-card-section>
-            <div class="q-ma-sm row q-gutter-xs">
-                <div class="col">
-                    <STable
-                        flat
-                        bordered
-                        hide-bottom
-                        :loading="isLoading"
-                        :columns="tableHeadersMainBill"
-                        :data="data.dataTableMainBill"
-                        row-key="name"
-                        separator="cell"
-                        :rows-per-page-options="[0]"
-                        :pagination.sync="pagination">
-                        <template v-slot:loading>
-                            <q-inner-loading showing color="primary" />
-                        </template>
+        <q-card-section class="q-pa-none">
+          <div class="q-ma-sm row q-gutter-xs">
+            <div class="col">
+              <STable
+                class="my-sticky-header-table"
+                flat
+                style="max-height: 300px"
+                :loading="isLoading"
+                bordered
+                :columns="tableHeadersMainBill"
+                :data="data.dataTableMainBill"
+                row-key="name"
+                separator="cell"
+                :rows-per-page-options="[5, 10]"
+                :pagination.sync="pagination">
+                <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                </template>
 
-                        <template v-slot:body="props">
-                          <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
-                            <q-td
-                              v-for="col in props.cols"
-                              :key="col.name"
-                              :props="props"
-                              @click="onClickMoveRight(props.row)">
-                                {{ col.value }}
-                            </q-td>
-                          </q-tr>
-                        </template>
-                    </STable>
-                </div>
-
-                <!-- <div class="row items-center">
-                  <div class="col q-gutter-xs">
-                    <q-btn unelevated color="primary" icon="mdi-chevron-left" @click="onClickMoveLeft"/>
-                  </div>
-                </div>
-
-                <div class="row items-center">
-                  <div class="col">
-                    <q-btn unelevated color="primary" icon="mdi-chevron-right" @click="onClickMoveRight" />
-                  </div>
-                </div> -->
-
-                <div class="col">
-                    <STable
-                        flat
-                        bordered
-                        hide-bottom
-                        :loading="isLoading"
-                        :columns="tableHeadersSplitBill"
-                        :data="data.dataTableSplitBill"
-                        row-key="name"
-                        separator="cell"
-                        :rows-per-page-options="[0]"
-                        :pagination.sync="pagination">
-                        <template v-slot:loading>
-                            <q-inner-loading showing color="primary" />
-                        </template>
-
-                        <template v-slot:body="props">
-                          <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
-                            <q-td
-                              v-for="col in props.cols"
-                              :key="col.name"
-                              :props="props"
-                              @click="onClickMoveLeft(props.row)">
-                                {{ col.value }}
-                            </q-td>
-                          </q-tr>
-                        </template>
-                    </STable>
-                </div>
+                <template v-slot:body="props">
+                  <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                    <q-td
+                      v-for="col in props.cols"
+                      :key="col.name"
+                      :props="props"
+                      @click="onClickMoveRight(props.row)">
+                        {{ col.value }}
+                    </q-td>
+                  </q-tr>
+                </template>
+              </STable>
             </div>
+
+            <!-- <div class="row items-center">
+              <div class="col q-gutter-xs">
+                <q-btn unelevated color="primary" icon="mdi-chevron-left" @click="onClickMoveLeft"/>
+              </div>
+            </div>
+
+            <div class="row items-center">
+              <div class="col">
+                <q-btn unelevated color="primary" icon="mdi-chevron-right" @click="onClickMoveRight" />
+              </div>
+            </div> -->
+
+            <div class="col">
+                <STable
+                    class="my-sticky-header-table"
+                    flat
+                    style="max-height: 300px"
+                    bordered
+                    :loading="isLoading"
+                    :columns="tableHeadersSplitBill"
+                    :data="data.dataTableSplitBill"
+                    row-key="name"
+                    separator="cell"
+                    :rows-per-page-options="[5, 10]"
+                    :pagination.sync="pagination">
+                    <template v-slot:loading>
+                        <q-inner-loading showing color="primary" />
+                    </template>
+
+                    <template v-slot:body="props">
+                      <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                        <q-td
+                          v-for="col in props.cols"
+                          :key="col.name"
+                          :props="props"
+                          @click="onClickMoveLeft(props.row)">
+                            {{ col.value }}
+                        </q-td>
+                      </q-tr>
+                    </template>
+                </STable>
+            </div>
+          </div>
         </q-card-section>
 
         <q-card-section>
@@ -201,7 +203,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline unelevated color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
         </q-card-actions>
       </q-card>

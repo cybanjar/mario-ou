@@ -1,32 +1,32 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card  style="max-width: 1500px;width:600px;">
+      <q-card  style="max-width: 1500px;width:1100px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
         <q-card-section>
             <div class="row">
-                <div class="col-3">
+                <div class="col-4">
                     <SInput outlined v-model="data.num" class="q-mx-xs q-mt-sm" label-text="Outlet Number" :disable="true" readonly/>
-                </div>
-                <div class="col-9">
                     <SInput outlined v-model="data.name" class="q-mx-xs q-mt-sm" label-text="Name" :disable="true" readonly/>
                 </div>
-            </div>
-            <div class="row">
-              <template v-for="datarow in data.dataDetail">
-                <q-card flat bordered
-                  class="col-sm-3 col-sm-4 q-ma-sm"
-                  style="width:240px" 
-                  :key="datarow['num']"
-                  @click="onClickTable(datarow)">
-                  <q-card-section :class="(datarow.selected)?'bg-cyan text-white':'bg-white text-black'">
-                    {{datarow['depart']}}
-                  </q-card-section>
-                </q-card>
-              </template>
+                <div class="col-8">
+                  <div class="row">
+                    <template v-for="datarow in data.dataDetail">
+                      <q-card flat bordered
+                        class="col-sm-3 col-sm-4 q-ma-sm"
+                        style="width:240px" 
+                        :key="datarow['num']"
+                        @click="onClickTable(datarow)">
+                        <q-card-section :class="(datarow.selected)?'bg-cyan text-white':'bg-white text-black'">
+                          {{datarow['depart']}}
+                        </q-card-section>
+                      </q-card>
+                    </template>
+                  </div>
+                </div>
             </div>
         </q-card-section>
 

@@ -1,72 +1,68 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card style="max-width: 1500px;width:650px;">
+      <q-card style="max-width: 1500px;width:1100px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section class="q-ma-none">
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
+        <q-card-section style="max-height: 70vh" class="scroll">
+          <div class="row">
+            <div class="col-4">
+              <div class="q-ma-sm row q-gutter-xs">
+                <div class="col">
+                  <SInput v-model="data.balance" outlined  label-text="Balance" :disable="true" readonly/>
+                </div>
+              </div>
 
-            <div class="col">
-              <SInput v-model="data.balance" outlined  label-text="Balance" :disable="true" readonly/>
-            </div>
-          </div>
+              <div class="q-ma-sm row q-gutter-xs">
+                <div class="col">
+                  <SInput outlined v-model="data.room" label-text="Room" @change="(v) => { getReturnZinr(data.zinr); }" data-layout="numeric" ref="paymentRoom" @focus="showKeyboard"/>
+                </div>
+              </div>
 
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
+              <div class="q-ma-sm row q-gutter-xs">
+                <div class="col">
+                  <SInput outlined v-model="data.remark" type="textarea" label-text="Remark" :disable="true" readonly/>
+                </div>
+              </div>
             </div>
+            <div class="col-8">
+              <div class="q-pa-sm">
+                <STable
+                  class="my-sticky-header-table"
+                  flat
+                  bordered
+                  :loading="isLoading"
+                  :columns="tableHeaders"
+                  :data="data.dataDetail"
+                  row-key="name"
+                  separator="cell"
+                  :rows-per-page-options="[10, 13, 16]"
+                  :pagination.sync="pagination"
+                >
+                  <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                  </template>
 
-            <div class="col">
-              <SInput outlined v-model="data.room" label-text="Room" @change="(v) => { getReturnZinr(data.zinr); }" data-layout="numeric" ref="paymentRoom" @focus="showKeyboard"/>
-            </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-            <div class="col">
-              <q-space />
-            </div>
-
-            <div class="col">
-              <SInput outlined v-model="data.remark" label-text="Remark" :disable="true" readonly/>
+                  <template v-slot:body="props">
+                    <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                      <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                        @click="onRowClickTable(props.row)">
+                          {{ col.value }}
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </STable>
+              </div>
             </div>
           </div>
         </q-card-section>
 
         <q-card-section>
-          <div class="q-pa-sm">
-            <STable
-              hide-bottom
-              :loading="isLoading"
-              :columns="tableHeaders"
-              :data="data.dataDetail"
-              row-key="name"
-              separator="cell"
-              :rows-per-page-options="[0]"
-              :pagination.sync="pagination">
-              <template v-slot:loading>
-                <q-inner-loading showing color="primary" />
-              </template>
-
-              <template v-slot:body="props">
-                <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
-                  <q-td
-                    v-for="col in props.cols"
-                    :key="col.name"
-                    :props="props"
-                    @click="onRowClickTable(props.row)">
-                      {{ col.value }}
-                  </q-td>
-                </q-tr>
-              </template>
-            </STable>
-          </div>
-
           <vue-touch-keyboard 
             id="keyboard"
             :options="options" 
@@ -82,7 +78,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
 

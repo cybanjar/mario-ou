@@ -1,93 +1,94 @@
 <template>
   <section>
     <q-dialog v-model="dialogModel" persistent>
-      <q-card style="max-width: 1500px;width:900px;">
+      <q-card style="max-width: 1500px;width:1100px;">
         <q-toolbar>
           <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section>
-          <div class="q-ma-sm row q-gutter-xs">
-              <div class="col q-mr-sm">
-                <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
+        <q-card-section style="max-height: 70vh" class="scroll">
+          <div class="row">
+            <div class="col-4">
+              <div class="q-ma-sm row q-gutter-xs">
+                  <div class="col q-mr-sm">
+                    <SInput outlined v-model="data.balance" label-text="Balance" :disable="true" readonly/>
+                  </div>
               </div>
 
-              <div class="col">
-              </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-              <div class="col q-mr-sm">
-                <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentPayment" @focus="showKeyboard"/>
+              <div class="q-ma-sm row q-gutter-xs">
+                  <div class="col q-mr-sm">
+                    <SInput outlined v-model="data.payment" label-text="Payment" data-layout="numeric" ref="paymentPayment" @focus="showKeyboard"/>
+                  </div>
               </div>
 
-              <div class="col">
+              <div class="q-ma-sm row q-gutter-xs">
+                  <div class="col q-mr-sm">
+                    <SInput
+                      outlined
+                      v-model="data.name" 
+                      type="search"
+                      @change="(v) => { onChangeSearchInput(data.name); }"
+                      label-text="Name"
+                      data-layout="compact" 
+                      ref="paymentName" 
+                      @focus="showKeyboard"/>
+                  </div>
               </div>
-          </div>
-
-          <div class="q-ma-sm row q-gutter-xs">
-              <div class="col q-mr-sm">
-                <SInput outlined
-                  v-model="data.name" 
-                  type="search"
-                  @change="(v) => { onChangeSearchInput(data.name); }"
-                  label-text="Name"
-                  data-layout="compact" 
-                  ref="paymentName" 
-                  @focus="showKeyboard"/>
+              <div class="q-ma-sm row q-gutter-xs">
+                <div class="col q-mr-sm">
+                  <SInput outlined v-model="data.remark" label-text="Remark" type="textarea" :disable="true" readonly/>
+                </div>
               </div>
+            </div>
+            <div class="col-8">
+              <div class="q-pa-sm">
+                <STable
+                  class="my-sticky-header-table"
+                  flat
+                  bordered
+                  :loading="isLoading"
+                  :columns="tableHeaders"
+                  :data="data.filteredDataTable"
+                  row-key="name"
+                  separator="cell"
+                  :rows-per-page-options="[10, 13, 16]"
+                  :pagination.sync="pagination">
+                  <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                  </template>
 
-              <div class="col">
-                <q-input outlined v-model="data.remark" label-text="Remark" :disable="true" readonly/>
+                  <template v-slot:body="props">
+                    <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
+                      <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                        @click="onRowClick(props.row)">
+                          {{ col.value }}
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </STable>
+
+                <vue-touch-keyboard 
+                  id="keyboard"
+                  :options="options" 
+                  v-if="numpadVisible" 
+                  :layout="layout" 
+                  :cancel="hideKeyboard" 
+                  :accept="acceptKeyboard" 
+                  :next="acceptKeyboard"
+                  :input="input"
+                  :close="hideKeyboard" />
               </div>
-          </div>
-        </q-card-section>
-
-        <q-card-section>
-          <div class="q-pa-sm">
-            <STable
-              hide-bottom
-              :loading="isLoading"
-              :columns="tableHeaders"
-              :data="data.filteredDataTable"
-              row-key="name"
-              separator="cell"
-              :rows-per-page-options="[0]"
-              :pagination.sync="pagination">
-              <template v-slot:loading>
-                <q-inner-loading showing color="primary" />
-              </template>
-
-              <template v-slot:body="props">
-                <q-tr :props="props" :class="(props.row.selected)?'bg-cyan text-white':'bg-white text-black'">
-                  <q-td
-                    v-for="col in props.cols"
-                    :key="col.name"
-                    :props="props"
-                    @click="onRowClick(props.row)">
-                      {{ col.value }}
-                  </q-td>
-                </q-tr>
-              </template>
-            </STable>
-
-            <vue-touch-keyboard 
-              id="keyboard"
-              :options="options" 
-              v-if="numpadVisible" 
-              :layout="layout" 
-              :cancel="hideKeyboard" 
-              :accept="acceptKeyboard" 
-              :next="acceptKeyboard"
-              :input="input"
-              :close="hideKeyboard" />
+            </div>
           </div>
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
 

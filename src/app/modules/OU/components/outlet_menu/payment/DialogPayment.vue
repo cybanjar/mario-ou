@@ -91,7 +91,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
+          <q-btn outline color="primary" label="Cancel" @click="onCancelDialog"  />
           <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
@@ -116,7 +116,7 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn outline label="Cancel" v-close-popup />
+          <q-btn outline color="primary" label="Cancel" v-close-popup />
           <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
         </q-card-actions>
       </q-card>

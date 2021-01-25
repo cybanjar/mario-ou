@@ -462,31 +462,27 @@
     }
   }
 
-  .my-sticky-header-table {
-    /* height or max-height is important */
-    height: 60vh;
+  // .my-sticky-header-table {
+  //   height: 60vh;
 
-    .q-table__top,
-    .q-table__bottom,
-    thead tr:first-child th {
-      /* bg color is important for th; just specify one */
-      background-color: #c1f4cd;
-    }
+  //   .q-table__top,
+  //   .q-table__bottom,
+  //   thead tr:first-child th {
+  //     background-color: #c1f4cd;
+  //   }
 
-    thead tr th {
-      position: sticky;
-      z-index: 1;
-    }
+  //   thead tr th {
+  //     position: sticky;
+  //     z-index: 1;
+  //   }
 
-    thead tr:first-child th {
-      top: 0;
+  //   thead tr:first-child th {
+  //     top: 0;
 
-      /* this is when the loading indicator appears */
-      &.q-table--loading thead tr:last-child th {
-        /* height of all previous header rows */
-        top: 48px;
-      }
-    }
-  }
+  //     &.q-table--loading thead tr:last-child th {
+  //       top: 48px;
+  //     }
+  //   }
+  // }
 </style>
 
