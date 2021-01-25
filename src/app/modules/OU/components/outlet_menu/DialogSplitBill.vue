@@ -209,18 +209,21 @@
 
     <dialogPaymentCash
       :showPaymentCash="showPaymentCash"
+      :flagSplit="true"
       :selectedPayment="data.selectedPayment"
       :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCash="onDialogPaymentCash" />
 
     <dialogPaymentCard 
       :showPaymentCard="showPaymentCard"
+      :flagSplit="true"
       :selectedPayment="data.selectedPayment"
       :dataPreparePayment="data.dataPreparePayment"
       @onDialogPaymentCard="onDialogPaymentCard" />
 
     <dialogPaymentCityLedger
       :showPaymentCityLedger="showPaymentCityLedger"
+      :flagSplit="true"
       :selectedPayment="data.selectedPayment"
       :dataTable="data.dataPreparePayment"
       @onDialogPaymentCityLedger="onDialogPaymentCityLedger" />

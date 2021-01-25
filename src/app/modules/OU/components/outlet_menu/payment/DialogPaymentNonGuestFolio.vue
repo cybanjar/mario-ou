@@ -112,6 +112,7 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentNonGuestFolio: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},

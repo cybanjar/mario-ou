@@ -122,6 +122,7 @@ interface State {
 export default defineComponent({
   props: {
     showPaymentCash: { type: Boolean, required: true },
+    flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
     dataPreparePayment: {type: null, required: true},
   },

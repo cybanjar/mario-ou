@@ -124,6 +124,7 @@
 
     <dialogPaymentCash
       :showPaymentCash="data.showPaymentCash"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataPreparePayment="data.dataPreparePayment"
@@ -131,6 +132,7 @@
 
     <dialogPaymentCard 
       :showPaymentCard="data.showPaymentCard"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataPreparePayment="data.dataPreparePayment"
@@ -138,6 +140,7 @@
 
     <dialogPaymentCityLedger
       :showPaymentCityLedger="data.showPaymentCityLedger"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -145,6 +148,7 @@
 
     <dialogPaymentGuestFolio
       :showPaymentGuestFolio="data.showPaymentGuestFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -152,6 +156,7 @@
 
     <dialogPaymentNonGuestFolio
       :showPaymentNonGuestFolio="data.showPaymentNonGuestFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -166,6 +171,7 @@
 
     <dialogPaymentMasterFolio
       :showPaymentMasterFolio="data.showPaymentMasterFolio"
+      :flagSplit="false"
       :selectedPayment="data.selectedPayment"
       :selectedPrint="data.selectedPrint"
       :dataTable="data.dataPreparePayment"
@@ -181,6 +187,7 @@
     <dialogSelectDepartment 
       :showDialogChangeOutlet="data.showDepartment"
       :flagActivity="flag"
+      :flagSplit="false"
       @onDialogDepartment="onDialogDepartment"
       />
 
@@ -319,6 +326,11 @@ export default defineComponent({
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
           state.data.balance = state.data.dataPreparePayment['dataTable']['dataThBill'][0]['saldo'];
+
+          for (let i = 0; i<state.data.dataTablePayment.length; i++) {
+            const datarow = state.data.dataTablePayment[i];
+            datarow['selected'] = false;
+          }       
           console.log('Dialog Payment Mount: ', props.dataTable);
         }
       }
@@ -450,6 +462,8 @@ export default defineComponent({
           if (zuggrifval == "true") {
             if (idPayment == 1) {
               getPreparePayCash3();
+            } else if (idPayment == 2) {
+              getRestInvBtnTransfer();
             } else if (idPayment == 3) {
               getRestInvBtnTransfer();
             } else if (idPayment == 4) { 
@@ -631,6 +645,8 @@ export default defineComponent({
               getRestInvBillTransfer();
             } else if (idPayment == 7) {
               getRestInvBillTransfer();
+            } else if (idPayment == 2) {
+              onDialogPaymentCard(true, '', {});
             }
           }
 
@@ -820,7 +836,7 @@ export default defineComponent({
       if (idPayment == 1) {
         getRestInvGetSaldo();
       } else if (idPayment == 2) {
-        onDialogPaymentCard(true, '', {});
+        getRestInvGetSaldo();
       } else if (idPayment == 3) {
         getRestInvGetSaldo();
       } else if (idPayment == 4) {
@@ -872,6 +888,8 @@ export default defineComponent({
       } else if (idPayment == 7) {
         zuggriff(20, 2);
       } else if (idPayment == 1) {
+        zuggriff(20, 2);
+      } else if (idPayment == 2) {
         zuggriff(20, 2);
       }
     }
