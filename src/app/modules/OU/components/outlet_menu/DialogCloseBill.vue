@@ -96,6 +96,7 @@ export default defineComponent({
 
           console.log("On Mount : ", props.dataTable);
           console.log("On Mount : ", props.dataPrepare);
+          getPrepare();
         }
       }
     );
@@ -107,7 +108,88 @@ export default defineComponent({
         },
     });
 
-    // -- 
+    // -- HTTP Request Method
+    const getPrepare = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('oldhbillPrepare ', {
+            rechnr : props.dataTable['rechnr'],
+            dept : props.dataPrepare['currDept'],
+            incomeAudit : false,
+            knr: props.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('oldhbillPrepare : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getOldhbillBtnExit = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('oldhbillBtnExit ', {
+            rechnr : props.dataTable['rechnr'],
+            dept : props.dataPrepare['currDept'],
+            incomeAudit : false,
+            knr: props.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('oldhbillBtnExit : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    // -- On Click Listener
     const onOkDialog = () => {
     }
 

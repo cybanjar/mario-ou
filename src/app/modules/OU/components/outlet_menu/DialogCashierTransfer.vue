@@ -15,8 +15,8 @@
                     hide-header
                     hide-bottom
                     :loading="isLoading"
-                    :columns="tableHeadersPrint"
-                    :data="data.dataTablePrint"
+                    :columns="tableHeaders"
+                    :data="data.dataDetailOrderTaker"
                     row-key="name"
                     separator="cell"
                     :rows-per-page-options="[0]"
@@ -28,7 +28,7 @@
                     <template v-slot:item="props">
                         <div class="q-pa-xs col-sm-3 col-md-4">
                         <q-card flat bordered :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                            <q-card-section @click="onRowClickTablePrint(props.row)" >
+                            <q-card-section @click="onRowClickOrderTaker(props.row)" >
                                 <strong>{{ props.row.name }}</strong>
                             </q-card-section>
                         </q-card>
@@ -54,9 +54,10 @@
                                 flat
                                 bordered
                                 hide-bottom
+                                hide-header
                                 :loading="isLoading"
-                                :columns="tableHeadersPrint"
-                                :data="data.dataTablePayment"
+                                :columns="tableHeadersLeft"
+                                :data="data.dataTableLeft"
                                 row-key="name"
                                 separator="cell"
                                 :rows-per-page-options="[0]"
@@ -65,14 +66,16 @@
                                     <q-inner-loading showing color="primary" />
                                 </template>
 
-                                <template v-slot:item="props">
-                                    <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                                    <q-card>
-                                        <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                                            <strong>{{ props.row.name }}</strong>
-                                        </q-card-section>
-                                    </q-card>
-                                    </div>
+                                <template v-slot:body="props">
+                                  <q-tr :props="props">
+                                    <q-td
+                                      v-for="col in props.cols"
+                                      :key="col.name"
+                                      :props="props"
+                                      @click="onRowClickTableLeft(props.row)">
+                                        {{ col.value }}
+                                    </q-td>
+                                  </q-tr>
                                 </template>
                             </STable>
                         </div>                        
@@ -82,9 +85,10 @@
                                 flat
                                 bordered
                                 hide-bottom
+                                hide-header
                                 :loading="isLoading"
-                                :columns="tableHeadersPrint"
-                                :data="data.dataTablePayment"
+                                :columns="tableHeadersRight"
+                                :data="data.dataTableRight"
                                 row-key="name"
                                 separator="cell"
                                 :rows-per-page-options="[0]"
@@ -93,29 +97,20 @@
                                     <q-inner-loading showing color="primary" />
                                 </template>
 
-                                <template v-slot:item="props">
-                                    <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                                    <q-card>
-                                        <q-card-section @click="onRowClickTablePayment(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                                            <strong>{{ props.row.name }}</strong>
-                                        </q-card-section>
-                                    </q-card>
-                                    </div>
+                                <template v-slot:body="props">
+                                  <q-tr :props="props">
+                                    <q-td
+                                      v-for="col in props.cols"
+                                      :key="col.name"
+                                      :props="props"
+                                      @click="onRowClickTableRight(props.row)">
+                                        {{ col.value }}
+                                    </q-td>
+                                  </q-tr>
                                 </template>
                             </STable>
                         </div>
-
                     </div>
-                    <div class="row text-center">
-                        <div class="col q-gutter-xs">
-                            <q-btn unelevated color="primary" icon="mdi-chevron-left" />
-                            <q-btn unelevated color="primary" icon="mdi-chevron-right" />
-                        </div>
-                    </div>
-                    <!-- <div class="row ">
-                        <div class="col">
-                        </div>
-                    </div> -->
                 </q-card-section>
             </div>
         </div>        
@@ -124,7 +119,7 @@
 
         <q-card-actions align="right">
           <q-btn outline color="primary" class="q-mr-sm" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialog" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -138,9 +133,10 @@ import { Notify } from 'quasar';
 interface State {
   isLoading: boolean;
   data: {
-    dataDetail: [];
-    dataTablePrint: any;
-    dataTablePayment: any;
+    dataDetailOrderTaker: any;
+    dataTableMain: any;
+    dataTableLeft: any;
+    dataTableRight: any;
     buttonOkEnable: boolean;
   }
   title: string;
@@ -150,67 +146,18 @@ export default defineComponent({
   props: {
     showDialogCashierTransfer: { type: Boolean, required: true },
     dataSelectedCashierTransfer: { type: Object, required: true },
+    dataTable: { type: null, required: true },
+    dataPrepare: { type: null, required: true },
   },
 
   setup(props, { emit, root: { $api } }) {
     const state = reactive<State>({
       isLoading: false,
       data: {
-        dataDetail: [],
-        dataTablePrint : [
-          {
-            'name': "Print Bill",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Reprint Bill",
-            'id': '2',
-            'selected': false,
-          }
-        ],
-        dataTablePayment : [
-          {
-            'name': "Cash",
-            'id': '1',
-            'selected': false,
-          },
-          {
-            'name': "Card",
-            'id': '2',
-            'selected': false,
-          },
-          {
-            'name': "City Ledger",
-            'id': '3',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Guest Folio",
-            'id': '4',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Non Guest Folio",
-            'id': '5',
-            'selected': false,
-          },
-          {
-            'name': "Transfer To Master Folio",
-            'id': '6',
-            'selected': false,
-          },
-          {
-            'name': "Compliment",
-            'id': '7',
-            'selected': false,
-          },
-          {
-            'name': "Meal Coupon",
-            'id': '8',
-            'selected': false,
-          }
-        ],
+        dataDetailOrderTaker: [],
+        dataTableMain: [],
+        dataTableLeft : [],
+        dataTableRight : [],
         buttonOkEnable: false,
       },
       title: '',
@@ -222,7 +169,9 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Cashier Transfer';
 
-          console.log("Selected Data : ", props.dataSelectedCashierTransfer);
+          getRestInvCreateList();
+
+          console.log("On Mount Cashier Transfer : ", props.dataPrepare);
         }
       }
     );
@@ -234,123 +183,135 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTablePayment = (dataRow) => {
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        datarow['selected'] = false;
-      }        
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const datarow = state.data.dataTablePayment[i];
-        
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          datarow['databaru'] = 1;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const onRowClickTablePrint = (dataRow) => {
-      for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        datarow['selected'] = false;
-      }
-
-      const id = dataRow['id'];
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const datarow = state.data.dataTablePrint[i];
-        if (id === datarow['id']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-
-      let flagButton = false;
-      for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-        const selected = state.data.dataTablePayment[i]['selected'];
-
-        if (selected === true) {
-          flagButton = true;
-          break
-        }
-      }
-
-      for (let i = 0; i<state.data.dataTablePrint.length; i++) {
-        const selected = state.data.dataTablePrint[i]['selected'];
-
-        if (flagButton && selected === true) {
-          state.data.buttonOkEnable = true;
-          break
-        }
-      }
-    }
-
-    const tableHeadersPrint = [
+    const tableHeaders = [
       {
-            label: "Name", 
-            field: "name",
-            name: "name",
-            align: "center",
-        }, 
-        // {
-        //     label: "id", 
-        //     field: "id",
-        //     name: "id",
-        //     align: "center",
-        // },
+        label: "Name", 
+        field: "name",
+        name: "name",
+        align: "center",
+      }
     ];
 
-    // -- 
-    const onOkDialogSelectUser = () => {
+    const tableHeadersLeft = [
+      {
+        label: "Name", 
+        field: "name",
+        name: "name",
+        align: "left",
+      }
+    ];
+
+    const tableHeadersRight = [
+      {
+        label: "Name", 
+        field: "name",
+        name: "name",
+        align: "left",
+      }
+    ];
+
+    // -- HTTP Request Method
+    const getRestInvCreateList = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvCreateList', {
+            currDept: props.dataPrepare['currDept'],
+            currWaiter: 1,
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('restInvCreateList : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+          state.data.dataTableMain = response['tableList']['table-list'];
+          for (let i = 0; i<state.data.dataTableMain.length; i++) {
+            const datarow = state.data.dataTableMain[i];
+            state.data.dataTableMain[i]['name'] = datarow['tischnr'] + ' - #' + datarow['rechnr'] + ' / ' + datarow['saldo']
+          }
+          state.data.dataTableLeft = state.data.dataTableMain.slice();
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    // -- onClick listener
+    const onRowClickTableLeft = (dataRow) => {
+      for (let i = 0; i<state.data.dataTableLeft.length; i++) {
+        if (state.data.dataTableLeft[i]['rechnr'] == dataRow['rechnr']) {
+          state.data.dataTableRight.push(dataRow);
+          state.data.dataTableLeft.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    const onRowClickTableRight = (dataRow) => {
+      for (let i = 0; i<state.data.dataTableRight.length; i++) {
+        if (state.data.dataTableRight[i]['rechnr'] == dataRow['rechnr']) {
+          state.data.dataTableLeft.push(dataRow);
+          state.data.dataTableRight.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    const onRowClickOrderTaker = (dataRow) => {
+      for(let i = 0; i<state.data.dataDetailOrderTaker.length; i++) {
+        const datarow = state.data.dataDetailOrderTaker[i];
+        datarow['selected'] = false;
+      }
+
+      const id = dataRow['id'];
+      for (let i = 0; i<state.data.dataDetailOrderTaker.length; i++) {
+        const datarow = state.data.dataDetailOrderTaker[i];
+        if (id === datarow['id']) {
+          datarow['selected'] = true;
+          break;
+        }
+      }
+    }
+    const onOkDialog = () => {
       // if (props.dataSelectedOrderTaker != null) {
       //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
       // } 
     }
 
     const onCancelDialog = () => {
-      // for(let i = 0; i<state.data.dataTablePrint.length; i++) {
-      //   const datarow = state.data.dataTablePrint[i];
-      //   datarow['selected'] = false;
-      // }
-
-      // for (let i = 0; i<state.data.dataTablePayment.length; i++) {
-      //   const datarow = state.data.dataTablePayment[i];
-      //   datarow['selected'] = false;
-      // }  
-
-      // state.data.buttonOkEnable = false;
       emit('onDialogCashierTransfer', false);
     }
 
     return {
       dialogModel,
       ...toRefs(state),
-      tableHeadersPrint,
-      onRowClickTablePayment,
-      onRowClickTablePrint,
-      onOkDialogSelectUser,
+      tableHeaders,
+      onRowClickTableRight,
+      onRowClickTableLeft,
+      onRowClickOrderTaker,
+      onOkDialog,
       onCancelDialog,
+      tableHeadersLeft,
+      tableHeadersRight,
       pagination: { rowsPerPage: 0 },
     };
   },

@@ -24,7 +24,7 @@
                   </q-icon>
                 </span>
 
-                <span @click="zugriff(49, 1, 'closebill')" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
+                <span @click="zuggriff(49, 1, 'closebill')" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
                   <q-icon color="white" name="mdi-account-cash" >
                     <q-tooltip>
                       Close Bill
@@ -152,7 +152,7 @@
                           </q-img>                          
                         </q-card-section>
                       </q-card>
-                      <q-card @click="onClickStandingMode = true" flat bordered>
+                      <q-card @click="getRestInvOpenStandTable()" flat bordered>
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -335,7 +335,7 @@
 
                           <q-item-section top side>
                             <div class="text-grey-3 q-gutter-xs">
-                              <q-btn size="14px" flat dense :label="datarow['epreis']" />
+                              <q-btn size="14px" flat dense :label="datarow['betrag']" />
                               <q-btn size="12px" flat dense round icon="mdi-dots-vertical" >
                                 <q-menu>
                                   <q-list style="min-width: 100px;">
@@ -468,7 +468,7 @@
         </q-dialog>
 
         <!-- Dialog Standing Mode -->
-        <q-dialog v-model="onClickStandingMode" persistent>
+        <q-dialog v-model="showDialogStandingTableNotDefined" persistent>
           <q-card style="max-width: 1500px;width:300px;">
             <q-toolbar>
               <q-toolbar-title class="text-white text-weight-medium">Information</q-toolbar-title>
@@ -480,7 +480,7 @@
                   <q-avatar icon="mdi-information" color="info" text-color="white" />
                 </div>
                 <div class="col-md-10">                  
-                  <p class="q-pl-lg q-my-sm">Standing table not define</p>
+                  <p class="q-pl-lg q-my-sm">{{titleDialogStandingTable}}</p>
                 </div>
               </div>              
             </q-card-section>
@@ -555,6 +555,8 @@
         <dialogCashierTransfer
           :showDialogCashierTransfer="showDialogCashierTransfer"
           :dataSelectedCashierTransfer="dataSelected"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           @onDialogCashierTransfer="onDialogCashierTransfer"/>
         
         <dialogCloseBill
@@ -584,6 +586,8 @@
         <dialogVoidItem
           :showDialogVoidItem="showDialogVoidItem"
           :dataSelectedVoidItem="dataSelected"
+          :dataTable="dataTable"
+          :dataPrepare="dataPrepare"
           @onDialogVoidItem="onDialogVoidItem"/>
 
           <!-- <div>
@@ -633,7 +637,8 @@ interface State {
   showDialogDiscountBill: boolean,
   showDialogTransferTable: boolean,
   showConfirmationDialog: boolean,
-  onClickStandingMode: boolean,
+  showDialogStandingTableNotDefined: boolean,
+  titleDialogStandingTable: string
   showDialogChangeUser: boolean,
   onClickPrintBill: boolean,
   currDept: any,
@@ -660,6 +665,7 @@ interface State {
   showDialogVoidItem: boolean,
   restaurant: string,
   dataPrepareInv: {},
+  objRequestInvUpdateBill: {},
 }
 export default defineComponent({
   setup(_, {root: { $api } }) {
@@ -689,7 +695,8 @@ export default defineComponent({
       showDialogDiscountBill: false,
       showDialogTransferTable: false,
       showConfirmationDialog: false,
-      onClickStandingMode: false,
+      showDialogStandingTableNotDefined: false,
+      titleDialogStandingTable: '',
       showDialogChangeUser: false,
       onClickPrintBill: false,
       currDept: 1,
@@ -719,6 +726,7 @@ export default defineComponent({
       showDialogVoidItem: false,
       restaurant: '',
       dataPrepareInv: {},
+      objRequestInvUpdateBill: {},
     });
 
     onMounted(async () => { 
@@ -935,14 +943,159 @@ export default defineComponent({
 
         if (payType == 1) {
           console.log('should refresh , Cash : ', state.dataTable)
+          const flagPay = data['flagPay'];
+          if (flagPay == 'full') {
+            state.dataTable['saldo'] = 0;
+            state.dataOrdered = [];
+            state.dataNewOrder = [];
+            state.dataTable['belegung'] = 0;
+            state.dataTable['bezeich'] = '';
+            state.dataTable['bilname'] = '';
+            state.qty = 1;
+            state.objRequestInvUpdateBill = {};
+            onDialogTablePlan(true);
+          } else if (flagPay == 'half') {
+            state.objRequestInvUpdateBill = {
+              pvILanguage : 1,
+              recId: state.dataTable['dataThBill'][0]['rec-id'],
+              recIdHArtikel :state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['rec-id'],
+              deptname :state.dataPrepare['deptname'],
+              transdate: date.formatDate((new Date), 'MM/DD/YY'),
+              hArtart :state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['artart'],
+              cancelOrder :'false',
+              hArtikelServiceCode :state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['service-code'],
+              amount: state.dataTable['dataPayment']['payment'],
+              amountForeign:-state.dataTable['dataPayment']['payment'],
+              price: 0,
+              doubleCurrency: state.dataPrepare['doubleCurrency'],
+              qty: 1,
+              exchgRate:state.dataPrepare['exchgRate'],
+              priceDecimal:state.dataPrepare['priceDecimal'],
+              orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
+              tischnr:state.dataTable['tischnr'],
+              currDept:state.dataPrepare['currDept'],
+              currWaiter:state.dataPrepare['currWaiter'],
+              gname:state.dataTable['bilname'],
+              pax:state.dataTable['belegung'],
+              kreditlimit: state.dataTable['klimit'],
+              addZeit: 1,
+              billart: state.dataTable['dataPayment']['billart'],
+              description:  state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['bezeich'],
+              changeStr:' ',
+              ccComment:' ',
+              cancelStr:' ',
+              reqStr:' ',
+              voucherStr:state.dataTable['dataPayment']['voucherStr'],
+              hogaCard:' ',
+              printToKitchen:'true',
+              fromAcct:'false',
+              hArtnrfront: state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['artnrfront'],
+              payType:0,
+              guestnr:0,
+              transferZinr:' ',
+              curedeptFlag:'false',
+              foreignRate:'false',
+              currRoom:' ',
+              userInit:dataStoreLogin['userInit'],
+              hogaResnr:0,
+              hogaReslinnr:0,
+              inclVat:'false',
+              getPrice:'0',
+              mcStr:'0',
+              'submenuList': {'submenu-list' : [{
+                "menurecid": 0,
+                "zeit": 0,
+                "nr": 0,
+                "artnr": 0,
+                "bezeich": " ",
+                "anzahl": 0,
+                "zknr": 0,
+                "request": " "
+              }]},
+            }
+            console.log('request : ', state.objRequestInvUpdateBill);
+            restInvUpdateBill1('cash');
+          }
         } else if (payType == 2) {
-          console.log('should refresh , Card : ', state.dataTable)
-          // (hArtart, billart, description, hArtnrfront)
-          restInvUpdateBill1(data['dataSelected']['artart'], data['billart'], data['dataSelected']['bezeich'], data['dataSelected']['artnrfront']);
+          console.log('should refresh , Card / dataTable : ', state.dataTable);
+          
+          state.objRequestInvUpdateBill = {
+            pvILanguage : 1,
+            recId: state.dataTable['dataThBill'][0]['rec-id'],
+            recIdHArtikel :state.dataTable['dataPayment']['tHArtikel']['t-h-artikel'][0]['rec-id'],
+            deptname :state.dataPrepare['deptname'],
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            hArtart :state.dataTable['dataPayment']['dataSelected']['artart'],
+            cancelOrder :'false',
+            hArtikelServiceCode :state.dataTable['dataPayment']['dataSelected']['service-code'],
+            amount: -state.dataTable['dataThBill'][0]['saldo'],
+            amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
+            price: 0,
+            doubleCurrency: state.dataPrepare['doubleCurrency'],
+            qty: 1,
+            exchgRate:state.dataPrepare['exchgRate'],
+            priceDecimal:state.dataPrepare['priceDecimal'],
+            orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
+            tischnr:state.dataTable['tischnr'],
+            currDept:state.dataPrepare['currDept'],
+            currWaiter:state.dataPrepare['currWaiter'],
+            gname:state.dataTable['bilname'],
+            pax:state.dataTable['belegung'],
+            kreditlimit: state.dataTable['klimit'],
+            addZeit: 1,
+            billart: state.dataTable['dataPayment']['billart'],
+            description:  state.dataTable['dataPayment']['dataSelected']['bezeich'],
+            changeStr:' ',
+            ccComment:' ',
+            cancelStr:' ',
+            reqStr:' ',
+            voucherStr:' ',
+            hogaCard:' ',
+            printToKitchen:'true',
+            fromAcct:'false',
+            hArtnrfront: state.dataTable['dataPayment']['dataSelected']['artnrfront'],
+            payType:0,
+            guestnr:0,
+            transferZinr:' ',
+            curedeptFlag:'false',
+            foreignRate:'false',
+            currRoom:' ',
+            userInit:dataStoreLogin['userInit'],
+            hogaResnr:0,
+            hogaReslinnr:0,
+            inclVat:'false',
+            getPrice:'0',
+            mcStr:'0',
+            'submenuList': {'submenu-list' : [{
+              "menurecid": 0,
+              "zeit": 0,
+              "nr": 0,
+              "artnr": 0,
+              "bezeich": " ",
+              "anzahl": 0,
+              "zknr": 0,
+              "request": " "
+            }]},
+          }
+
+          console.log('request : ', state.objRequestInvUpdateBill);
+          restInvUpdateBill1('card');
         } else if (payType == 3) {
           console.log('should refresh , City Legder : ', state.dataTable)
         } else if (payType == 4) {
           console.log('should refresh , Transfer to Guest Folio : ', state.dataTable)
+          const flag = state.dataTable['dataPayment']['tHBill']['t-h-bill'][0]['flag'];
+          if (flag == 1) {
+            state.dataTable['saldo'] = 0;
+            state.dataOrdered = [];
+            state.dataNewOrder = [];
+            state.dataTable['belegung'] = 0;
+            state.dataTable['bezeich'] = '';
+            state.dataTable['bilname'] = '';
+            state.qty = 1;
+            state.objRequestInvUpdateBill = {};
+            onDialogTablePlan(true);
+          }
         } else if (payType == 5) {
           console.log('should refresh , Transfer to Non Guest Folio : ', state.dataTable)
         } else if (payType == 6) {
@@ -1102,8 +1255,11 @@ export default defineComponent({
                     type: 'warning',
                   });
               }
-            } else if ('closebill') {
+            } else if (flagCheck == 'closebill') {
               onDialogCloseBill(true, null);
+            } else if (flagCheck == 'voiditem') {
+              //prepareCancelOrderBL
+              getRestInvCancelOrder();
             }
           } else {
             Notify.create({
@@ -1790,116 +1946,77 @@ export default defineComponent({
       initDataClickMenu();
     }
 
-    const restInvUpdateBill1 = (hArtart, billart, description, hArtnrfront) => {
+    const restInvUpdateBill1 = (flag) => {
       state.isLoading = true;
 
-      console.log({
-            pvILanguage : 0,
-            recId: state.dataTable['dataThBill'][0]['rec-id'],
-            recIdArtikel :state.dataOrdered[0]['rec-id'],
-            deptname :state.dataPrepare['deptname'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            hArtart :hArtart,
-            cancelOrder :'false',
-            serviceCode :'0',
-            amount: -state.dataTable['dataThBill'][0]['saldo'],
-            amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
-            price:'0',
-            doubleCurrency: state.dataPrepare['doubleCurrency'],
-            qty: '1',
-            exchgRate:state.dataPrepare['exchgRate'],
-            priceDecimal:state.dataPrepare['priceDecimal'],
-            orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
-            // orderTaker:state.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
-            tischnr:state.dataTable['tischnr'],
-            currDept:state.dataPrepare['currDept'],
-            currWaiter:state.dataPrepare['currWaiter'],
-            gname:state.dataTable['bilname'],
-            pax:state.dataTable['belegung'],
-            kreditlimit: 0,
-            addZeit: 1,
-            billart: billart,
-            description: description,
-            changeStr:' ',
-            ccComment:' ',
-            cancelStr:' ',
-            reqStr:' ',
-            voucherStr:' ',
-            hogaCard:' ',
-            printToKitchen:'true',
-            fromAcct:'false',
-            hArtnrfront: hArtnrfront,
-            payType:'0',
-            guestnr:'0',
-            transferZinr:' ',
-            curedeptFlag:'false',
-            foreignRate:'false',
-            currRoom:' ',
-            userInit:dataStoreLogin['userInit'],
-            hogaResnr:'0',
-            hogaReslinnr:'0',
-            inclVat:'false',
-            getPrice:'0',
-            mcStr:'0',
-            'submenu-list': {'submenuList' : []},
-          })
+      // console.log('data : ', data);
+
+      // console.log({
+      //       pvILanguage : 1,
+      //       recId: data['dataThBill'][0]['rec-id'],
+      //       recIdHArtikel :data['dataPayment']['tHArtikel']['t-h-artikel'][0]['rec-id'],
+      //       deptname :state.dataPrepare['deptname'],
+      //       transdate: date.formatDate((new Date), 'MM/DD/YY'),
+      //       hArtart :data['dataPayment']['dataSelected']['artart'],
+      //       cancelOrder :'false',
+      //       hArtikelServiceCode :state.dataTable['dataPayment']['dataSelected']['service-code'],
+      //       amount: -state.dataTable['dataThBill'][0]['saldo'],
+      //       amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
+      //       price: 0,
+      //       doubleCurrency: state.dataPrepare['doubleCurrency'],
+      //       qty: 1,
+      //       exchgRate:state.dataPrepare['exchgRate'],
+      //       priceDecimal:state.dataPrepare['priceDecimal'],
+      //       orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
+      //       tischnr:state.dataTable['tischnr'],
+      //       currDept:state.dataPrepare['currDept'],
+      //       currWaiter:state.dataPrepare['currWaiter'],
+      //       gname:state.dataTable['bilname'],
+      //       pax:state.dataTable['belegung'],
+      //       kreditlimit: data['klimit'],
+      //       addZeit: 1,
+      //       billart: state.dataTable['dataPayment']['billart'],
+      //       description:  state.dataTable['dataPayment']['dataSelected']['bezeich'],
+      //       changeStr:' ',
+      //       ccComment:' ',
+      //       cancelStr:' ',
+      //       reqStr:' ',
+      //       voucherStr:' ',
+      //       hogaCard:' ',
+      //       printToKitchen:'true',
+      //       fromAcct:'false',
+      //       hArtnrfront: data['dataPayment']['dataSelected']['artnrfront'],
+      //       payType:0,
+      //       guestnr:0,
+      //       transferZinr:' ',
+      //       curedeptFlag:'false',
+      //       foreignRate:'false',
+      //       currRoom:' ',
+      //       userInit:dataStoreLogin['userInit'],
+      //       hogaResnr:0,
+      //       hogaReslinnr:0,
+      //       inclVat:'false',
+      //       getPrice:'0',
+      //       mcStr:'0',
+      //       'submenuList': {'submenu-list' : [{
+      //         "menurecid": 0,
+      //         "zeit": 0,
+      //         "nr": 0,
+      //         "artnr": 0,
+      //         "bezeich": " ",
+      //         "anzahl": 0,
+      //         "zknr": 0,
+      //         "request": " "
+      //       }]},
+      //     })
 
       async function asyncCall() {
-        const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvUpdateBill1', {
-            pvILanguage : 0,
-            recId: state.dataTable['dataThBill'][0]['rec-id'],
-            recIdHArtikel :state.dataOrdered[0]['rec-id'],
-            deptname :state.dataPrepare['deptname'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            hArtart :hArtart,
-            cancelOrder :'false',
-            serviceCode :'0',
-            amount: -state.dataTable['dataThBill'][0]['saldo'],
-            amountForeign:-state.dataTable['dataThBill'][0]['saldo'],
-            price:'0',
-            doubleCurrency: state.dataPrepare['doubleCurrency'],
-            qty: '1',
-            exchgRate:state.dataPrepare['exchgRate'],
-            priceDecimal:state.dataPrepare['priceDecimal'],
-            orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
-            // orderTaker:state.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
-            tischnr:state.dataTable['tischnr'],
-            currDept:state.dataPrepare['currDept'],
-            currWaiter:state.dataPrepare['currWaiter'],
-            gname:state.dataTable['bilname'],
-            pax:state.dataTable['belegung'],
-            kreditlimit: 0,
-            addZeit: 1,
-            billart: billart,
-            description: description,
-            changeStr:' ',
-            ccComment:' ',
-            cancelStr:' ',
-            reqStr:' ',
-            voucherStr:' ',
-            hogaCard:' ',
-            printToKitchen:'true',
-            fromAcct:'false',
-            hArtnrfront: hArtnrfront,
-            payType:'0',
-            guestnr:'0',
-            transferZinr:' ',
-            curedeptFlag:'false',
-            foreignRate:'false',
-            currRoom:' ',
-            userInit:dataStoreLogin['userInit'],
-            hogaResnr:'0',
-            hogaReslinnr:'0',
-            inclVat:'false',
-            getPrice:'0',
-            mcStr:'0',
-            'submenu-list': {'submenuList' : []},
-          })
+        const [dataFetch] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvUpdateBill1', state.objRequestInvUpdateBill)
         ]);
 
-        if (data) {
-          const response = data || [];
+        if (dataFetch) {
+          const response = dataFetch || [];
           const okFlag = response['outputOkFlag'];
 
           console.log('response restInvUpdateBill1 : ', response);
@@ -1912,6 +2029,29 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+
+          const saldo = response['balance'];
+          const flagCode = response['tHBill']['t-h-bill'][0]['flag'];
+
+          if (flag == 'card') {
+            if (flagCode == 1) {
+              state.dataTable['saldo'] = saldo;
+              state.dataOrdered = [];
+              state.dataNewOrder = [];
+              state.dataTable['belegung'] = 0;
+              state.dataTable['bezeich'] = '';
+              state.dataTable['bilname'] = '';
+              state.qty = 1;
+              state.objRequestInvUpdateBill = {};
+              onDialogTablePlan(true);
+            }
+          } else if (flag == 'cash') {
+            if (flagCode == 0) {
+              state.dataTable['saldo'] = saldo;
+              getBillLine();
+            }
+          }
+
           state.isLoading = false;
         } else {
           Notify.create({
@@ -1959,6 +2099,141 @@ export default defineComponent({
           }
           onDialogChangeOutlet(true, '', 'closebill');
           state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getRestInvCancelOrder = () => {
+      // state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvCancelOrder', {
+            hBlineRecId : state.dataSelected['rec-id'],
+            zugriff: true,
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('restInvCancelOrder : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+          }
+
+          const flCode1 = response['flCode1'];
+          if (flCode1 == 1) {
+            
+          }
+
+          state.dataSelected['recIdHArt'] = response['recIdHArt'];
+          state.dataSelected['cancelFlag'] = response['cancelFlag'];
+          state.dataSelected['pricePrepare'] = response['price'];
+          state.dataSelected['qtyPrepare'] = response['qty'];
+          state.dataSelected['flCode1'] = response['flCode1'];
+          state.dataSelected['anz'] = response['anz'];
+          onDialogVoidItem(true, '', null);
+
+          if (response['tHArtikel']['t-h-artikel'][0]['artart'] == 0) {
+            
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getRestInvOpenStandTable = () => {
+      // state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvOpenStandTable', {
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('restInvOpenStandTable : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+          }
+
+          const flCode = response['flCode'];
+          if (flCode == 1) {
+            state.titleDialogStandingTable = 'Standing table not define';
+            state.showDialogStandingTableNotDefined = true;
+          } else if (flCode == 2) {
+            state.titleDialogStandingTable = 'No vacant standing table available';
+            state.showDialogStandingTableNotDefined = true;
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getRestInvWaiterTransfer = () => {
+      // state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvWaiterTransfer', {
+            currDept: state.currDept,
+          })
+        ]);
+
+         if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('restInvWaiterTransfer : ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            // state.isLoading = false;
+            return false;
+          }
+          onDialogCashierTransfer(true);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -2071,7 +2346,9 @@ export default defineComponent({
     }
 
     const onClickCashierTransfer = () => {
-      onDialogCashierTransfer(true);
+      // onDialogCashierTransfer(true);
+
+      getRestInvWaiterTransfer();
     }
 
     const onDialogCashierTransfer = (val) => {
@@ -2109,13 +2386,20 @@ export default defineComponent({
       }
     }
 
-    const onClickVoidItem = () => {
-      onDialogVoidItem(true);
+    const onClickVoidItem = (datarow) => {
+      // console.log('datarow to void : ', datarow);
+      state.dataSelected = datarow;
+      // console.log(state.dataSelected);
+      zuggriff(52, 2, 'voiditem');
     }
 
-    const onDialogVoidItem = (datarow) => {
-      console.log('onClick Void Item : ', datarow);
-      state.showDialogVoidItem = datarow;
+    const onDialogVoidItem = (val, flag, data) => {
+      state.showDialogVoidItem = val;
+
+      if (flag == 'ok') {
+        state.dataTable['dataPayment'] = data;
+        console.log('onResultVoid : ', state.dataTable);
+      }
     }
 
     return {
@@ -2177,6 +2461,7 @@ export default defineComponent({
       onDialogVoidItem,
       onClickVoidItem,
       getRestInvNotBalance,
+      getRestInvOpenStandTable,
     };
   },
   components: {

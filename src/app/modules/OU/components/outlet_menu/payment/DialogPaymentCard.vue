@@ -234,28 +234,11 @@ export default defineComponent({
 
     const getRestInvCC2 = () => {
       state.isLoading = true;
-
-      console.log({
-            billart  : '9942',
-            recId: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
-            currDept: props.dataPreparePayment['dataPrepare']['currDept'],
-            balance : state.data.balance,
-            paid: state.data.payment,
-            balanceForeign: state.data.balance,
-            exchgRate: props.dataPreparePayment['dataPrepare']['exchgRate'],
-            fullPaid: state.data.fullPaid,
-            discArt1: props.dataPreparePayment['dataPrepare']['discArt1'],
-            discArt2: props.dataPreparePayment['dataPrepare']['discArt2'],
-            discArt3: props.dataPreparePayment['dataPrepare']['discArt3'],
-            kellnerKellnerNr: props.dataPreparePayment['dataTable']['kellner-nr'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-
-           })
-
+      
       async function asyncCall() {
         const [data] = await Promise.all([
           $api.outlet.getOUPrepare('restInvBtnCcard2', {
-            billart  : '9942',
+            billart  : state.data.objCardSelected['artnr'],
             recId: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
             currDept: props.dataPreparePayment['dataPrepare']['currDept'],
             balance : state.data.balance,

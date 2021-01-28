@@ -249,6 +249,8 @@ export default defineComponent({
           }
 
           console.log('restInvPayCash4 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['voucherStr'] = state.data.voucherNr
           emit('onDialogPaymentCash', false, 'ok', responsePrepare);
           state.isLoading = false;
         }
@@ -295,6 +297,11 @@ export default defineComponent({
           }
 
           console.log('restInvPayCash5 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'half';
+          responsePrepare['payment'] = state.data.payment;
+          responsePrepare['voucherStr'] = state.data.voucherNr
+          emit('onDialogPaymentCash', false, 'ok', responsePrepare);
+
           state.isLoading = false;
         }
       }
@@ -351,7 +358,7 @@ export default defineComponent({
         console.log('paycash 5');
       } else if (amount != 0 && fullpaid) {
       // paycash6
-      console.log('paycash 6');
+      // console.log('paycash 6');
       }
 
       // getPreparePayCash3();

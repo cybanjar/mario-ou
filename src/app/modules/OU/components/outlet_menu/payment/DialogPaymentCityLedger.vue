@@ -366,12 +366,28 @@ export default defineComponent({
     const getPayType1 = () => {
       state.isLoading = true;
 
+      console.log('request', {
+            pvILanguage : 0,
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            guestnr: 0,
+            currDept: props.dataTable['dataPrepare']['currDept'],
+            paid: state.data.payment,
+            exchgRate: 0,
+            priceDecimal: 0,
+            balance: state.data.balance,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            discArt1: props.dataTable['dataPrepare']['discArt1'],
+            discArt2: props.dataTable['dataPrepare']['discArt2'],
+            discArt3: props.dataTable['dataPrepare']['discArt3'],
+            kellnerKellnerNr: 1,
+           })
+
       async function asyncCall() {
         const [data] = await Promise.all([
           $api.outlet.getOUPrepare('restInvBtnTransferPaytype1', {
             pvILanguage : 0,
             recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: 0,
+            guestnr: state.data.dataGuestSelected['gastnr'],
             currDept: props.dataTable['dataPrepare']['currDept'],
             paid: state.data.payment,
             exchgRate: 0,
@@ -399,6 +415,15 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
+
+          if (response['msgStr'] != '') {
+            Notify.create({
+              message: response['msgStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
           state.isLoading = false;
         } else {
           Notify.create({
@@ -468,7 +493,7 @@ export default defineComponent({
         console.log('Hit API ? 1');          
 
         state.data.showConfirmationDialog = false;
-        emit('onDialogPaymentCityLedger', false, 'ok', {});
+        // emit('onDialogPaymentCityLedger', false, 'ok', {});
       }
 
     }
