@@ -7,7 +7,7 @@
 
       <div>
         <q-card-section>
-          <SInput v-model="pax" label-text="Pax" name="mdi-magnify" data-layout="numeric" type="number" ref="paxBox" @focus="showKeyboard">
+          <SInput autofocus v-model="pax" label-text="Pax" name="mdi-magnify" data-layout="numeric" type="number" ref="paxBox" @focus="showKeyboard">
             <!-- <template v-slot:append>
               <q-icon @click="showKeyboard" class="cursor-pointer"/>
             </template> -->
@@ -59,7 +59,7 @@
 
       <q-card-actions align="right">
         <q-btn color="primary" label="Reservation" @click="openTableReservation()" v-show="false" />
-        <q-btn color="primary" label="Cancel" @click="onCancel()" />
+        <q-btn outline color="primary" label="Cancel" @click="onCancel()" />
         <q-btn color="primary" label="Ok" @click="onConfirm()" :disable="pax == '0' || pax == '' || pax == undefined"/>
       </q-card-actions>
     </q-card>

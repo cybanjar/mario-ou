@@ -8,6 +8,8 @@
 
         <q-card-section>
           <STable
+            flat
+            bordered
             dense            
             :loading="isLoading"
             :columns="tableHeaders"
@@ -38,7 +40,7 @@
 
         <q-card-actions align="right">
           <q-btn unelevated color="primary" outline label="Cancel" @click="onCancelDialogSelectUser" />
-          <q-btn unelevated color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
+          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser" :disable="!data.buttonOkEnable"/>
         </q-card-actions>
       </q-card>
     </q-dialog>

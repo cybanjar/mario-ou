@@ -14,6 +14,8 @@
             </SInput>
 
             <STable
+              flat
+              bordered
               style="height:300px;"
               dense
               :loading="isLoading"
@@ -46,7 +48,7 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn color="primary" label="Cancel" @click="onCancel()" />
+        <q-btn outline color="primary" label="Cancel" @click="onCancel()" />
         <q-btn color="primary" label="Ok" @click="onConfirm()" :disable="dataRoomSelected == {} ? true : false" />
       </q-card-actions>
     </q-card>
