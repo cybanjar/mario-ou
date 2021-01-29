@@ -369,17 +369,17 @@ export default defineComponent({
       console.log('request', {
             pvILanguage : 0,
             recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: 0,
+            guestnr: state.data.dataGuestSelected['gastnr'],
             currDept: props.dataTable['dataPrepare']['currDept'],
             paid: state.data.payment,
-            exchgRate: 0,
-            priceDecimal: 0,
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
             balance: state.data.balance,
             transdate: date.formatDate((new Date), 'MM/DD/YY'),
             discArt1: props.dataTable['dataPrepare']['discArt1'],
             discArt2: props.dataTable['dataPrepare']['discArt2'],
             discArt3: props.dataTable['dataPrepare']['discArt3'],
-            kellnerKellnerNr: 1,
+            kellnerKellnerNr: props.dataTable['dataPrepare']['tKellner']['t-kellner'][0]['kellner-nr'],
            })
 
       async function asyncCall() {
@@ -390,14 +390,14 @@ export default defineComponent({
             guestnr: state.data.dataGuestSelected['gastnr'],
             currDept: props.dataTable['dataPrepare']['currDept'],
             paid: state.data.payment,
-            exchgRate: 0,
-            priceDecimal: 0,
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
             balance: state.data.balance,
             transdate: date.formatDate((new Date), 'MM/DD/YY'),
             discArt1: props.dataTable['dataPrepare']['discArt1'],
             discArt2: props.dataTable['dataPrepare']['discArt2'],
             discArt3: props.dataTable['dataPrepare']['discArt3'],
-            kellnerKellnerNr: 1,
+            kellnerKellnerNr: props.dataTable['dataPrepare']['tKellner']['t-kellner'][0]['kellner-nr'],
            })
         ]);
 
@@ -424,7 +424,10 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
+          response['dataSelected'] = state.data.dataGuestSelected; 
+          response['payment'] = state.data.payment;
           state.isLoading = false;
+          emit('onDialogPaymentCityLedger', false, 'ok', response);
         } else {
           Notify.create({
               message: 'Please check your internet connection',

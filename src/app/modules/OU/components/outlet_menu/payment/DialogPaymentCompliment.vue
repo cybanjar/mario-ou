@@ -80,7 +80,8 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { Notify } from 'quasar';
+import { Notify, date } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -89,6 +90,7 @@ interface State {
     buttonOkEnable: boolean;
     cardNo: any;
     balance: any;
+    dataSelected: {};
   }
   title: string;
   options: {};
@@ -106,13 +108,16 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
         dataDetail: [],
         buttonOkEnable: false,
         cardNo: '',
-        balance: 0
+        balance: 0,
+        dataSelected: {}
       },
       title: '',
       options: {
@@ -144,7 +149,7 @@ export default defineComponent({
         },
     });
 
-    // -- HTTP Request 
+    // -- HTTP Request Method
     const getComplimentBuildCompl = () => {
       state.isLoading = true;
 
@@ -288,21 +293,34 @@ export default defineComponent({
 
     const getInvBtnTransferPaytype56 = () => {
        state.isLoading = true;
+       console.log({
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            guestnr: 0,
+            currDept: props.dataTable['dataPrepare']['currDept'],
+            balanceForeign: state.data.balance,
+            balance: state.data.balance,
+            payType: 5,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+            userInit: dataStoreLogin['userInit'],
+          })
 
       async function asyncCall() {
         const [data] = await Promise.all([
           $api.outlet.getOUPrepare('restInvBtnTransferPaytype56 ', {
-            recId: props.dataTable['dataThBill'][0]['rec-id'],
-            guestnr: 0,
-            currDept: props.dataTable['departement'],
-            balanceForeign: 0,
-            balance: '',
-            payType: '',
-            transdate: '',
-            doubleCurrency: '',
-            exchgRate: '',
-            priceDecimal: '',
-            userInit: '',
+            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            guestnr: state.data.dataSelected['num'], // artnr selected
+            currDept: props.dataTable['dataPrepare']['currDept'],
+            balanceForeign: state.data.balance,
+            balance: state.data.balance,
+            payType: 5,
+            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+            userInit: dataStoreLogin['userInit'],
           })
         ]);
 
@@ -321,6 +339,9 @@ export default defineComponent({
             return false;
           } 
 
+          response['dataSelected'] = state.data.dataSelected; 
+          emit('onDialogPaymentCompliment', false, 'ok', response);
+
           state.isLoading = false;
         } else {
           Notify.create({
@@ -332,13 +353,21 @@ export default defineComponent({
           }
       }
       asyncCall();
-    }
+    }    
 
+    const tableHeaders = [
+      {
+            label: "bezeich", 
+            field: "bezeich",
+            name: "bezeich",
+            align: "center",
+      }
+    ];
 
-    // On Click Listener
+    // -- onClick Listener
     const onRowClickTable = (dataRow) => {
       console.log(dataRow);
-      // state.data.dataArtSelected = dataRow;
+      state.data.dataSelected = dataRow;
       
       let dataTable = [];
       for (let i = 0; i<state.data.dataDetail.length; i++) {
@@ -355,23 +384,12 @@ export default defineComponent({
           datarow['selected'] = true;
           break;
         }
-      }
-      
+      }      
       state.data.dataDetail = dataTable;
-      console.log(state.data.dataDetail);
     }
 
-    const tableHeaders = [
-      {
-            label: "bezeich", 
-            field: "bezeich",
-            name: "bezeich",
-            align: "center",
-      }
-    ];
-
-    // -- 
     const onOkDialog = () => {
+      getInvBtnTransferPaytype56();
     }
 
     const onCancelDialog = () => {

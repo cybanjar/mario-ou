@@ -149,31 +149,6 @@ export default defineComponent({
         },
     });
 
-    const onRowClickTable = (dataRow) => {
-      console.log(dataRow);
-      state.data.dataArtSelected = dataRow;
-      
-      let dataTable = [];
-      for (let i = 0; i<state.data.dataDetail.length; i++) {
-        const datarow = state.data.dataDetail[i] as object;
-        datarow['selected'] = false;
-        dataTable.push(datarow);
-      }        
-
-      const id = dataRow['pos'];
-      for (let i = 0; i<dataTable.length; i++) {
-        const datarow = dataTable[i] as object;
-        
-        if (id === datarow['pos']) {
-          datarow['selected'] = true;
-          break;
-        }
-      }
-      
-      state.data.dataDetail = dataTable;
-      console.log(state.data.dataDetail);
-    }
-
     const tableHeaders = [
       {
             label: "name", 
@@ -227,125 +202,22 @@ export default defineComponent({
       asyncCall();
     }
 
-    const updateBill1 = () => {
-       state.isLoading = true;
-
-      async function asyncCall() {
-        const [data] = await Promise.all([
-          $api.outlet.getOUPrepare('restInvUpdateBill1 ', {
-            pvILanguage : 0,
-            recId  : 0,
-            recIdHArtikel: 0,
-            deptname: props.dataTable['dataTable']['departement'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            hArtart: '',
-            cancelOrder: '',
-            hArtikelServic: '',
-            amount: '',
-            amountForeign: '',
-            price: '',
-            doubleCurrency: '',
-            qty: '',
-            exchgRate: '',
-            priceDecimal: '',
-            orderTaker: '',
-            tischnr: '',
-            currDept: '',
-            currWaiter: '',
-            gname: '',
-            pax: '',
-            kreditlimit: '',
-            addZeit: '',
-            billart: '',
-            description: '',
-            changeStr: '',
-            ccComment: '',
-            cancelStr: '',
-            reqStr: '',
-            voucherStr: '',
-            hogaCard: '',
-            printToKitchen: '',
-            fromAcct: '',
-            hArtnrfront: '',
-            payType: '',
-            guestnr: '',
-            transferZinr: '',
-            curedeptFlag: '',
-            foreignRate: '',
-            currRoom: '',
-            userInit: dataStoreLogin['userInit'],
-            hogaResnr: '',
-            hogaReslinnr: '',
-            inclVat: '',
-            getPrice: '',
-            mcStr: '',
-            ['submenuList']: {
-              ['submenu-list']: [
-
-              ]
-            }
-          })
-        ]);
-
-        if (data) {
-          const response = data || [];
-          const okFlag = response['outputOkFlag'];
-
-          console.log('response prepare: ', response);
-
-          if (!okFlag) {
-            Notify.create({
-              message: 'Failed when retrive data, please try again',
-              color: 'red',
-            });
-            state.isLoading = false;
-            return false;
-          } 
-
-          state.data.dataDetail = response['grpCompl']['grp-compl'];
-          state.isLoading = false;
-        } else {
-          Notify.create({
-              message: 'Please check your internet connection',
-              color: 'red',
-            });
-            state.isLoading = false;
-            return false;
-          }
-      }
-      asyncCall();
-    }
-
     const getInvBtnTransferPaytype56 = () => {
-       state.isLoading = true;
-
-       console.log({
-            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: 0,
-            currDept: props.dataTable['dataPrepare']['departement'],
-            balanceForeign: 0,
-            balance: state.data.balance,
-            payType: 6,
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            doubleCurrency: false,
-            exchgRate: 1,
-            priceDecimal: 2,
-            userInit: dataStoreLogin['userInit'],
-          })
+      state.isLoading = true;
 
       async function asyncCall() {
         const [data] = await Promise.all([
           $api.outlet.getOUPrepare('restInvBtnTransferPaytype56', {
             recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: 0,
-            currDept: props.dataTable['dataPrepare']['departement'],
-            balanceForeign: 0,
+            guestnr: state.data.dataArtSelected['num'],
+            currDept: props.dataTable['dataPrepare']['currDept'],
+            balanceForeign: state.data.balance,
             balance: state.data.balance,
             payType: 6,
             transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            doubleCurrency: false,
-            exchgRate: 1,
-            priceDecimal: 2,
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
             userInit: dataStoreLogin['userInit'],
           })
         ]);
@@ -365,7 +237,8 @@ export default defineComponent({
             return false;
           } 
 
-          emit('onDialogPaymentMealCoupon', false, 'ok', {});
+          response['dataSelected'] = state.data.dataArtSelected; 
+          emit('onDialogPaymentMealCoupon', false, 'ok', response);
           state.isLoading = false;
         } else {
           Notify.create({
@@ -380,6 +253,30 @@ export default defineComponent({
     }
 
     // -- OnClick Listener
+     const onRowClickTable = (dataRow) => {
+      console.log(dataRow);
+      state.data.dataArtSelected = dataRow;
+      
+      let dataTable = [];
+      for (let i = 0; i<state.data.dataDetail.length; i++) {
+        const datarow = state.data.dataDetail[i] as object;
+        datarow['selected'] = false;
+        dataTable.push(datarow);
+      }        
+
+      const id = dataRow['pos'];
+      for (let i = 0; i<dataTable.length; i++) {
+        const datarow = dataTable[i] as object;
+        
+        if (id === datarow['pos']) {
+          datarow['selected'] = true;
+          break;
+        }
+      }
+      
+      state.data.dataDetail = dataTable;
+    }
+
     const onOkDialog = () => {
       state.data.showConfirmationDialog = true;
     }
