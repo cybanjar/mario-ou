@@ -112,8 +112,8 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { stat } from 'fs';
 import { Notify } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -124,7 +124,7 @@ interface State {
     balance: any;
     room: string;
     remark: string;
-    dataSelected: {};
+    dataSelected: null;
   }
   title: string;
   options: {};
@@ -139,11 +139,12 @@ export default defineComponent({
     showPaymentGuestFolio: { type: Boolean, required: true },
     flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -153,7 +154,7 @@ export default defineComponent({
         balance: 0,
         room: '',
         remark: '',
-        dataSelected: {},
+        dataSelected: null,
       },
       title: '',
       options: {
@@ -194,9 +195,9 @@ export default defineComponent({
           $api.outlet.getOUPrepare('rzinrPrepare ', {
             pvILanguage: 1,
             dept:props.dataTable['dataPrepare']['currDept'],
-            zinr: ' ',
-            hResnr: 0,
-            hReslinnr:0,
+            zinr: props.dataTable['dataTable']['tischnr'],
+            hResnr: props.dataTable['dataTable']['resnr'],
+            hReslinnr:props.dataTable['dataTable']['reslinnr'],
             balance: props.dataTable['dataTable']['saldo'],
           })
         ]);
@@ -319,6 +320,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
 
           console.log('response rzinrBtnExit: ', response);
+          state.data.dataSelected['bilrecid'] = response['bilrecid'];
 
           if (!okFlag) {
             Notify.create({
@@ -383,9 +385,9 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-          emit('onDialogPaymentGuestFolio', false, 'ok', response);
-          
+
           state.isLoading = false;
+          emit('onDialogPaymentGuestFolio', false, 'ok', response);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -394,6 +396,85 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
+      }
+      asyncCall();
+    }
+
+     const getPaySplitBill = () => {
+      console.log('REQUEST : ', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['bilrecid'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: -state.data.balance,
+            payType: 2,
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['resnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: -state.data.balance
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnTransferPaytypegt1', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['bilrecid'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: -state.data.balance,
+            payType: 2, //room transfer 2
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['resnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: -state.data.balance
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.balance;
+          emit('onDialogPaymentGuestFolio', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
       }
       asyncCall();
     }
@@ -435,10 +516,16 @@ export default defineComponent({
 
     // -- onClick listener 
     const onClickConfirmation = () => {
-      getMicrosBtn();
+      if (props.flagSplit) {
+        getPaySplitBill();
+      } else {
+        getMicrosBtn();
+      }
     }
 
     const onRowClickTable = (dataRow) => {
+      console.log(dataRow);
+
      for (let i = 0; i<state.data.dataDetail.length; i++) {
         const datarow = state.data.dataDetail[i] as {};
         datarow['selected'] = false;
@@ -468,21 +555,34 @@ export default defineComponent({
     const onOkDialog = () => {
       console.log(state.data.dataSelected);
 
-      let flCode = 0;
-      if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptLdry'])) {
-        flCode = 1;
-        state.data.dataResponse['flcode'] = flCode;
-        console.log('flCode', flCode);
-        getBtnExit();
-      } else if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptLdry'])) {
-        flCode = 2;
-        state.data.dataResponse['flcode'] = flCode;
-        console.log('flCode', flCode);
-        getBtnExit();
+      if (state.data.dataSelected == null) {
+        Notify.create({
+          message: 'Select guest first',
+          color: 'red',
+        });
+      } else {
+        let flCode = 0;
+        if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptLdry'])) {
+          flCode = 1;
+          state.data.dataResponse['flcode'] = flCode;
+          console.log('flCode', flCode);
+          getBtnExit();
+        } else if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptLdry'])) {
+          flCode = 2;
+          state.data.dataResponse['flcode'] = flCode;
+          console.log('flCode', flCode);
+          getBtnExit();
+        }
+
       }
+
     }
 
     const onCancelDialog = () => {
+      state.data.remark = '';
+      state.data.dataSelected = null;
+      state.data.room = '';
+      state.data.balance = 0;
       emit('onDialogPaymentGuestFolio', false, '', {});
     }
 

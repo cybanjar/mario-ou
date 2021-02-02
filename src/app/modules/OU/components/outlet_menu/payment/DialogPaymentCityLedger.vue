@@ -124,6 +124,7 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify, date } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -156,6 +157,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -440,8 +443,79 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getSplitBilBtnCityLedger = () => {
+      console.log('REQUEST : ', {
+            pvILanguage : 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            guestnr: state.data.dataGuestSelected['gastnr'],
+            paid: state.data.payment,
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+            transdate: '',
+            changeStr: ' ',
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            addZeit: 0,
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            hogaCard: ' ',
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnTransferPaytype1', {
+            pvILanguage : 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            guestnr: state.data.dataGuestSelected['gastnr'],
+            paid: state.data.payment,
+            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+            transdate: '',
+            changeStr: ' ',
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            addZeit: 0,
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            hogaCard: ' ',
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnTransferPaytype1 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.payment;
+          emit('onDialogPaymentCityLedger', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
+      }
+      asyncCall();
+    }
+
     // -- onClick Listener 
     const onRowClick = (dataRow) => {
+      console.log('On Click ', dataRow);
+
       for (let i = 0; i<state.data.filteredDataTable.length; i++) {
         const datarow = state.data.filteredDataTable[i] as {};
         datarow['selected'] = false;
@@ -485,19 +559,24 @@ export default defineComponent({
     }
 
     const onClickConfirmation = () => {
-      if (state.caseType == 0) {
-        if (state.data.dataGuestSelected['kreditlimit'] != 0) {
-          getGuestAroutStand();
-        } else {
-          getPayType1();
-          console.log('Hit API ? 0');          
-        }
-      } else if (state.caseType == 1) {
-        console.log('Hit API ? 1');          
+      if (props.flagSplit) {
+        getSplitBilBtnCityLedger();
+      } else {
+        if (state.caseType == 0) {
+          if (state.data.dataGuestSelected['kreditlimit'] != 0) {
+            getGuestAroutStand();
+          } else {
+            getPayType1();
+            console.log('Hit API ? 0');          
+          }
+        } else if (state.caseType == 1) {
+          console.log('Hit API ? 1');          
 
-        state.data.showConfirmationDialog = false;
-        // emit('onDialogPaymentCityLedger', false, 'ok', {});
+          state.data.showConfirmationDialog = false;
+          // emit('onDialogPaymentCityLedger', false, 'ok', {});
+        }
       }
+
 
     }
 

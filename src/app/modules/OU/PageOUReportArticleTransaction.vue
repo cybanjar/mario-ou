@@ -70,13 +70,13 @@
                 :rows-per-page-options="[10, 13, 16]"
                 :pagination.sync="pagination" />
 
-            <q-drawer :value="true" side="right" bordered :width="250" persistent>
+            <!-- <q-drawer :value="true" side="right" bordered :width="250" persistent>
                 <section class="mt-7">
                     <div class="q-pa-md">
                         <q-btn color="primary" label="Tes" class="q-mt-md full-width"/>
                     </div>
                 </section>
-            </q-drawer>
+            </q-drawer> -->
         </div>
 
         

@@ -98,6 +98,7 @@
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify, date } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -128,6 +129,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -210,6 +213,7 @@ export default defineComponent({
 
           console.log("dialog cash mounted, data prepare : ", props.dataPreparePayment);
           console.log("selected payment : ", props.selectedPayment);
+          console.log('Flag Intent From Split Bill : ', props.showPaymentCash);
         }
       }
     );
@@ -259,9 +263,8 @@ export default defineComponent({
     }
 
     const getPreparePayCash5 = () => {
-
       console.log( {
-            multiCash: false,
+            multiCash: props.dataPreparePayment['dataPrepare']['multiCash'],
             cashArtno: props.dataPreparePayment['prepareCash']['tHArtikel']['t-h-artikel'][0]['artnr'],
             currDept: props.dataPreparePayment['dataPrepare']['currDept'],
             cashForeign: false,
@@ -302,6 +305,96 @@ export default defineComponent({
           responsePrepare['voucherStr'] = state.data.voucherNr
           emit('onDialogPaymentCash', false, 'ok', responsePrepare);
 
+          state.isLoading = false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getSplitBilBtnCash = () => {
+      console.log('REQUEST : ', {
+            pvILanguage : 0,
+            dept: props.dataPreparePayment['dataPrepare']['currDept'],
+            recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            multiCash: props.dataPreparePayment['dataPrepare']['multiCash'],
+            cashArtno: 9900,
+            cashForeign: 'false',
+            payVoucher: 'false',
+            fullPaid: 'true',
+            voucherNr: state.data.voucherNr == '' ? ' ' : state.data.voucherNr,
+            amt: 0,
+            changed: state.data.change,
+            changedForeign: 0,
+            lchange: 0,
+            amount: state.data.payment,
+            transdate: '',
+            changeStr: 0,
+            tischnr: props.dataPreparePayment['dataTable']['tischnr'],
+            addZeit: 0,
+            currSelect: props.dataPreparePayment['dataPrepare']['counter'],
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter'],
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: 0,
+            cashType: 1,
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnCash', {
+            pvILanguage : 0,
+            dept: props.dataPreparePayment['dataPrepare']['currDept'],
+            recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            multiCash: props.dataPreparePayment['dataPrepare']['multiCash'],
+            cashArtno: 9900,
+            cashForeign: 'false',
+            payVoucher: 'false',
+            fullPaid: 'true',
+            voucherNr: state.data.voucherNr == '' ? ' ' : state.data.voucherNr,
+            amt: 0,
+            changed: state.data.change,
+            changedForeign: 0,
+            lchange: 0,
+            amount: state.data.payment,
+            transdate: '',
+            changeStr: 0,
+            tischnr: props.dataPreparePayment['dataTable']['tischnr'],
+            addZeit: 0,
+            currSelect: props.dataPreparePayment['dataPrepare']['counter'],
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter'],
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: 0,
+            cashType: 1,
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnCash : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.payment;
+          responsePrepare['voucherStr'] = state.data.voucherNr
+          emit('onDialogPaymentCash', false, 'ok', responsePrepare);
           state.isLoading = false;
         }
       }
@@ -351,21 +444,21 @@ export default defineComponent({
       console.log('amount : ', amount);
       console.log('fullpaid : ', fullpaid);
 
-      if (amount == 0 && fullpaid) {
-        getPreparePayCash4();
-      } else if (amount != 0 || fullpaid) { 
-        getPreparePayCash5();
-        console.log('paycash 5');
-      } else if (amount != 0 && fullpaid) {
-      // paycash6
-      // console.log('paycash 6');
+      if (props.flagSplit) {
+        getSplitBilBtnCash();
+      } else {
+        if (amount == 0 && fullpaid) {
+          getPreparePayCash4();
+        } else if (amount != 0 || fullpaid) { 
+          getPreparePayCash5();
+          console.log('paycash 5');
+        } else if (amount != 0 && fullpaid) {
+        // paycash6
+        // console.log('paycash 6');
+        }
+        // getPreparePayCash3();
       }
 
-      // getPreparePayCash3();
-      
-      // if (props.dataSelectedOrderTaker != null) {
-      //   // emit('onDialogMenuOrderTaker', false, props.dataSelectedOrderTaker);
-      // } 
     }
 
     const onCancelDialog = () => {

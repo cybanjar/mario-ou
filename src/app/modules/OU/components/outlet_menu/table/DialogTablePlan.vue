@@ -13,6 +13,7 @@
               Back
             </q-tooltip>
          </q-btn>
+         
          <div class="q-mx-md">           
             <STable
               grid

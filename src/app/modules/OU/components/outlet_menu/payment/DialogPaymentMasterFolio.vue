@@ -154,6 +154,7 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -180,11 +181,12 @@ export default defineComponent({
     showPaymentMasterFolio: { type: Boolean, required: true },
     flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -303,7 +305,14 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
-          emit('onDialogPaymentMasterFolio', false, 'ok', response);
+
+          if (props.flagSplit) {
+            getPaySplitBill();
+            console.log('SPLIT');
+          } else {
+
+            emit('onDialogPaymentMasterFolio', false, 'ok', response);
+          }
           state.isLoading = false;
         } else {
           Notify.create({
@@ -352,6 +361,85 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
+      }
+      asyncCall();
+    }
+
+    const getPaySplitBill = () => {
+      console.log('REQUEST : ', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['rec-id'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: state.data.balance,
+            payType: 3,
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['gastnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: state.data.balance
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnTransferPaytypegt1', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['rec-id'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: state.data.balance,
+            payType: 3, //room transfer 2
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['gastnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: state.data.balance
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.balance;
+          emit('onDialogPaymentMasterFolio', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
       }
       asyncCall();
     }
@@ -444,6 +532,8 @@ export default defineComponent({
     }
 
     const onRowClickTable = (dataRow) => {
+      console.log(dataRow);
+
       for (let i = 0; i<state.data.filteredDataTable.length; i++) {
         const datarow = state.data.filteredDataTable[i] as {};
         datarow['selected'] = false;

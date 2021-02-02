@@ -10,7 +10,7 @@
           <div
             class="row q-gutter-sm q-mx-sm"
           >
-            <q-card flat bordered @click="data.balance !=0 ? onDialogPaymentCash(true) : null">
+            <q-card flat bordered @click="zuggriff(20, 2, 1)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -22,7 +22,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered @click="data.balance !=0 ? onDialogPaymentCard(true) : null">
+            <q-card flat bordered @click="zuggriff(20, 2, 2)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -34,7 +34,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered @click="data.balance != 0 ? onDialogPaymentCityLedger(true) : null">
+            <q-card flat bordered @click="zuggriff(20, 2, 3)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -46,7 +46,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered>
+            <q-card flat bordered @click="zuggriff(20, 2, 4)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -58,7 +58,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered>
+            <q-card flat bordered @click="zuggriff(20, 2, 5)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -70,7 +70,7 @@
                 </q-img>                          
               </q-card-section>
             </q-card>
-            <q-card flat bordered>
+            <q-card flat bordered @click="zuggriff(20, 2, 6)">
               <q-card-section>                          
                 <q-img
                   class="img-collage"
@@ -204,7 +204,7 @@
 
         <q-card-actions align="right">
           <q-btn outline unelevated color="primary" label="Cancel" @click="onCancelDialog"  />
-          <q-btn color="primary" label="OK" @click="onOkDialogSelectUser"/>
+          <q-btn color="primary" label="OK" @click="onOkDialog"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -229,6 +229,34 @@
       :selectedPayment="data.selectedPayment"
       :dataTable="data.dataPreparePayment"
       @onDialogPaymentCityLedger="onDialogPaymentCityLedger" />
+
+    <dialogPaymentGuestFolio
+      :showPaymentGuestFolio="showPaymentGuestFolio"
+      :flagSplit="true"
+      :selectedPayment="data.selectedPayment"
+      :dataTable="data.dataPreparePayment"
+      @onDialogPaymentGuestFolio="onDialogPaymentGuestFolio" />
+
+    <dialogPaymentMasterFolio
+      :showPaymentMasterFolio="showPaymentMasterFolio"
+      :flagSplit="true"
+      :selectedPayment="data.selectedPayment"
+      :dataTable="data.dataPreparePayment"
+      @onDialogPaymentMasterFolio="onDialogPaymentMasterFolio" />
+
+    <dialogSelectDepartment 
+      :showDialogChangeOutlet="showDepartment"
+      flagActivity="payment"
+      :flagSplit="true"
+      @onDialogDepartment="onDialogDepartment"/>
+
+    <dialogPaymentNonGuestFolio
+      :showPaymentNonGuestFolio="showPaymentNonGuestFolio"
+      :flagSplit="true"
+      :selectedPayment="data.selectedPayment"
+      :dataTable="data.dataPreparePayment"
+      @onDialogPaymentNonGuestFolio="onDialogPaymentNonGuestFolio" />
+
   </section>
 </template>
 
@@ -255,6 +283,13 @@ interface State {
   showPaymentCash: boolean;
   showPaymentCard: boolean;
   showPaymentCityLedger: boolean;
+  showPaymentGuestFolio: boolean;
+  showPaymentNonGuestFolio: boolean;
+  showPaymentCompliment: boolean;
+  showPaymentMasterFolio: boolean;
+  showPaymentMealCoupon: boolean;
+  showDepartment: boolean;
+
 }
 
 export default defineComponent({
@@ -326,6 +361,13 @@ export default defineComponent({
       showPaymentCash: false,
       showPaymentCard: false,
       showPaymentCityLedger: false,
+      showPaymentGuestFolio: false,
+      showPaymentNonGuestFolio: false,
+      showPaymentCompliment: false,
+      showPaymentMasterFolio: false,
+      showPaymentMealCoupon: false,
+      showDepartment: false, 
+
     });
 
     watch(
@@ -348,12 +390,12 @@ export default defineComponent({
     const dialogModel = computed({
         get: () => props.showDialogSplitBill,
         set: (val) => {
-            emit('onDialogSplitBill', val, null);
+            emit('onDialogSplitBill', val, "");
         },
     });
 
     // -- HTTP Request method
-    const zuggriff = (arrayNr, expectedNr) => {
+    const zuggriff = (arrayNr, expectedNr, idPayment) => {
       let zuggrifval = "false";
       async function asyncCall() {
         const [dataZuggrif] = await Promise.all([
@@ -381,21 +423,31 @@ export default defineComponent({
           zuggrifval = responseZuggrif['zugriff'];
 
           if (zuggrifval == "true") {
-            // if (idPayment == 1) {
-            //   getPreparePayCash3();
-            // } else if (idPayment == 3) {
-            //   getRestInvBtnTransfer();
-            // } else if (idPayment == 4) { 
-            //   getRestInvBtnTransfer();
-            // } else if (idPayment == 5) {
-            //   getRestInvBtnTransfer();
-            // } else if (idPayment == 6) {
-            //   getRestInvBtnTransfer();
-            // } else if (idPayment == 7) {
-            //   getRestInvBtnTransfer();
-            // } else if (idPayment == 8) {
-            //   getRestInvBtnTransfer();
-            // }
+            if (idPayment == 1) {
+              if (state.data.balance !=0) {
+                onDialogPaymentCash(true, '', {});
+              }
+            } else if (idPayment == 2) {
+              if (state.data.balance !=0) {
+                onDialogPaymentCard(true, '', {});
+              }
+            } else if (idPayment == 3) {
+              if (state.data.balance !=0) {
+                onDialogPaymentCityLedger(true, '', {});
+              }
+            } else if (idPayment == 4) { 
+              if (state.data.balance !=0) {
+                onDialogPaymentGuestFolio(true, '', {});
+              }
+            } else if (idPayment == 5) {
+              if (state.data.balance != 0) {
+                onDialogDepartment(true, null);
+              }
+            } else if (idPayment == 6) {
+              if (state.data.balance != 0) {
+                onDialogPaymentMasterFolio(true, '', {});
+              }
+            }
           }
         }
       }
@@ -518,6 +570,51 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getRestInvGetSaldo = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [data] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvGetSaldo ', {
+            dept : state.data.dataPreparePayment['dataTable']['departement'],
+            rechnr: state.data.dataPreparePayment['dataTable']['rechnr'],
+          })
+        ]);
+
+        if (data) {
+          const response = data || [];
+          const okFlag = response['outputOkFlag'];
+
+          console.log('response get saldo: ', response);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+          state.isLoading = false;
+
+          state.data.dataPreparePayment['dataTable']['saldo'] = response['amount']; 
+          if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+            emit('onDialogSplitBill', false, "ok");
+          } else {
+            getPrepare();
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+      }
+      asyncCall();
+    }
+
     const getSplitBuildLMenu = (dataRow) => {
       state.isLoading = true;
 
@@ -535,7 +632,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response splitbillBuildRmenu: ', response);
+          console.log('response splitbillSelectLmenu: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -796,6 +893,135 @@ export default defineComponent({
       getCalBalance(true);      
     }
 
+    const onOkDialog = () => {
+      state.data.counter = 1;
+      state.data.dataTableMain = [];
+      state.data.dataTableMainBill = [];
+      state.data.dataTableSplitBill = [];
+
+      emit('onDialogSplitBill', false, "");
+    }
+
+    const onCancelDialog = () => {
+      state.data.counter = 1;
+      state.data.dataTableMain = [];
+      state.data.dataTableMainBill = [];
+      state.data.dataTableSplitBill = [];
+      emit('onDialogSplitBill', false, "");
+    }
+
+    // -- On Dialog Listener
+    const onDialogPaymentCash = (val, flag, data) => {
+      state.data.selectedPayment = state.data.dataTablePayment[0];
+      state.showPaymentCash = val;
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPayment = {};
+        state.isLoading = false;
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+    const onDialogPaymentCard = (val, flag, data) => {
+      state.data.selectedPayment = state.data.dataTablePayment[1];
+      state.showPaymentCard = val;
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPayment = {};
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+    const onDialogPaymentCityLedger = (val, flag, data) => {
+      state.data.selectedPayment = state.data.dataTablePayment[2];
+      state.showPaymentCityLedger = val;
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
+
+       if (!val && flag == 'ok') {
+        state.data.selectedPayment = {}
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+    const onDialogPaymentGuestFolio = (val, flag, data) => {
+      state.data.selectedPayment = state.data.dataTablePayment[3];
+      state.showPaymentGuestFolio = val;
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPayment = {};
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+    const onDialogPaymentMasterFolio = (val, flag, data) => {
+      state.data.selectedPayment = state.data.dataTablePayment[5];
+      state.showPaymentMasterFolio = val;
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPayment = {};
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+     const onDialogPaymentNonGuestFolio = (val, flag, data) => {
+      state.showPaymentNonGuestFolio = val;
+      state.data.selectedPayment = state.data.dataTablePayment[4];
+
+
+      if (!val && flag == 'ok') {
+        state.data.selectedPayment = {};
+
+        state.data.dataTableMain = [];
+        state.data.dataTableMainBill = [];
+        state.data.dataTableSplitBill = [];
+
+        getRestInvGetSaldo();
+      }
+    }
+
+    const onDialogDepartment = (val, data) => {
+      state.showDepartment = val;
+
+      if (!val && data != null) {
+        state.data.dataPreparePayment['dataHotelSelected'] = data;
+        onDialogPaymentNonGuestFolio(true, '', {});
+      }
+    }
+
     const tableHeadersMainBill = [
       {
             label: "Qty", 
@@ -824,44 +1050,6 @@ export default defineComponent({
       }
     ];
 
-    const onOkDialogSelectUser = () => {
-    }
-
-    const onCancelDialog = () => {
-      state.data.counter = 1;
-      state.data.dataTableMain = [];
-      state.data.dataTableMainBill = [];
-      state.data.dataTableSplitBill = [];
-      emit('onDialogSplitBill', false);
-    }
-
-    // -- On Dialog Listener
-    const onDialogPaymentCash = (val) => {
-      state.data.selectedPayment = state.data.dataTablePayment[1];
-      state.showPaymentCash = val;
-
-      if (!val) {
-        state.data.selectedPayment = {};
-      }
-    }
-
-    const onDialogPaymentCard = (val) => {
-      state.data.selectedPayment = state.data.dataTablePayment[0];
-      state.showPaymentCard = val;
-
-      if (!val) {
-        state.data.selectedPayment = {}
-      }
-    }
-
-    const onDialogPaymentCityLedger = (val) => {
-      state.data.selectedPayment = state.data.dataTablePayment[2];
-      state.showPaymentCityLedger = val;
-
-       if (!val) {
-        state.data.selectedPayment = {}
-      }
-    }
 
     return {
       dialogModel,
@@ -870,7 +1058,7 @@ export default defineComponent({
       tableHeadersSplitBill,
       onRowClickSplitBill,
       onRowClickMainBill,
-      onOkDialogSelectUser,
+      onOkDialog,
       onClickMoveRight,
       onClickMoveLeft,
       onCancelDialog,
@@ -879,6 +1067,11 @@ export default defineComponent({
       onDialogPaymentCash,
       onDialogPaymentCard,
       onDialogPaymentCityLedger,
+      onDialogPaymentGuestFolio,
+      onDialogPaymentMasterFolio,
+      onDialogPaymentNonGuestFolio,
+      onDialogDepartment,
+      zuggriff,
       pagination: { rowsPerPage: 0 },
     };
   },
@@ -886,14 +1079,16 @@ export default defineComponent({
     dialogPaymentCash: () => import('./payment/DialogPaymentCash.vue'),
     dialogPaymentCard: () => import('./payment/DialogPaymentCard.vue'),
     dialogPaymentCityLedger: () => import('./payment/DialogPaymentCityLedger.vue'),
+    dialogPaymentGuestFolio: () => import('./payment/DialogPaymentGuestFolio.vue'),
+    dialogPaymentMasterFolio:() => import('./payment/DialogPaymentMasterFolio.vue'),
+    dialogSelectDepartment: () => import('./DialogChangeOutlet.vue'),
+    dialogPaymentNonGuestFolio: () => import('./payment/DialogPaymentNonGuestFolio.vue'),
 
     // dialogPaymentCityLedger: () => import('./DialogPaymentCityLedger.vue'),
-    // dialogPaymentGuestFolio: () => import('./DialogPaymentGuestFolio.vue'),
-    // dialogPaymentNonGuestFolio: () => import('./DialogPaymentNonGuestFolio.vue'),
     // dialogPaymentCompliment:() => import('./DialogPaymentCompliment.vue'),
     // dialogPaymentMasterFolio:() => import('./DialogPaymentMasterFolio.vue'),
     // dialogPaymentMealCoupon:() => import('./DialogPaymentMealCoupon.vue'),
-    // dialogSelectDepartment: () => import('./../DialogChangeOutlet.vue')
+
   }
 });
 </script>

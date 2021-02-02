@@ -123,7 +123,6 @@ export default defineComponent({
     showPaymentNonGuestFolio: { type: Boolean, required: true },
     flagSplit: { type: Boolean, required: true },
     selectedPayment: { type: Object, required: true },
-    selectedPrint: { type: Object, required: true }, 
     dataTable: {type: null, required: true},
   },
 
@@ -281,7 +280,12 @@ export default defineComponent({
           } 
 
           state.isLoading = false;
-          emit('onDialogPaymentNonGuestFolio', false, 'ok', response);
+
+          if (props.flagSplit) {
+            console.log("SPLIT ");
+          } else {
+            emit('onDialogPaymentNonGuestFolio', false, 'ok', response);
+          }
         } else {
           Notify.create({
               message: 'Please check your internet connection',

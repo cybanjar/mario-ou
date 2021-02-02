@@ -117,6 +117,7 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify, date } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -147,6 +148,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -284,6 +287,75 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getSplitBilBtnCard = () => {
+      console.log('REQUEST : ', {
+            recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            billart: state.data.objCardSelected['artnr'],
+            balance: state.data.payment,
+            paid: state.data.payment,
+            priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
+            dept: props.dataPreparePayment['dataPrepare']['currDept'],
+            transdate: '',
+            changeStr: ' ',
+            price: 0,
+            addZeit: 0,
+            currSelect: props.dataPreparePayment['dataPrepare']['counter'],
+            hogaCard: 0,
+            cancelStr: " ",
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: 0,
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnCcard', {
+            recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+            billart: state.data.objCardSelected['artnr'],
+            balance: state.data.payment,
+            paid: state.data.payment,
+            priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
+            dept: props.dataPreparePayment['dataPrepare']['currDept'],
+            transdate: '',
+            changeStr: ' ',
+            price: 0,
+            addZeit: 0,
+            currSelect: props.dataPreparePayment['dataPrepare']['counter'],
+            hogaCard: 0,
+            cancelStr: " ",
+            amountForeign: state.data.payment,
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: 0,
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnCard : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.payment;
+          emit('onDialogPaymentCard', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
+      }
+      asyncCall();
+    }
+
     // -- On Clik Listener 
     const onRowClickTablePayment = (dataRow) => {
       state.data.objCardSelected = {};
@@ -316,7 +388,11 @@ export default defineComponent({
     }
 
     const onClickConfirmation = () => {
-      getRestInvCC2();
+      if (props.flagSplit) {
+        getSplitBilBtnCard();
+      } else {
+        getRestInvCC2();
+      }
     }
 
     const onOkDialog = () => {

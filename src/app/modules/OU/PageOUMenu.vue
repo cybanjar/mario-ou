@@ -1293,8 +1293,22 @@ export default defineComponent({
       } 
     }
 
-    const onDialogSplitBill = (val) => {
+    const onDialogSplitBill = (val, flag) => {
       state.showDialogSplitBill = val;
+      state.dataTable['dataPrepareInv'] = state.dataPrepare;
+
+      if (!val && flag == 'ok') {
+        state.dataTable['saldo'] = 0;
+        state.dataOrdered = [];
+        state.dataNewOrder = [];
+        state.dataTable['belegung'] = 0;
+        state.dataTable['bezeich'] = '';
+        state.dataTable['bilname'] = '';
+        state.qty = 1;
+        state.objRequestInvUpdateBill = {};
+        onDialogTablePlan(true);
+      }
+
     }
 
     const onDialogDiscountBill = (val) => {
@@ -2012,7 +2026,7 @@ export default defineComponent({
             if (flag == 'tabletransfer') {
               state.showConfirmationDialog = true;
             } else if (flag == 'splitbill') {
-              onDialogSplitBill(true);
+              onDialogSplitBill(true, '', {}, 0);
             }
           }
           // state.isLoading = false;
