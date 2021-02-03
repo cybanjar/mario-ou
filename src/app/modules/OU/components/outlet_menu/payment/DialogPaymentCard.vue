@@ -291,7 +291,7 @@ export default defineComponent({
       console.log('REQUEST : ', {
             recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
             billart: state.data.objCardSelected['artnr'],
-            balance: state.data.payment,
+            balance: -state.data.payment,
             paid: state.data.payment,
             priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
             dept: props.dataPreparePayment['dataPrepare']['currDept'],
@@ -300,13 +300,14 @@ export default defineComponent({
             price: 0,
             addZeit: 0,
             currSelect: props.dataPreparePayment['dataPrepare']['counter'],
-            hogaCard: 0,
+            hogaCard: ' ',
             cancelStr: " ",
             amountForeign: state.data.payment,
             currRoom: " ",
             userInit: dataStoreLogin['userInit'],
-            ccComment: " ",
+            ccComment: state.data.cardNumber,
             guestnr: 0,
+            currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter']
           });
       
       async function asyncCall() {
@@ -314,7 +315,7 @@ export default defineComponent({
           $api.outlet.getOUPrepare('splitbillBtnCcard', {
             recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
             billart: state.data.objCardSelected['artnr'],
-            balance: state.data.payment,
+            balance: -state.data.payment,
             paid: state.data.payment,
             priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
             dept: props.dataPreparePayment['dataPrepare']['currDept'],
@@ -323,13 +324,14 @@ export default defineComponent({
             price: 0,
             addZeit: 0,
             currSelect: props.dataPreparePayment['dataPrepare']['counter'],
-            hogaCard: 0,
+            hogaCard: ' ',
             cancelStr: " ",
             amountForeign: state.data.payment,
             currRoom: " ",
             userInit: dataStoreLogin['userInit'],
-            ccComment: " ",
+            ccComment:state.data.cardNumber,
             guestnr: 0,
+            currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter']
           }),
         ]);
 
@@ -426,7 +428,6 @@ export default defineComponent({
             message: msg,
             color: 'red',
           });
-          state.showConfirmationDialog = true;
         } else {
           state.showConfirmationDialog = true;
         }

@@ -99,6 +99,7 @@
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -109,6 +110,7 @@ interface State {
     name: string;
     dataSelected: {},
     overCLFlag: boolean,
+    balance: any,
   }
   showConfirmationDialog: boolean;
   title: string;
@@ -127,6 +129,8 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
@@ -136,6 +140,7 @@ export default defineComponent({
         name: '',
         dataSelected: {},
         overCLFlag: false,
+        balance: 0,
       },
       title: '',
       showConfirmationDialog: false,
@@ -153,6 +158,7 @@ export default defineComponent({
         if (props.showPaymentNonGuestFolio) {
           state.data.buttonOkEnable = false;
           state.title = 'Guest Non Folio Payment';
+          state.data.balance = props.dataTable['dataTable']['saldo']
 
           console.log('On mount non guest folio : ', props.dataTable);
 
@@ -282,7 +288,7 @@ export default defineComponent({
           state.isLoading = false;
 
           if (props.flagSplit) {
-            console.log("SPLIT ");
+            getPaySplitBill();
           } else {
             emit('onDialogPaymentNonGuestFolio', false, 'ok', response);
           }
@@ -294,6 +300,85 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
+      }
+      asyncCall();
+    }
+
+    const getPaySplitBill = () => {
+      console.log('REQUEST : ', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['rec-id'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: state.data.balance,
+            payType: 3,
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['resnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: -state.data.balance
+          });
+      
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('splitbillBtnTransferPaytypegt1', {
+        		pvILanguage: 0,
+            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+            bilrecid: state.data.dataSelected['rec-id'],
+            currSelect: props.dataTable['dataPrepare']['counter'],
+            multiVat: 'false',
+            balance: state.data.balance,
+            payType: 2,
+            transdate: '',
+            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+            dept: props.dataTable['dataPrepare']['currDept'],
+            changeStr: ' ',
+            addZeit: 0,
+            hogaCard: 0,
+            cancelStr: " ",
+            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+            currRoom: " ",
+            userInit: dataStoreLogin['userInit'],
+            ccComment: " ",
+            guestnr: state.data.dataSelected['resnr'],
+            tischnr: props.dataTable['dataTable']['tischnr'],
+            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+            amountForeign: -state.data.balance
+          }),
+        ]);
+
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
+          responsePrepare['flagPay'] = 'full';
+          responsePrepare['payment'] = state.data.balance;
+          emit('onDialogPaymentNonGuestFolio', false, 'ok', responsePrepare);
+          state.isLoading = false;
+        }
       }
       asyncCall();
     }

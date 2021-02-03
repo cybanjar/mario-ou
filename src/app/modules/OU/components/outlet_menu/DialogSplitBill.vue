@@ -998,8 +998,10 @@ export default defineComponent({
     }
 
      const onDialogPaymentNonGuestFolio = (val, flag, data) => {
+       state.data.selectedPayment = state.data.dataTablePayment[4];
       state.showPaymentNonGuestFolio = val;
-      state.data.selectedPayment = state.data.dataTablePayment[4];
+      state.data.dataPreparePayment['dataTable']['saldo'] = state.data.balance;
+      state.data.dataPreparePayment['dataPrepare']['counter'] = state.data.counter;
 
 
       if (!val && flag == 'ok') {

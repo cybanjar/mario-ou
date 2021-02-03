@@ -400,14 +400,14 @@ export default defineComponent({
       asyncCall();
     }
 
-     const getPaySplitBill = () => {
+    const getPaySplitBill = () => {
       console.log('REQUEST : ', {
         		pvILanguage: 0,
             recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
             bilrecid: state.data.dataSelected['bilrecid'],
             currSelect: props.dataTable['dataPrepare']['counter'],
             multiVat: 'false',
-            balance: -state.data.balance,
+            balance: state.data.balance,
             payType: 2,
             transdate: '',
             exchgRate: props.dataTable['dataPrepare']['exchgRate'],
@@ -435,7 +435,7 @@ export default defineComponent({
             bilrecid: state.data.dataSelected['bilrecid'],
             currSelect: props.dataTable['dataPrepare']['counter'],
             multiVat: 'false',
-            balance: -state.data.balance,
+            balance: state.data.balance,
             payType: 2, //room transfer 2
             transdate: '',
             exchgRate: props.dataTable['dataPrepare']['exchgRate'],
