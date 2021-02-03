@@ -24,7 +24,8 @@
     "litepicker": "^1.5.5",
     "quasar": "^1.14.0",
     "v-calendar": "^1.0.8",
-    "vue-touch-keyboard": "^0.3.2"
+    "vue-touch-keyboard": "^0.3.2",
+    "print-js": "^1.5.0"
   },
   "devDependencies": {
     "@quasar/app": "^2.1.0",

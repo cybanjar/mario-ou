@@ -616,10 +616,15 @@ export const SUBMODULES: Pages = {
         pathParent: '/ou/menu',
       },
       {
-        name: 'Outlet Sales And Cost',
+        name: 'Outlet Sold Menu',
         keyword: 'Outlet',
         pathParent: '/ou/menu',
-      }
+      },
+      {
+        name: 'Summary Restaurant Report',
+        keyword: 'Outlet',
+        pathParent: '/ou/menu',
+      },
     ],
     
   },
