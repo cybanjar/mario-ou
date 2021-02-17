@@ -96,9 +96,6 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
-import VueTouchKeyboard from "vue-touch-keyboard";
-import {formatThousands} from '~/app/helpers/numberFormat.helpers';
-import { dataTable } from '~/app/modules/GC/utils/params.cashAdvance';
 import { store } from '~/store';
 
 interface State {

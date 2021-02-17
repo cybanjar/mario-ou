@@ -79,7 +79,7 @@ export default defineComponent({
       },
       title: '',
       bill: 1,
-       options: {
+      options: {
         useKbEvents: false,
         preventClickEvent: false
       },

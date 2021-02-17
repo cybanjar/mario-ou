@@ -103,15 +103,14 @@
 
 <script lang="ts">
 import VueTouchKeyboard from 'vue-touch-keyboard';
-// import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 
 Vue.use(VueTouchKeyboard);
-// Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 import Vue from 'vue';
 
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify, date } from 'quasar';
+import { store } from '~/store';
 
 interface State {
   isLoading: boolean;
@@ -119,6 +118,7 @@ interface State {
     dataDetail: any;
     buttonOkEnable: boolean;
     dataSelected: {},
+    dataPayment: {},
   }
   title: string;
   qty: any,
@@ -144,12 +144,15 @@ export default defineComponent({
   },
 
   setup(props, { emit, root: { $api } }) {
+    const dataStoreLogin = store.state.auth.user || {} as any;
+
     const state = reactive<State>({
       isLoading: false,
       data: {
         dataDetail: [],
         buttonOkEnable: false,
         dataSelected: {},
+        dataPayment: {},
       },
       title: '',
       qty: 1,
@@ -183,6 +186,8 @@ export default defineComponent({
 
           getRestInvCancelOrder2();
 
+          state.data.dataPayment = props.dataPrepare;
+
           console.log("On mount void item : ", props.dataSelectedVoidItem);
           console.log('dataPrepare : ', props.dataPrepare);
           console.log('dataTable : ', props.dataTable);
@@ -198,6 +203,57 @@ export default defineComponent({
     });
 
     // -- HTTP Request
+     const zuggriff = (arrayNr, expectedNr) => {
+      let zuggrifval = "false";
+      async function asyncCall() {
+        const [dataZuggrif] = await Promise.all([
+          $api.outlet.getZugriff('checkPermission', {
+            arrayNr: arrayNr,
+            expectedNr: expectedNr,
+            userInit:  dataStoreLogin['userInit']
+          }),
+        ]);
+
+        if (dataZuggrif) {
+          const responseZuggrif = dataZuggrif || [];
+          const okFlag = responseZuggrif['outputOkFlag'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+
+          zuggrifval = responseZuggrif['zugriff'];
+
+          if (zuggrifval == "true") {
+            props.dataSelectedVoidItem['prepareArticle']['betrag'] = props.dataSelectedVoidItem['betrag']
+            props.dataSelectedVoidItem['prepareArticle']['qty'] = state.qty
+            // emit('onDialogVoidItem', false, 'ok', props.dataSelectedVoidItem['prepareArticle']);
+            emit('onDialogVoidItem', false, 'ok', state.data.dataPayment);
+          } else {
+            Notify.create({
+              message: responseZuggrif['messStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          }
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
     const getRestInvCancelOrder2 = () => {
       state.isLoading = true;
 
@@ -214,6 +270,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
 
           console.log('restInvCancelOrder2 : ', response);
+          state.data.dataPayment = data;
 
           if (!okFlag) {
             Notify.create({
@@ -280,7 +337,7 @@ export default defineComponent({
       asyncCall();
     }  
 
-     const loadQueasy = () => {
+    const loadQueasy = () => {
       async function asyncCall() {
         const [data] = await Promise.all([
           $api.outlet.getZugriff('loadQueasy', {
@@ -329,7 +386,11 @@ export default defineComponent({
 
     // -- On Click Listener
     const onOkDialog = () => {
-      emit('onDialogVoidItem', false, 'ok', {});
+      if (props.dataSelectedVoidItem['prepareArticle']['artart'] == 0) {
+        zuggriff(19, 2);
+      } else {
+        zuggriff(20, 2);
+      }
     }
 
     const onCancelDialog = () => {
@@ -358,6 +419,7 @@ export default defineComponent({
           break;
         }
       }
+      props.dataSelectedVoidItem['prepareArticle']['cancelStr'] = dataRow['char1'];
       state.data.dataDetail = dataTable;
     }
 
@@ -436,6 +498,7 @@ export default defineComponent({
       showKeyboardBottom,
       hideKeyboardBottom,
       acceptKeyboardBottom,
+      zuggriff,
       pagination: { rowsPerPage: 0 },
     };
   },

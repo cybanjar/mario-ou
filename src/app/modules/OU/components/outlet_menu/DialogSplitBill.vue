@@ -257,6 +257,30 @@
       :dataTable="data.dataPreparePayment"
       @onDialogPaymentNonGuestFolio="onDialogPaymentNonGuestFolio" />
 
+      <q-dialog v-model="showDialogKpr" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirmation</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Print the bill?</p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline color="primary" label="Cancel" @click="onClickDialogKpr(false)" />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickDialogKpr(true)" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
   </section>
 </template>
 
@@ -277,7 +301,7 @@ interface State {
     selectedPayment: {},
     dataPreparePayment: {},
     dataTablePayment: any,
-
+    askKpr: boolean,
   }
   title: string;
   showPaymentCash: boolean;
@@ -289,6 +313,7 @@ interface State {
   showPaymentMasterFolio: boolean;
   showPaymentMealCoupon: boolean;
   showDepartment: boolean;
+  showDialogKpr: boolean;
 
 }
 
@@ -356,6 +381,7 @@ export default defineComponent({
         ],
         selectedPayment: {},
         dataPreparePayment: {},
+        askKpr: true,
       },
       title: '',
       showPaymentCash: false,
@@ -367,7 +393,7 @@ export default defineComponent({
       showPaymentMasterFolio: false,
       showPaymentMealCoupon: false,
       showDepartment: false, 
-
+      showDialogKpr: false,
     });
 
     watch(
@@ -598,11 +624,21 @@ export default defineComponent({
           state.isLoading = false;
 
           state.data.dataPreparePayment['dataTable']['saldo'] = response['amount']; 
-          if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
-            emit('onDialogSplitBill', false, "ok");
+          if (state.data.askKpr) {
+            state.showDialogKpr = true;
           } else {
-            getPrepare();
+            if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+              emit('onDialogSplitBill', false, "ok");
+            } else {
+              getPrepare();
+            }
           }
+            
+          // if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+          //   emit('onDialogSplitBill', false, "ok");
+          // } else {
+          //   getPrepare();
+          // }
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -910,6 +946,16 @@ export default defineComponent({
       emit('onDialogSplitBill', false, "");
     }
 
+    const onClickDialogKpr = (isOk) => {
+      state.showDialogKpr = false;
+      
+      if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+        emit('onDialogSplitBill', false, "ok");
+      } else {
+        getPrepare();
+      }
+    }
+
     // -- On Dialog Listener
     const onDialogPaymentCash = (val, flag, data) => {
       state.data.selectedPayment = state.data.dataTablePayment[0];
@@ -1074,6 +1120,7 @@ export default defineComponent({
       onDialogPaymentNonGuestFolio,
       onDialogDepartment,
       zuggriff,
+      onClickDialogKpr,
       pagination: { rowsPerPage: 0 },
     };
   },
