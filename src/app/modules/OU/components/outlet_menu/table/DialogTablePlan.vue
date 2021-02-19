@@ -97,7 +97,7 @@ export default defineComponent({
       () => props.showDialogTablePlan, (showDialogTablePlan) => {
 
         if (props.showDialogTablePlan) {
-          console.log('Prepare on mount : ', props.dataPrepare);
+          // console.log('Prepare on mount : ', props.dataPrepare);
           state.currDept = props.dataPrepare['currDept'];
           state.isFetching = true;
           getDataPrepareTable();
@@ -339,7 +339,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('OU Main - getCheckTable: ', responseCheckTable);
+          // console.log('OU Main - getCheckTable: ', responseCheckTable);
           
           emit('onResultTablePlan', state.dataTableSelected);
           emit('onDialogTablePlan', false);
@@ -393,8 +393,8 @@ export default defineComponent({
                     }
                 }
 
-                console.log("dataPrepare : " , dataPrepare);
-                console.log("dataTable: " , state);
+                // console.log("dataPrepare : " , dataPrepare);
+                // console.log("dataTable: " , state);
             
                 state.isFetching = false;
             } else {

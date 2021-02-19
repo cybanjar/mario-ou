@@ -174,7 +174,7 @@ export default defineComponent({
           state.title = 'Guest Folio Payment';
           state.data.balance = props.dataTable['dataTable']['saldo']
           getPrepare();
-          console.log('data table : ', props.dataTable);
+          // console.log('data table : ', props.dataTable);
         }
       }
     );
@@ -206,7 +206,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response rzinrPrepare: ', response);
+          // console.log('response rzinrPrepare: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -243,14 +243,14 @@ export default defineComponent({
     const getReturnZinr = () => {
       state.isLoading = true;
 
-      console.log({
-        pvILanguage: 0,
-        dept:props.dataTable['dataPrepare']['currDept'],
-        room: state.data.room,
-        caseType: 1,
-        deptMbar: state.data.dataResponse['deptMbar'],
-        deptLdry: state.data.dataResponse['deptLdry'],
-      })
+      // console.log({
+      //   pvILanguage: 0,
+      //   dept:props.dataTable['dataPrepare']['currDept'],
+      //   room: state.data.room,
+      //   caseType: 1,
+      //   deptMbar: state.data.dataResponse['deptMbar'],
+      //   deptLdry: state.data.dataResponse['deptLdry'],
+      // })
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -268,7 +268,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response return: ', response);
+          // console.log('response return: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -319,7 +319,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response rzinrBtnExit: ', response);
+          // console.log('response rzinrBtnExit: ', response);
           state.data.dataSelected['bilrecid'] = response['bilrecid'];
 
           if (!okFlag) {
@@ -373,7 +373,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response restInvMicrosBtnTransfer: ', response);
+          // console.log('response restInvMicrosBtnTransfer: ', response);
 
           props.dataTable['dataPayment'] = response;
 
@@ -401,31 +401,31 @@ export default defineComponent({
     }
 
     const getPaySplitBill = () => {
-      console.log('REQUEST : ', {
-        		pvILanguage: 0,
-            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            bilrecid: state.data.dataSelected['bilrecid'],
-            currSelect: props.dataTable['dataPrepare']['counter'],
-            multiVat: 'false',
-            balance: state.data.balance,
-            payType: 2,
-            transdate: '',
-            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
-            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
-            dept: props.dataTable['dataPrepare']['currDept'],
-            changeStr: ' ',
-            addZeit: 0,
-            hogaCard: 0,
-            cancelStr: " ",
-            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
-            currRoom: " ",
-            userInit: dataStoreLogin['userInit'],
-            ccComment: " ",
-            guestnr: state.data.dataSelected['resnr'],
-            tischnr: props.dataTable['dataTable']['tischnr'],
-            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
-            amountForeign: -state.data.balance
-          });
+      // console.log('REQUEST : ', {
+      //   		pvILanguage: 0,
+      //       recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+      //       bilrecid: state.data.dataSelected['bilrecid'],
+      //       currSelect: props.dataTable['dataPrepare']['counter'],
+      //       multiVat: 'false',
+      //       balance: state.data.balance,
+      //       payType: 2,
+      //       transdate: '',
+      //       exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+      //       foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+      //       dept: props.dataTable['dataPrepare']['currDept'],
+      //       changeStr: ' ',
+      //       addZeit: 0,
+      //       hogaCard: 0,
+      //       cancelStr: " ",
+      //       currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+      //       currRoom: " ",
+      //       userInit: dataStoreLogin['userInit'],
+      //       ccComment: " ",
+      //       guestnr: state.data.dataSelected['resnr'],
+      //       tischnr: props.dataTable['dataTable']['tischnr'],
+      //       doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+      //       amountForeign: -state.data.balance
+      //     });
       
       async function asyncCall() {
         const [dataPrepare] = await Promise.all([
@@ -469,7 +469,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
+          // console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
           responsePrepare['flagPay'] = 'full';
           responsePrepare['payment'] = state.data.balance;
           emit('onDialogPaymentGuestFolio', false, 'ok', responsePrepare);
@@ -524,7 +524,7 @@ export default defineComponent({
     }
 
     const onRowClickTable = (dataRow) => {
-      console.log(dataRow);
+      // console.log(dataRow);
 
      for (let i = 0; i<state.data.dataDetail.length; i++) {
         const datarow = state.data.dataDetail[i] as {};
@@ -553,7 +553,7 @@ export default defineComponent({
     }
 
     const onOkDialog = () => {
-      console.log(state.data.dataSelected);
+      // console.log(state.data.dataSelected);
 
       if (state.data.dataSelected == null) {
         Notify.create({
@@ -565,12 +565,12 @@ export default defineComponent({
         if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] == state.data.dataResponse['deptLdry'])) {
           flCode = 1;
           state.data.dataResponse['flcode'] = flCode;
-          console.log('flCode', flCode);
+          // console.log('flCode', flCode);
           getBtnExit();
         } else if (state.data.dataSelected['dataSelected'] != '' && (props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptMbar'] || props.dataTable['dataPrepare']['currDept'] != state.data.dataResponse['deptLdry'])) {
           flCode = 2;
           state.data.dataResponse['flcode'] = flCode;
-          console.log('flCode', flCode);
+          // console.log('flCode', flCode);
           getBtnExit();
         }
 

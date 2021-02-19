@@ -286,7 +286,7 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
-import { Notify } from 'quasar';
+import { Notify, date } from 'quasar';
 import { store } from '~/store';
 
 interface State {
@@ -302,6 +302,7 @@ interface State {
     dataPreparePayment: {},
     dataTablePayment: any,
     askKpr: boolean,
+    billDate: string,
   }
   title: string;
   showPaymentCash: boolean;
@@ -382,6 +383,7 @@ export default defineComponent({
         selectedPayment: {},
         dataPreparePayment: {},
         askKpr: true,
+        billDate: '',
       },
       title: '',
       showPaymentCash: false,
@@ -405,10 +407,9 @@ export default defineComponent({
           state.data.dataPreparePayment['dataTable'] = props.dataTable;
           state.data.dataPreparePayment['dataPrepare'] = props.dataPrepare;
 
-          console.log('On Mount Split Bill');
-
           state.data.dataTableMainBill = state.data.dataTableMain.slice()
           getPrepare();
+          getHTParam(2, 87);
         }
       }
     );
@@ -735,7 +736,7 @@ export default defineComponent({
       asyncCall();
     }
 
-     const getSplitBuildRMenu = (dataRow) => {
+    const getSplitBuildRMenu = (dataRow) => {
       state.isLoading = true;
 
       console.log({
@@ -825,6 +826,112 @@ export default defineComponent({
       }
       asyncCall();
     }
+
+    const getAddKitchpr = () => {
+      // console.log('Request add kitchen printer : ', {
+      //       pvlLanguage : '1',
+      //       sessionParameter: '',
+      //       dept : props.dataPrepare['currDept'],
+      //       rechnr: props.dataTable['dataThBill'][0]['rechnr'],
+      //       billdate: date.formatDate((new Date(state.data.billDate)), 'MM/DD/YY'),
+      //       userInit: '01',
+      //     })
+
+      
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('addKitchenPrinter', {
+            pvlLanguage : '1',
+            sessionParameter: '',
+            dept : props.dataPrepare['currDept'],
+            rechnr: props.dataTable['dataThBill'][0]['rechnr'],
+            billdate: date.formatDate((new Date(state.data.billDate)), 'MM/DD/YY'),
+            userInit: '01',
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          console.log('addKitchenPrinter : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (responsePrepare['errorStr'] != '') {
+            Notify.create({
+              message: responsePrepare['errorStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+              emit('onDialogSplitBill', false, "ok");
+            } else {
+              getPrepare();
+            }
+          }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getHTParam = (caseType, inp) => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [gethtparam] = await Promise.all([
+          $api.outlet.getCommonOutletUserList('getHTParam0', {
+            casetype : caseType,
+            inpParam: inp
+          })
+        ]);
+
+        if (gethtparam) {
+          const responseHTParam = gethtparam || [];
+          const okFlag = responseHTParam['outputOkFlag'];
+
+          console.log('responseHTParam ' , inp , ' : ', responseHTParam);
+          state.data.billDate = responseHTParam['fdate'];
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
 
     // -- On Click Listener
     const onRowClickSplitBill = (dataRow) => {
@@ -946,14 +1053,17 @@ export default defineComponent({
       emit('onDialogSplitBill', false, "");
     }
 
-    const onClickDialogKpr = (isOk) => {
+    const onClickDialogKpr = (isButtonOK) => {
       state.showDialogKpr = false;
-      
-      if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
-        emit('onDialogSplitBill', false, "ok");
-      } else {
-        getPrepare();
-      }
+
+      if (isButtonOK) {
+        getAddKitchpr();
+      } else
+        if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+          emit('onDialogSplitBill', false, "ok");
+        } else {
+          getPrepare();
+        }
     }
 
     // -- On Dialog Listener

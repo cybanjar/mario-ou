@@ -188,9 +188,9 @@ export default defineComponent({
 
           state.data.dataPayment = props.dataPrepare;
 
-          console.log("On mount void item : ", props.dataSelectedVoidItem);
-          console.log('dataPrepare : ', props.dataPrepare);
-          console.log('dataTable : ', props.dataTable);
+          // console.log("On mount void item : ", props.dataSelectedVoidItem);
+          // console.log('dataPrepare : ', props.dataPrepare);
+          // console.log('dataTable : ', props.dataTable);
         }
       }
     );
@@ -269,7 +269,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvCancelOrder2 : ', response);
+          // console.log('restInvCancelOrder2 : ', response);
           state.data.dataPayment = data;
 
           if (!okFlag) {
@@ -314,7 +314,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvCalculateAmount : ', response);
+          // console.log('restInvCalculateAmount : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -350,7 +350,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('loadQueasy : ', response);
+          // console.log('loadQueasy : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -430,7 +430,7 @@ export default defineComponent({
     }
 
     const checkQty = (qty) => {
-      console.log(state.qty);
+      // console.log(state.qty);
       
       if (state.qty > props.dataSelectedVoidItem['anzahl']) {
         state.qty = 1;

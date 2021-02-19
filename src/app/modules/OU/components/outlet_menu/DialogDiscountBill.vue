@@ -193,7 +193,7 @@ export default defineComponent({
           state.title = "Discount Bill Number " + objTHBill['rechnr'] + " - " + "Table " + objTHBill['tischnr'];
 
           getDisc1Prepare1();
-          console.log("responsePrepare", responsePrepare);
+          // console.log("responsePrepare", responsePrepare);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -243,8 +243,8 @@ export default defineComponent({
 
           // const objTHBill = responsePrepare['tHBill']['t-h-bill'][0];
           // state.title = "Discount Bill Number " + objTHBill['rechnr'] + " - " + "Table " + objTHBill['tischnr'];
-          console.log("responsePrepare1", responsePrepare);
-          console.log("dataDetail : ", state.data.dataDetail);
+          // console.log("responsePrepare1", responsePrepare);
+          // console.log("dataDetail : ", state.data.dataDetail);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -294,7 +294,7 @@ export default defineComponent({
           state.data.dataDetail = [];
           state.data.dataDetail = tempData;
 
-          console.log("responsePrepareGetArticle", responsePrepare);
+          // console.log("responsePrepareGetArticle", responsePrepare);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -331,8 +331,8 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           } 
-          console.log('prepare article: ', state.data.dataPrepare);
-          console.log("responseDisc1CalAmount", response);
+          // console.log('prepare article: ', state.data.dataPrepare);
+          // console.log("responseDisc1CalAmount", response);
 
           if (selected && (datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt1'] && 
                 datarow['artnr'] == state.data.dataPrepare['prepare1']['discArt2'] && 
@@ -383,10 +383,10 @@ export default defineComponent({
                   state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
 
                   // console.log(i);     
-                  console.log('epreis', datarow['epreis']);
-                  console.log('val1 : ' , tempValue);
-                  console.log('val2 : ' , tempValue2);
-                  console.log('discount value : ' , -discount);     
+                  // console.log('epreis', datarow['epreis']);
+                  // console.log('val1 : ' , tempValue);
+                  // console.log('val2 : ' , tempValue2);
+                  // console.log('discount value : ' , -discount);     
                 }
               }
             }
@@ -567,16 +567,16 @@ export default defineComponent({
                   }
                   state.data.discountValue = (discount.toFixed(2));
 
-                  console.log('epreis', datarow['epreis']);
-                  console.log('val1 : ' , tempValue);
-                  console.log('val2 : ' , tempValue2);
-                  console.log('discount value : ' , discount);       
+                  // console.log('epreis', datarow['epreis']);
+                  // console.log('val1 : ' , tempValue);
+                  // console.log('val2 : ' , tempValue2);
+                  // console.log('discount value : ' , discount);       
                
               }
             }
 
           state.data.discountBalance = (state.data.discountAmount - state.data.discountValue).toFixed(2);
-          console.log("responseTaxService", responseTaxService);
+          // console.log("responseTaxService", responseTaxService);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -636,45 +636,45 @@ export default defineComponent({
         }
       });
 
-      console.log('data : ', state.data.dataDetail);
-      console.log('billLine : ', state.data.dataPrepare['prepare2']['tHBillLine']['t-h-bill-line']);
-      console.log({
-            recId  : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['rec-id'],
-            billart  : state.data.dataPrepare['prepareArticle']['billart'],
-            dept : 1,
-            transdate : '',
-            amount : state.data.discountAmount,
-            DESCRIPTION : state.data.dataPrepare['prepareArticle']['description'],
-            nettoBetrag : (state.data.discountBalance * state.data.discountPercent) / 100,
-            exchgRate : state.data.dataPrepare['prepare2']['exchgRate'],
-            tischnr : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['tischnr'],
-            currSelect : '0',
-            discValue : state.data.discountPercent,
-            qty  : '1',
-            cancelStr  : '',
-            currWaiter  : '1',
-            procent  : state.data.dataPrepare['prepare1']['procent'],
-            bArtnrfront   : state.data.dataPrepare['prepareArticle']['bArtnrfront'],
-            oArtnrfront   : state.data.dataPrepare['prepareArticle']['oArtnrfront'],
-            priceDecimal   : state.data.dataPrepare['prepare2']['priceDecimal'],
-            userInit    : dataStoreLogin['userInit'],
-            MENU : {MENU: dataMenu}, 
-            vatList: {
-              'vat-list': {
-                'ArtNo ': 0,
-                'vatProz': 0,
-                'vatAmt': 0,
-                'netto': 0,
-                'betrag': 0,
-                'fbetrag': 0,
-              }
-            },
-            discList: {
-              'disc-list': {
+      // console.log('data : ', state.data.dataDetail);
+      // console.log('billLine : ', state.data.dataPrepare['prepare2']['tHBillLine']['t-h-bill-line']);
+      // console.log({
+      //       recId  : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['rec-id'],
+      //       billart  : state.data.dataPrepare['prepareArticle']['billart'],
+      //       dept : 1,
+      //       transdate : '',
+      //       amount : state.data.discountAmount,
+      //       DESCRIPTION : state.data.dataPrepare['prepareArticle']['description'],
+      //       nettoBetrag : (state.data.discountBalance * state.data.discountPercent) / 100,
+      //       exchgRate : state.data.dataPrepare['prepare2']['exchgRate'],
+      //       tischnr : state.data.dataPrepare['prepare1']['tHBill']['t-h-bill'][0]['tischnr'],
+      //       currSelect : '0',
+      //       discValue : state.data.discountPercent,
+      //       qty  : '1',
+      //       cancelStr  : '',
+      //       currWaiter  : '1',
+      //       procent  : state.data.dataPrepare['prepare1']['procent'],
+      //       bArtnrfront   : state.data.dataPrepare['prepareArticle']['bArtnrfront'],
+      //       oArtnrfront   : state.data.dataPrepare['prepareArticle']['oArtnrfront'],
+      //       priceDecimal   : state.data.dataPrepare['prepare2']['priceDecimal'],
+      //       userInit    : dataStoreLogin['userInit'],
+      //       MENU : {MENU: dataMenu}, 
+      //       vatList: {
+      //         'vat-list': {
+      //           'ArtNo ': 0,
+      //           'vatProz': 0,
+      //           'vatAmt': 0,
+      //           'netto': 0,
+      //           'betrag': 0,
+      //           'fbetrag': 0,
+      //         }
+      //       },
+      //       discList: {
+      //         'disc-list': {
                 
-              }
-            } 
-          });
+      //         }
+      //       } 
+      //     });
      
      async function asyncCall() {
         const [data] = await Promise.all([
@@ -721,7 +721,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response button ok: ', response);
+          // console.log('response button ok: ', response);
 
           if (!okFlag) {
             Notify.create({

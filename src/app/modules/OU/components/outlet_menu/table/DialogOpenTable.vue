@@ -157,7 +157,7 @@ export default defineComponent({
             state.time = '';
           }
 
-          console.log("click : ", state.dataSelected);
+          // console.log("click : ", state.dataSelected);
         }
       }
     );
@@ -170,7 +170,7 @@ export default defineComponent({
     });
 
     const onChangeRoom = (v) => {
-      console.log("onChangeRoom", v.target.value);
+      // console.log("onChangeRoom", v.target.value);
     }
 
     const onCancel = () => {
@@ -226,7 +226,7 @@ export default defineComponent({
       state.dataRoom = dataRoom;
       state.room = state.dataRoom['zinr'];
       state.guest = state.dataRoom['gname'];
-      console.log("Room : ", state.dataRoom);
+      // console.log("Room : ", state.dataRoom);
     }
 
     const showKeyboard = (e) => {
@@ -282,7 +282,7 @@ export default defineComponent({
           const responseOpenTable = opentTable || [];
           const okFlag = responseOpenTable['outputOkFlag'];
 
-          console.log('responseOpenTable : ', responseOpenTable);
+          // console.log('responseOpenTable : ', responseOpenTable);
 
           if (!okFlag) {
             Notify.create({

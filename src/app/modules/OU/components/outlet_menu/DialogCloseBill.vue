@@ -94,8 +94,8 @@ export default defineComponent({
           state.data.buttonOkEnable = false;
           state.title = 'Select Close Bill';
 
-          console.log("On Mount : ", props.dataTable);
-          console.log("On Mount : ", props.dataPrepare);
+          // console.log("On Mount : ", props.dataTable);
+          // console.log("On Mount : ", props.dataPrepare);
           getPrepare();
         }
       }
@@ -126,7 +126,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('oldhbillPrepare : ', response);
+          // console.log('oldhbillPrepare : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -166,7 +166,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('oldhbillBtnExit : ', response);
+          // console.log('oldhbillBtnExit : ', response);
 
           if (!okFlag) {
             Notify.create({

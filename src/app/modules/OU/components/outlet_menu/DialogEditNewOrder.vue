@@ -135,7 +135,7 @@ export default defineComponent({
     }
 
     const onConfirm = () => {
-      console.log(state.dataNewOrderSelected, "CONFIRM");
+      // console.log(state.dataNewOrderSelected, "CONFIRM");
       
       state.dataNewOrderSelected['qty'] = state.qty;
       state.dataNewOrderSelected['remark'] = state.remark;

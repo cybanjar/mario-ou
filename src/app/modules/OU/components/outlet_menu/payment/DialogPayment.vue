@@ -331,7 +331,7 @@ export default defineComponent({
             const datarow = state.data.dataTablePayment[i];
             datarow['selected'] = false;
           }       
-          console.log('Dialog Payment Mount: ', props.dataTable);
+          // console.log('Dialog Payment Mount: ', props.dataTable);
         }
       }
     );
@@ -456,7 +456,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('responseZuggrif : ', responseZuggrif);
+          // console.log('responseZuggrif : ', responseZuggrif);
           zuggrifval = responseZuggrif['zugriff'];
 
           if (zuggrifval == "true") {
@@ -510,7 +510,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('responsePrepare : ', responsePrepare);
+          // console.log('responsePrepare : ', responsePrepare);
 
           if (responsePrepare['msgStr'] == "") {
             state.isLoading = false;
@@ -562,7 +562,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response get saldo: ', response);
+          // console.log('response get saldo: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -614,7 +614,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
           const idPayment = state.data.selectedPayment['id'];
 
-          console.log('response btn transfer: ', response);
+          // console.log('response btn transfer: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -678,7 +678,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
           const idPayment = state.data.selectedPayment['id'];
 
-          console.log('response bill transfer: ', response);
+          // console.log('response bill transfer: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -728,7 +728,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response check discount: ', response);
+          // console.log('response check discount: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -789,7 +789,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
           const idPayment = state.data.selectedPayment['id'];
 
-          console.log('response getBillTransferCheckVAT: ', response);
+          // console.log('response getBillTransferCheckVAT: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -904,7 +904,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 1);
       }
 
@@ -918,7 +918,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 2);
       }
     }
@@ -931,7 +931,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 3);
       }
     }
@@ -944,7 +944,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 4);
       }
     }
@@ -957,7 +957,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 5);
       }
     }
@@ -970,7 +970,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 7);
       }
     }
@@ -983,7 +983,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 6);
       }
     }
@@ -996,7 +996,7 @@ export default defineComponent({
         state.data.selectedPayment = {};
         state.data.buttonOkEnable = false;
         state.isLoading = false;
-        console.log('payment data : ', data);
+        // console.log('payment data : ', data);
         emit('onDialogPayment', false, 'ok', data, 8);
       }
     }

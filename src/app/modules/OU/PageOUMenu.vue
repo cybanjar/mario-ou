@@ -200,7 +200,7 @@
                           </q-img>
                         </q-card-section>
                       </q-card>
-                      <q-card>
+                      <q-card @click="flagPrintOrderCheckerEnable ? onClickPrintOrderChecker : null">
                         <q-card-section>
                           <q-img
                             class="img-collage"
@@ -308,7 +308,7 @@
                             rounded
                             class="full-width"
                             label="CONFIRM"
-                            @click="confirmNewOrder()"
+                            @click="showDialogConfirmMenu = true"
                           />
                         </div>
                       </div>
@@ -614,6 +614,54 @@
           </q-card>
         </q-dialog>
 
+        <q-dialog v-model="showDialogMergeBill" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirmation</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Table already has an active bill. Select OK to open and merge the bill, or select CANCEL to open new table</p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline color="primary" label="Cancel" @click="onClickMergeBill(false)" />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickMergeBill(true)" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
+        <q-dialog v-model="showDialogConfirmMenu" persistent>
+          <q-card style="max-width: 1500px;width:450px;">
+            <q-toolbar>
+              <q-toolbar-title class="text-white text-weight-medium">Confirmation</q-toolbar-title>
+            </q-toolbar>
+
+          <q-card-section class="row items-center">
+            <div class="row">
+              <div class="col-md-2">
+                <q-avatar icon="mdi-help" color="negative" text-color="white" />
+              </div>
+              <div class="col-md-10">                  
+                <p class="q-ml-md">Confirm your menu(s) selection?</p>
+              </div>
+            </div>              
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn outline color="primary" label="Cancel" v-close-popup />
+              <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmNewOrder" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
         
 
           <!-- <div>
@@ -634,8 +682,8 @@ Vue.use(VueTouchKeyboard);
 // Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 
-import { defineComponent, computed, watch, reactive, toRefs, ref, onMounted, } from '@vue/composition-api';
-import { date, Notify, Cookies } from 'quasar';
+import { defineComponent, reactive, toRefs, onMounted, } from '@vue/composition-api';
+import { date, Notify } from 'quasar';
 import Vue from 'vue';
 import { store } from '~/store';
 
@@ -699,7 +747,13 @@ interface State {
   tempFlCodePayment: any,
   flagPostingMenu: boolean,
   flagRefreshAfterAction: boolean,
+  showDialogMergeBill: boolean, 
+  showDialogConfirmMenu: boolean,
+  tabbillnumber: string,
+  billDate: '',
+  flagPrintOrderCheckerEnable: boolean,
 }
+
 export default defineComponent({
   setup(_, {root: { $api } }) {
     const dataStoreLogin = store.state.auth.user || {} as any;
@@ -767,6 +821,11 @@ export default defineComponent({
       tempFlCodePayment: -1,
       flagPostingMenu: false,
       flagRefreshAfterAction: false,
+      showDialogMergeBill: false,
+      showDialogConfirmMenu: false,
+      tabbillnumber: 'neworder',
+      billDate: '',
+      flagPrintOrderCheckerEnable: false,
     });
 
     onMounted(async () => { 
@@ -790,8 +849,9 @@ export default defineComponent({
     //   console.log("refresh, delete ou cookies");
     // }
 
-    // OnClick listener Event
-    
+
+
+    // OnClick listener Event    
     const onClickSubGroup = (datarow) => {
       for (let i = 0; i<state.dataFilteredSubGroup.length; i++) {
         const zknr = datarow['zknr'];
@@ -812,6 +872,10 @@ export default defineComponent({
     } 
 
     const onClickArticle = (datarows) => {
+      if (state.tabbillnumber != "neworder") {
+        state.tabbillnumber = 'neworder';
+      }
+
       if (state.qty == 0) {
         Notify.create({
           type: "warning",
@@ -838,7 +902,6 @@ export default defineComponent({
 
     const onSplitItem = (datarow) => {
       state.dataSelected = datarow;
-      console.log("split item");
       onDialogSplitItem(true, datarow);
     }
 
@@ -874,8 +937,9 @@ export default defineComponent({
       getRestInvCheckSaldo(state.currentState);
     }
 
-    const confirmNewOrder = () => {
+    const onClickConfirmNewOrder = () => {
       state.flagPostingMenu = true;
+      state.showDialogConfirmMenu = false;
       state.titleDialogKpr = 'Send ordered menu item(s) to kitchen printer?';
 
       getRestInvRunHelp4();
@@ -896,7 +960,6 @@ export default defineComponent({
     }
 
     const onClickDialogChangeUser = () => {
-      console.log(" On Click Dialog Change User");
       onDialogChangeUser(true);      
     }
 
@@ -906,29 +969,48 @@ export default defineComponent({
       }
     }
 
-    const onClickDialogKpr = (val) => {
-      if (state.flagPostingMenu) {
-        checkBill(); 
+    const onClickDialogKpr = (isOKButton) => {
+      state.showDialogKpr = false;
+
+      if (isOKButton) {
+        getAddKitchpr();
       } else {
-        if (state.paytype == 2) {
-          onDialogTablePlan(true);          
-        } else if (state.paytype == 1) {
-          getBillLine();
-        } else if (state.paytype == 11) {
-          onDialogTablePlan(true);          
-        } else if (state.paytype == 3) {
-          if (state.tempFlCodePayment == 1) {
+        if (state.flagPostingMenu) {
+          checkBill(); 
+        } else {
+          if (state.paytype == 2) {
+            onDialogTablePlan(true);          
+          } else if (state.paytype == 1) {
+            getBillLine();
+          } else if (state.paytype == 11) {
+            onDialogTablePlan(true);          
+          } else if (state.paytype == 3) {
+            if (state.tempFlCodePayment == 1) {
+              onDialogTablePlan(true);
+            } else if (state.tempFlCodePayment == 0) {
+             getBillLine();
+            }
+          } else if (state.paytype == 7) {
             onDialogTablePlan(true);
-          } else if (state.tempFlCodePayment == 0) {
-           getBillLine();
+          } else if (state.paytype == 8) {
+            onDialogTablePlan(true);          
           }
-        } else if (state.paytype == 7) {
-          onDialogTablePlan(true);
-        } else if (state.paytype == 8) {
-          onDialogTablePlan(true);          
         }
       }
-      state.showDialogKpr = false;
+    }
+
+    const onClickMergeBill = (isButtonOK) => {
+      state.showDialogMergeBill = false;
+
+      if (isButtonOK) {
+        getRestInvOpenTable();
+      } else {
+        onDialogTablePlan(true);
+      }
+    }
+
+    const onClickPrintOrderChecker = () => {
+
     }
 
     // Dialog Listener
@@ -996,7 +1078,7 @@ export default defineComponent({
         for(let i = 0; i<state.dataNewOrder.length; i++) {
           state.dataNewOrder[i]['position'] = i;
         } 
-        console.log(state.dataNewOrder);
+        // console.log(state.dataNewOrder);
       }
 
     }
@@ -1425,7 +1507,7 @@ export default defineComponent({
       if (!state.showDialogInputMultiple && result != null) {
         // state.tempDataRowSelectedArticle['epreis1'] = result;
 
-        console.log('result', state.tempDataRowSelectedArticle);
+        // console.log('result', state.tempDataRowSelectedArticle);
         const epreis1 = state.tempDataRowSelectedArticle['epreis1'];
         let epreis = (epreis1 * result);
         state.tempDataRowSelectedArticle['epreis1'] = epreis;
@@ -1449,7 +1531,6 @@ export default defineComponent({
     }
 
     const onDialogInputDescription = (e, result) => {
-      console.log('onDialogInputDescription');
       state.showDialogInputDescription = e;
 
       if (!state.showDialogInputDescription && result != null) {
@@ -1557,7 +1638,86 @@ export default defineComponent({
       asyncCall();
     }
 
-    const getAddKitchpr = () => {}
+    const getAddKitchpr = () => {
+      // console.log('Request add kitchen printer : ', {
+      //       pvlLanguage : '1',
+      //       sessionParameter: '',
+      //       dept : state.currDept,
+      //       rechnr: state.dataTable['dataThBill'][0]['rechnr'],
+      //       billdate: date.formatDate((new Date(state.billDate)), 'MM/DD/YY'),
+      //       userInit: '01',
+      //     })
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('addKitchenPrinter', {
+            pvlLanguage : '1',
+            sessionParameter: '',
+            dept : state.currDept,
+            rechnr: state.dataTable['dataThBill'][0]['rechnr'],
+            billdate: date.formatDate((new Date(state.billDate)), 'MM/DD/YY'),
+            userInit: '01',
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          // console.log('addKitchenPrinter : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (responsePrepare['errorStr'] != '') {
+            Notify.create({
+              message: responsePrepare['errorStr'],
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            if (state.flagPostingMenu) {
+              checkBill(); 
+            } else {
+              if (state.paytype == 2) {
+                onDialogTablePlan(true);          
+              } else if (state.paytype == 1) {
+                getBillLine();
+              } else if (state.paytype == 11) {
+                onDialogTablePlan(true);          
+              } else if (state.paytype == 3) {
+                if (state.tempFlCodePayment == 1) {
+                  onDialogTablePlan(true);
+                } else if (state.tempFlCodePayment == 0) {
+                  getBillLine();
+                }
+              } else if (state.paytype == 7) {
+                onDialogTablePlan(true);
+              } else if (state.paytype == 8) {
+                onDialogTablePlan(true);          
+              }
+            }
+          }
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
 
     const getSubgroup = () => {
       state.isLoading = true;
@@ -1599,7 +1759,7 @@ export default defineComponent({
             getArticle();       
           }
           state.isLoading = false;
-          console.log("response subgr", responseSubGroup);
+          // console.log("response subgr", responseSubGroup);
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -1630,7 +1790,7 @@ export default defineComponent({
           const responseGetArticle = dataArticle || [];
           const okFlag = responseGetArticle['outputOkFlag'];
 
-          console.log('responseGetArticle : ', responseGetArticle);
+          // console.log('responseGetArticle : ', responseGetArticle);
 
           if (!okFlag) {
             Notify.create({
@@ -1701,7 +1861,7 @@ export default defineComponent({
           const responseCheckBill = dataCheckBill || [];
           const okFlag = responseCheckBill['outputOkFlag'];
 
-          console.log('responseCheckBill : ', responseCheckBill);
+          // console.log('responseCheckBill : ', responseCheckBill);
 
           if (!okFlag) {
             Notify.create({
@@ -1745,7 +1905,7 @@ export default defineComponent({
       async function asyncCall() {
         const [gethtparam] = await Promise.all([
           $api.outlet.getCommonOutletUserList('getHTParam0', {
-            caseType : caseType,
+            casetype : caseType,
             inpParam: inp
           })
         ]);
@@ -1754,8 +1914,14 @@ export default defineComponent({
           const responseHTParam = gethtparam || [];
           const okFlag = responseHTParam['outputOkFlag'];
 
-          console.log('responseHTParam : ', responseHTParam);
-          getPrepare(responseHTParam['fint']);
+          console.log('responseHTParam ' , inp , ' : ', responseHTParam);
+
+          if (inp == 60) {
+            getPrepare(responseHTParam['fint']);
+            getHTParam(2, 87);
+          } else if (inp == 87) {
+            state.billDate = responseHTParam['fdate'];
+          }
 
           if (!okFlag) {
             Notify.create({
@@ -1796,7 +1962,7 @@ export default defineComponent({
           const msgStr = responsePrepare['msgStr'];
           responsePrepare['currDept'] = state.currDept;
 
-          console.log('responsePrepare : ', responsePrepare);
+          // console.log('responsePrepare : ', responsePrepare);
 
           if (!okFlag) {
             Notify.create({
@@ -1833,7 +1999,7 @@ export default defineComponent({
             var strBtitle = bTitle.split(";");
             responsePrepare['btitleMicrosFlag'] = strBtitle[1];
             responsePrepare['btitleTitle'] = strBtitle[0];
-            console.log(responsePrepare);
+            // console.log(responsePrepare);
 
             zuggriff(19, 2, "getPrepare");
 
@@ -1869,7 +2035,7 @@ export default defineComponent({
           const responseGetBillLine = dataBillLine || [];
           const okFlag = responseGetBillLine['outputOkFlag'];
 
-          console.log('responseGetBillLine : ', responseGetBillLine);
+          // console.log('responseGetBillLine : ', responseGetBillLine);
 
           state.dataOrdered = responseGetBillLine['tHBillLine']['t-h-bill-line'];
 
@@ -1921,7 +2087,7 @@ export default defineComponent({
           const responseSelectItem = dataSelectItem || [];
           const okFlag = responseSelectItem['outputOkFlag'];
 
-          console.log('responseSelectItem : ', responseSelectItem);
+          // console.log('responseSelectItem : ', responseSelectItem);
 
           if (!okFlag) {
             Notify.create({
@@ -1960,7 +2126,7 @@ export default defineComponent({
           const responseGetPrice = dataGetPrice || [];
           const okFlag = responseGetPrice['outputOkFlag'];
 
-          console.log('responseGetPrice : ', responseGetPrice);
+          // console.log('responseGetPrice : ', responseGetPrice);
 
           if (!okFlag) {
             Notify.create({
@@ -2001,7 +2167,7 @@ export default defineComponent({
           const responseSelectItem = dataSelectItem || [];
           const okFlag = responseSelectItem['outputOkFlag'];
 
-          console.log('responseSelectItem1 : ', responseSelectItem);
+          // console.log('responseSelectItem1 : ', responseSelectItem);
 
           if (!okFlag) {
             Notify.create({
@@ -2042,7 +2208,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response : ', response);
+          // console.log('response restInvCheckSaldo: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -2081,7 +2247,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response get saldo: ', response);
+          // console.log('response restInvGetSaldo: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -2136,7 +2302,7 @@ export default defineComponent({
           const responseSelectItem = dataSelectItem || [];
           const okFlag = responseSelectItem['outputOkFlag'];
 
-          console.log('responseSelectItem2 : ', responseSelectItem);
+          // console.log('responseSelectItem2 : ', responseSelectItem);
 
           if (!okFlag) {
             Notify.create({
@@ -2437,7 +2603,7 @@ export default defineComponent({
           const okFlag = responsePrepare['outputOkFlag'];
           const msgStr = responsePrepare['msgStr'];
 
-          console.log('restInvNotBalanceBill : ', responsePrepare);
+          // console.log('restInvNotBalanceBill : ', responsePrepare);
 
           if (!okFlag) {
             Notify.create({
@@ -2538,7 +2704,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvOpenStandTable : ', response);
+          // console.log('restInvOpenStandTable : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -2583,7 +2749,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvWaiterTransfer : ', response);
+          // console.log('restInvWaiterTransfer : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -2698,7 +2864,7 @@ export default defineComponent({
             doubleCurrency: state.dataPrepare['doubleCurrency'],
             exchgRate: state.dataPrepare['exchgRate'],
             priceDecimal: state.dataPrepare['priceDecimal'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            transdate: null,
             foreignRate: 'false',
             deptname: state.dataPrepare['deptname'],
             cancelOrder: 'false',
@@ -2763,7 +2929,7 @@ export default defineComponent({
             doubleCurrency: state.dataPrepare['doubleCurrency'],
             exchgRate: state.dataPrepare['exchgRate'],
             priceDecimal: state.dataPrepare['priceDecimal'],
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
+            transdate: null,
             foreignRate: 'false',
             deptname: state.dataPrepare['deptname'],
             cancelOrder: 'false',
@@ -2833,9 +2999,13 @@ export default defineComponent({
             return false;
           } 
 
+          state.tabbillnumber = 'ordered';
+
           const dataBill = responsePrepare['tHBill']['t-h-bill'];
           if (dataBill.length > 0) {
+            state.dataTable['dataThBill'] = dataBill;
             state.dataTable['saldo'] = dataBill[0]['saldo'];
+            state.billDate = responsePrepare['billDate'];
             state.dataNewOrder = [];
             state.flagRefreshAfterAction = true;
 
@@ -2844,7 +3014,82 @@ export default defineComponent({
             } else {
               checkBill(); 
             }
+          } else if (responsePrepare['flCode2'] == 1) {
+            Notify.create({
+              message: 'Transaction not allowed; Posted item(s) with different billing date found.',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else if (responsePrepare['flCode4'] == 1) {
+            if (state.dataPrepare['doubleCurrency']) {
+
+            }
+            checkBill();
+          } else if (responsePrepare['flCode5'] == 1) {
+            state.flagPrintOrderCheckerEnable = true;
+
+            checkBill();
+          } else if (responsePrepare['flCode3'] == 1) {
+            // Run TS Voucher UI
+             checkBill();
+          } else if (responsePrepare['flCode2'] == 2 && responsePrepare['availBill']) {
+            state.isLoading = false;
+            state.showDialogMergeBill = true;          
+          } else {
+
           }
+        } else {
+          Notify.create({
+            message: 'Please check your internet connection',
+            color: 'red',
+          });
+          state.isLoading = false;
+          return false;
+        }
+      }
+      asyncCall();
+    }
+
+    const getRestInvOpenTable = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvOpenTable', {
+            gname : ' ',
+            room: ' ',
+            userInit: ' ',
+            fromAcct: false,
+            currDept : state.currDept,
+            tischnr : state.dataTable['tischnr'],
+            balance: '?',
+            curedeptFlag: false,
+            userName: ' ',
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          console.log('restInvOpenTable : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          state.dataTable['dataThBill'] = responsePrepare['tHBill']['t-h-bill'];
+          state.dataTable['bilname'] = responsePrepare['tHBill']['t-h-bill'][0]['bilname'];
+          state.dataTable['belegung'] = responsePrepare['tHBill']['t-h-bill'][0]['belegung'];
+          state.dataTable['tischnr'] = responsePrepare['tHBill']['t-h-bill'][0]['tischnr'];
+
+          getRestInvPostingMenu();
         } else {
           Notify.create({
               message: 'Please check your internet connection',
@@ -2899,7 +3144,7 @@ export default defineComponent({
 
     // Delegate Listener
     const onResultTablePlan = (result) => {
-      console.log('result table plan: ', result);
+      // console.log('result table plan: ', result);
       state.dataTable = result;
       checkBill();
 
@@ -2990,7 +3235,7 @@ export default defineComponent({
 
         getHTParam(4, 60);
 
-        console.log('on result change outlet : ', state.dataPrepare);
+        // console.log('on result change outlet : ', state.dataPrepare);
         // onDialogTablePlan(true);
       }
     }
@@ -3081,7 +3326,6 @@ export default defineComponent({
       ...toRefs(state),
       tab: 'variant',
       tabbill: 'calc',
-      tabbillnumber: 'neworder',
       lorem: 'Wastern Flavor',
       dense: false,
       zuggriff,
@@ -3099,7 +3343,7 @@ export default defineComponent({
       onRemoveNewOrder,
       onDialogSplitItem,
       onDialogSplitBill,
-      confirmNewOrder,
+      onClickConfirmNewOrder,
       onDialogPayment, 
       onClickPayment,
       onClickSplitBill,
@@ -3139,6 +3383,9 @@ export default defineComponent({
       getRestInvRunHelp4,
       getRestInvPostingMenu,
       onClickDialogKpr, 
+      onClickMergeBill,
+      getRestInvOpenTable,
+      onClickPrintOrderChecker,
 
     };
   },

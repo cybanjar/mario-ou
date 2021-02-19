@@ -121,7 +121,7 @@ export default defineComponent({
     }
 
     const onClickApproval = () => {
-        console.log("APPROVAL");
+        // console.log("APPROVAL");
     }
 
     return {

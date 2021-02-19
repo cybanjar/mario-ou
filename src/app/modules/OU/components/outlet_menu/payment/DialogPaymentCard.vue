@@ -183,7 +183,7 @@ export default defineComponent({
           state.data.payment = -props.dataPreparePayment['dataTable']['saldo'];
 
           getDataArticle();
-          console.log("selectedPayment", props.dataPreparePayment);
+          // console.log("selectedPayment", props.dataPreparePayment);
         }
       }
     );
@@ -229,7 +229,7 @@ export default defineComponent({
           }
           state.data.dataDetail = response['tHArtikel']['t-h-artikel'];
           state.isLoading = false;
-          console.log('response prepare : ', response);
+          // console.log('response prepare : ', response);
         }
       }
       asyncCall();
@@ -261,7 +261,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response restInvBtnCcard2: ', response);
+          // console.log('response restInvBtnCcard2: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -288,27 +288,27 @@ export default defineComponent({
     }
 
     const getSplitBilBtnCard = () => {
-      console.log('REQUEST : ', {
-            recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
-            billart: state.data.objCardSelected['artnr'],
-            balance: -state.data.payment,
-            paid: state.data.payment,
-            priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
-            dept: props.dataPreparePayment['dataPrepare']['currDept'],
-            transdate: '',
-            changeStr: ' ',
-            price: 0,
-            addZeit: 0,
-            currSelect: props.dataPreparePayment['dataPrepare']['counter'],
-            hogaCard: ' ',
-            cancelStr: " ",
-            amountForeign: state.data.payment,
-            currRoom: " ",
-            userInit: dataStoreLogin['userInit'],
-            ccComment: state.data.cardNumber,
-            guestnr: 0,
-            currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter']
-          });
+      // console.log('REQUEST : ', {
+      //       recIdHBill: props.dataPreparePayment['dataTable']['dataThBill'][0]['rec-id'],
+      //       billart: state.data.objCardSelected['artnr'],
+      //       balance: -state.data.payment,
+      //       paid: state.data.payment,
+      //       priceDecimal: props.dataPreparePayment['dataPrepare']['priceDecimal'],
+      //       dept: props.dataPreparePayment['dataPrepare']['currDept'],
+      //       transdate: '',
+      //       changeStr: ' ',
+      //       price: 0,
+      //       addZeit: 0,
+      //       currSelect: props.dataPreparePayment['dataPrepare']['counter'],
+      //       hogaCard: ' ',
+      //       cancelStr: " ",
+      //       amountForeign: state.data.payment,
+      //       currRoom: " ",
+      //       userInit: dataStoreLogin['userInit'],
+      //       ccComment: state.data.cardNumber,
+      //       guestnr: 0,
+      //       currWaiter: props.dataPreparePayment['dataPrepare']['currWaiter']
+      //     });
       
       async function asyncCall() {
         const [dataPrepare] = await Promise.all([
@@ -348,7 +348,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('splitbillBtnCard : ', responsePrepare);
+          // console.log('splitbillBtnCard : ', responsePrepare);
           responsePrepare['flagPay'] = 'full';
           responsePrepare['payment'] = state.data.payment;
           emit('onDialogPaymentCard', false, 'ok', responsePrepare);
@@ -386,7 +386,7 @@ export default defineComponent({
           break
         }
       }
-      console.log(state.data.objCardSelected)
+      // console.log(state.data.objCardSelected)
     }
 
     const onClickConfirmation = () => {
@@ -400,13 +400,13 @@ export default defineComponent({
     const onOkDialog = () => {
       const dif = (parseInt(state.data.payment) * -1) - parseInt(state.data.balance)
       state.data.fullPaid = dif >= 0 ? true : false;
-      console.log('fullpaid : ', state.data.fullPaid);
+      // console.log('fullpaid : ', state.data.fullPaid);
 
       if (state.data.payment > 0 && state.data.cardSelected != "" && state.data.cardNumber != '') {
         state.showConfirmationDialog = true;
       } else {
         let msg = '';
-        console.log('dif : ', dif);
+        // console.log('dif : ', dif);
 
         if (state.data.payment == 0 || dif != 0) {
           msg = 'Payment incorrect';

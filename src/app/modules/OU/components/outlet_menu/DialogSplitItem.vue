@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import VueTouchKeyboard from 'vue-touch-keyboard';
-import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
+// import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 
 Vue.use(VueTouchKeyboard);
 Vue.use(style);
@@ -98,7 +98,7 @@ export default defineComponent({
       () => props.dialogSplitItem, (dialogSplitItem) => {
         if (props.dialogSplitItem) {
           state.title = 'Split Item ';
-          console.log("data selected split: " + props.dataSelectedSplitItem);
+          // console.log("data selected split: " + props.dataSelectedSplitItem);
         //   initDataUser();
         }
       }
@@ -119,7 +119,7 @@ export default defineComponent({
         state.layout = e.target.dataset.layout;
       } 
 
-      console.log("input", state.input);
+      // console.log("input", state.input);
 
       // if (!state.numpadVisible) {
       //   state.numpadVisible = true;

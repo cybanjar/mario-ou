@@ -224,7 +224,7 @@ export default defineComponent({
     }
 
     const dialogABC = (val) => {
-        console.log("customRemark : ", state.customRemark);
+        // console.log("customRemark : ", state.customRemark);
         state.dialogCustomRemark = val;
 
         if (!val) {

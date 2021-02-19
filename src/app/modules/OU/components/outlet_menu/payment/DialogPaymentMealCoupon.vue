@@ -137,7 +137,7 @@ export default defineComponent({
 
           getPrepare();
 
-          console.log("Mount Meal Coupon : ", props.dataTable);
+          // console.log("Mount Meal Coupon : ", props.dataTable);
         }
       }
     );
@@ -177,7 +177,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response prepare: ', response);
+          // console.log('response prepare: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -226,7 +226,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response restInvBtnTransferPaytype56: ', response);
+          // console.log('response restInvBtnTransferPaytype56: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -254,7 +254,7 @@ export default defineComponent({
 
     // -- OnClick Listener
      const onRowClickTable = (dataRow) => {
-      console.log(dataRow);
+      // console.log(dataRow);
       state.data.dataArtSelected = dataRow;
       
       let dataTable = [];

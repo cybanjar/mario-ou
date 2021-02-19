@@ -253,7 +253,7 @@ export default defineComponent({
 
           getRestInvCreateUserList();
 
-          console.log("On Mount Cashier Transfer : ", props.dataPrepare);
+          // console.log("On Mount Cashier Transfer : ", props.dataPrepare);
         }
       }
     );
@@ -308,7 +308,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvCreateList : ', response);
+          // console.log('restInvCreateList : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -351,7 +351,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvWaiterHelpusrGlist : ', response);
+          // console.log('restInvWaiterHelpusrGlist : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -411,7 +411,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvWaiterTransfer1 : ', response);
+          // console.log('restInvWaiterTransfer1 : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -446,11 +446,11 @@ export default defineComponent({
     const getCheckPassword = () => {
       state.isLoading = true;
 
-      console.log('Request : ', {
-            passwd: state.id,
-            knr : state.data.num,
-            dept: props.dataPrepare['currDept'],
-          });
+      // console.log('Request : ', {
+      //       passwd: state.id,
+      //       knr : state.data.num,
+      //       dept: props.dataPrepare['currDept'],
+      //     });
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -465,7 +465,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('restInvWaiterHelpusrCheckPwd : ', response);
+          // console.log('restInvWaiterHelpusrCheckPwd : ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -581,8 +581,8 @@ export default defineComponent({
             if (state.data.p1079 == 'true') {
               state.showDialogID = true;
             } else {
-              console.log(state.data);
-              console.log('saving ..');
+              // console.log(state.data);
+              // console.log('saving ..');
               getSave();
 
             }

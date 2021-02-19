@@ -160,7 +160,7 @@ export default defineComponent({
           state.title = 'Guest Non Folio Payment';
           state.data.balance = props.dataTable['dataTable']['saldo']
 
-          console.log('On mount non guest folio : ', props.dataTable);
+          // console.log('On mount non guest folio : ', props.dataTable);
 
           getHTParam(1, 879);
         }
@@ -190,7 +190,7 @@ export default defineComponent({
           const responseHTParam = gethtparam || [];
           const okFlag = responseHTParam['outputOkFlag'];
 
-          console.log('responseHTParam : ', responseHTParam);
+          // console.log('responseHTParam : ', responseHTParam);
 
           if (!okFlag) {
             Notify.create({
@@ -228,7 +228,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response prepare: ', response);
+          // console.log('response prepare: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -274,7 +274,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response getCheckCreditLimit: ', response);
+          // console.log('response getCheckCreditLimit: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -305,31 +305,31 @@ export default defineComponent({
     }
 
     const getPaySplitBill = () => {
-      console.log('REQUEST : ', {
-        		pvILanguage: 0,
-            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            bilrecid: state.data.dataSelected['rec-id'],
-            currSelect: props.dataTable['dataPrepare']['counter'],
-            multiVat: 'false',
-            balance: state.data.balance,
-            payType: 3,
-            transdate: '',
-            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
-            foreignRate: props.dataTable['dataPrepare']['foreignRate'],
-            dept: props.dataTable['dataPrepare']['currDept'],
-            changeStr: ' ',
-            addZeit: 0,
-            hogaCard: 0,
-            cancelStr: " ",
-            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
-            currRoom: " ",
-            userInit: dataStoreLogin['userInit'],
-            ccComment: " ",
-            guestnr: state.data.dataSelected['resnr'],
-            tischnr: props.dataTable['dataTable']['tischnr'],
-            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
-            amountForeign: -state.data.balance
-          });
+      // console.log('REQUEST : ', {
+      //   		pvILanguage: 0,
+      //       recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+      //       bilrecid: state.data.dataSelected['rec-id'],
+      //       currSelect: props.dataTable['dataPrepare']['counter'],
+      //       multiVat: 'false',
+      //       balance: state.data.balance,
+      //       payType: 3,
+      //       transdate: '',
+      //       exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+      //       foreignRate: props.dataTable['dataPrepare']['foreignRate'],
+      //       dept: props.dataTable['dataPrepare']['currDept'],
+      //       changeStr: ' ',
+      //       addZeit: 0,
+      //       hogaCard: 0,
+      //       cancelStr: " ",
+      //       currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+      //       currRoom: " ",
+      //       userInit: dataStoreLogin['userInit'],
+      //       ccComment: " ",
+      //       guestnr: state.data.dataSelected['resnr'],
+      //       tischnr: props.dataTable['dataTable']['tischnr'],
+      //       doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+      //       amountForeign: -state.data.balance
+      //     });
       
       async function asyncCall() {
         const [dataPrepare] = await Promise.all([
@@ -373,7 +373,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
+          // console.log('splitbillBtnTransferPaytypegt1 : ', responsePrepare);
           responsePrepare['flagPay'] = 'full';
           responsePrepare['payment'] = state.data.balance;
           emit('onDialogPaymentNonGuestFolio', false, 'ok', responsePrepare);
@@ -404,7 +404,7 @@ export default defineComponent({
 
     // -- OnClick Listener
     const onRowClick = (dataRow) => {
-     console.log(dataRow);
+    //  console.log(dataRow);
 
      for (let i = 0; i<state.data.dataFilteredTable.length; i++) {
         const datarow = state.data.dataFilteredTable[i] as {};

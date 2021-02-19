@@ -136,7 +136,7 @@ export default defineComponent({
           state.title = 'Compliment';
           state.data.balance = props.dataTable['dataTable']['saldo'];
 
-          console.log("On Mount Compliment", props.dataTable);
+          // console.log("On Mount Compliment", props.dataTable);
           getComplimentBuildCompl();
         }
       }
@@ -164,7 +164,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response complimentBuildCompl: ', response);
+          // console.log('response complimentBuildCompl: ', response);
 
 
           if (!okFlag) {
@@ -204,7 +204,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response biltransfer2: ', response);
+          // console.log('response biltransfer2: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -255,7 +255,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response biltransferCheckCreditlimit: ', response);
+          // console.log('response biltransferCheckCreditlimit: ', response);
 
 
           if (!okFlag) {
@@ -292,20 +292,20 @@ export default defineComponent({
     }
 
     const getInvBtnTransferPaytype56 = () => {
-       state.isLoading = true;
-       console.log({
-            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: 0,
-            currDept: props.dataTable['dataPrepare']['currDept'],
-            balanceForeign: state.data.balance,
-            balance: state.data.balance,
-            payType: 5,
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
-            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
-            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
-            userInit: dataStoreLogin['userInit'],
-          })
+      state.isLoading = true;
+      // console.log({
+      //       recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+      //       guestnr: 0,
+      //       currDept: props.dataTable['dataPrepare']['currDept'],
+      //       balanceForeign: state.data.balance,
+      //       balance: state.data.balance,
+      //       payType: 5,
+      //       transdate: date.formatDate((new Date), 'MM/DD/YY'),
+      //       doubleCurrency: props.dataTable['dataPrepare']['doubleCurrency'],
+      //       exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+      //       priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+      //       userInit: dataStoreLogin['userInit'],
+      //     })
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -328,7 +328,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response restInvBtnTransferPaytype56: ', response);
+          // console.log('response restInvBtnTransferPaytype56: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -366,7 +366,7 @@ export default defineComponent({
 
     // -- onClick Listener
     const onRowClickTable = (dataRow) => {
-      console.log(dataRow);
+      // console.log(dataRow);
       state.data.dataSelected = dataRow;
       
       let dataTable = [];

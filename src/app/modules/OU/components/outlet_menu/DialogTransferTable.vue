@@ -166,7 +166,7 @@
         (showDialogTransferTable) => {
           if (props.showDialogTransferTable) {
             state.title = 'Table Transfer';
-            console.log('Data table : ', props.dataTable);
+            // console.log('Data table : ', props.dataTable);
             getTischnrBuildListSelect();
           }
         }
@@ -186,7 +186,7 @@
           state.data.dataSelected['tHBill'].length != 0
             ? state.data.dataSelected['tHBill']['rec-id']
             : 0;
-        console.log('bilrecid : ', bilrecid);
+        // console.log('bilrecid : ', bilrecid);
 
         async function asyncCall() {
           const [data] = await Promise.all([
@@ -206,7 +206,7 @@
           if (data) {
             const response = data || [];
             const okFlag = response['outputOkFlag'];
-            console.log('response : ', response);
+            // console.log('response : ', response);
 
             if (!okFlag) {
               Notify.create({
@@ -244,7 +244,7 @@
             const response = data || [];
             const okFlag = response['outputOkFlag'];
 
-            console.log('response Prepare transafer table: ', response);
+            // console.log('response Prepare transafer table: ', response);
 
             if (!okFlag) {
               Notify.create({
@@ -285,7 +285,7 @@
             const response = data || [];
             const okFlag = response['outputOkFlag'];
 
-            console.log('response transtischBtnExit: ', response);
+            // console.log('response transtischBtnExit: ', response);
 
             if (!okFlag) {
               Notify.create({
@@ -297,8 +297,8 @@
             }
 
             state.data.dataSelected['tHBill'] = response['tHBill']['t-h-bill'];
-            console.log('table : ', props.dataTable);
-            console.log('table selected : ', state.data.dataSelected);
+            // console.log('table : ', props.dataTable);
+            // console.log('table selected : ', state.data.dataSelected);
 
             if (response['errCode'] == 1) {
               Notify.create({
@@ -336,7 +336,7 @@
           state.layout = e.target.dataset.layout;
         }
 
-        console.log('input', state.input);
+        // console.log('input', state.input);
       };
 
       const tableHeaders = [
@@ -404,7 +404,7 @@
 
         dataRow['selected'] = true;
         state.data.dataSelected = dataRow;
-        console.log(state.data.dataSelected);
+        // console.log(state.data.dataSelected);
       };
 
       const onOkDialog = () => {

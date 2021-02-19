@@ -203,7 +203,7 @@ export default defineComponent({
 
           getHTParam(4, 491);
 
-          console.log("On mount City Ledegr : ", props.dataTable);
+          // console.log("On mount City Ledegr : ", props.dataTable);
         }
       }
     );
@@ -255,7 +255,7 @@ export default defineComponent({
           const responseHTParam = gethtparam || [];
           const okFlag = responseHTParam['outputOkFlag'];
 
-          console.log('responseHTParam : ', responseHTParam);
+          // console.log('responseHTParam : ', responseHTParam);
 
           if (!okFlag) {
             Notify.create({
@@ -291,7 +291,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response prepare: ', response);
+          // console.log('response prepare: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -333,7 +333,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response guestAroutstand: ', response);
+          // console.log('response guestAroutstand: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -369,21 +369,21 @@ export default defineComponent({
     const getPayType1 = () => {
       state.isLoading = true;
 
-      console.log('request', {
-            pvILanguage : 0,
-            recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            guestnr: state.data.dataGuestSelected['gastnr'],
-            currDept: props.dataTable['dataPrepare']['currDept'],
-            paid: state.data.payment,
-            exchgRate: props.dataTable['dataPrepare']['exchgRate'],
-            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
-            balance: state.data.balance,
-            transdate: date.formatDate((new Date), 'MM/DD/YY'),
-            discArt1: props.dataTable['dataPrepare']['discArt1'],
-            discArt2: props.dataTable['dataPrepare']['discArt2'],
-            discArt3: props.dataTable['dataPrepare']['discArt3'],
-            kellnerKellnerNr: props.dataTable['dataPrepare']['tKellner']['t-kellner'][0]['kellner-nr'],
-           })
+      // console.log('request', {
+      //       pvILanguage : 0,
+      //       recId: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+      //       guestnr: state.data.dataGuestSelected['gastnr'],
+      //       currDept: props.dataTable['dataPrepare']['currDept'],
+      //       paid: state.data.payment,
+      //       exchgRate: props.dataTable['dataPrepare']['exchgRate'],
+      //       priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+      //       balance: state.data.balance,
+      //       transdate: date.formatDate((new Date), 'MM/DD/YY'),
+      //       discArt1: props.dataTable['dataPrepare']['discArt1'],
+      //       discArt2: props.dataTable['dataPrepare']['discArt2'],
+      //       discArt3: props.dataTable['dataPrepare']['discArt3'],
+      //       kellnerKellnerNr: props.dataTable['dataPrepare']['tKellner']['t-kellner'][0]['kellner-nr'],
+      //      })
 
       async function asyncCall() {
         const [data] = await Promise.all([
@@ -408,7 +408,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          console.log('response restInvBtnTransferPaytype1: ', response);
+          // console.log('response restInvBtnTransferPaytype1: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -444,26 +444,26 @@ export default defineComponent({
     }
 
     const getSplitBilBtnCityLedger = () => {
-      console.log('REQUEST : ', {
-            pvILanguage : 0,
-            recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
-            dept: props.dataTable['dataPrepare']['currDept'],
-            guestnr: state.data.dataGuestSelected['gastnr'],
-            paid: state.data.payment,
-            priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
-            transdate: '',
-            changeStr: ' ',
-            tischnr: props.dataTable['dataTable']['tischnr'],
-            addZeit: 0,
-            currSelect: props.dataTable['dataPrepare']['counter'],
-            hogaCard: ' ',
-            cancelStr: " ",
-            currWaiter: props.dataTable['dataPrepare']['currWaiter'],
-            amountForeign: state.data.payment,
-            currRoom: " ",
-            userInit: dataStoreLogin['userInit'],
-            ccComment: " ",
-          });
+      // console.log('REQUEST : ', {
+      //       pvILanguage : 0,
+      //       recIdHBill: props.dataTable['dataTable']['dataThBill'][0]['rec-id'],
+      //       dept: props.dataTable['dataPrepare']['currDept'],
+      //       guestnr: state.data.dataGuestSelected['gastnr'],
+      //       paid: state.data.payment,
+      //       priceDecimal: props.dataTable['dataPrepare']['priceDecimal'],
+      //       transdate: '',
+      //       changeStr: ' ',
+      //       tischnr: props.dataTable['dataTable']['tischnr'],
+      //       addZeit: 0,
+      //       currSelect: props.dataTable['dataPrepare']['counter'],
+      //       hogaCard: ' ',
+      //       cancelStr: " ",
+      //       currWaiter: props.dataTable['dataPrepare']['currWaiter'],
+      //       amountForeign: state.data.payment,
+      //       currRoom: " ",
+      //       userInit: dataStoreLogin['userInit'],
+      //       ccComment: " ",
+      //     });
       
       async function asyncCall() {
         const [dataPrepare] = await Promise.all([
@@ -502,7 +502,7 @@ export default defineComponent({
             return false;
           }
 
-          console.log('splitbillBtnTransferPaytype1 : ', responsePrepare);
+          // console.log('splitbillBtnTransferPaytype1 : ', responsePrepare);
           responsePrepare['flagPay'] = 'full';
           responsePrepare['payment'] = state.data.payment;
           emit('onDialogPaymentCityLedger', false, 'ok', responsePrepare);
@@ -514,7 +514,7 @@ export default defineComponent({
 
     // -- onClick Listener 
     const onRowClick = (dataRow) => {
-      console.log('On Click ', dataRow);
+      // console.log('On Click ', dataRow);
 
       for (let i = 0; i<state.data.filteredDataTable.length; i++) {
         const datarow = state.data.filteredDataTable[i] as {};
@@ -567,10 +567,10 @@ export default defineComponent({
             getGuestAroutStand();
           } else {
             getPayType1();
-            console.log('Hit API ? 0');          
+            // console.log('Hit API ? 0');          
           }
         } else if (state.caseType == 1) {
-          console.log('Hit API ? 1');          
+          // console.log('Hit API ? 1');          
 
           state.data.showConfirmationDialog = false;
           // emit('onDialogPaymentCityLedger', false, 'ok', {});
