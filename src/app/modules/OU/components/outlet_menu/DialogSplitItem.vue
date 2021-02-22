@@ -32,7 +32,7 @@ import VueTouchKeyboard from 'vue-touch-keyboard';
 // import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 
 Vue.use(VueTouchKeyboard);
-Vue.use(style);
+// Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
