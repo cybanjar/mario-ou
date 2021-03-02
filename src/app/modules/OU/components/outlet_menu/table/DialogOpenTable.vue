@@ -7,32 +7,36 @@
 
       <div>
         <q-card-section>
-          <SInput autofocus v-model="pax" label-text="Pax" name="mdi-magnify" data-layout="numeric" type="number" ref="paxBox" @focus="showKeyboard">
-            <!-- <template v-slot:append>
-              <q-icon @click="showKeyboard" class="cursor-pointer"/>
-            </template> -->
-          </SInput>
-
-          <SInput v-model="room" label-text="Room" data-layout="numeric" ref="roomBox" @focus="showKeyboard" @change="(v) => { onChangeRoom(v); }">
-            <template v-if="pax != ''" v-slot:append>
-              <q-icon @click="openDialogRoomList" name="mdi-magnify" class="cursor-pointer" />
-            </template>
-          </SInput>
-
-          <SInput outlined v-model="guest" label-text="Guest" data-layout="compact" ref="guestBox" @focus="showKeyboard">
-            <template v-if="dataSelected['flagChangeGuest']" v-slot:append>
-              <q-icon @click="openDialogSelectGuest" name="mdi-magnify" class="cursor-pointer" />
-            </template>
-          </SInput>
-          
-          <div class="row q-gutter-xs">
-              <div class="col">
-                <SInput outlined v-model="time" label-text="Time" :disable="true" readonly/>
-              </div>
-
-              <div class="col">
+          <div class="row">
+            <div class="col-3 q-pr-sm">
+              <SInput autofocus v-model="pax" label-text="Pax" name="mdi-magnify" data-layout="numeric" type="number" ref="paxBox" @focus="showKeyboard">
+                <!-- <template v-slot:append>
+                  <q-icon @click="showKeyboard" class="cursor-pointer"/>
+                </template> -->
+              </SInput>
+            </div>
+            <div class="col-3 q-pr-sm">
+              <SInput v-model="room" label-text="Room" data-layout="numeric" ref="roomBox" @focus="showKeyboard" @change="(v) => { onChangeRoom(v); }">
+                <template v-if="pax != ''" v-slot:append>
+                  <q-icon @click="openDialogRoomList" name="mdi-magnify" class="cursor-pointer" />
+                </template>
+              </SInput>
+            </div>
+            <div class="col-6">
+              <SInput outlined v-model="guest" label-text="Guest" data-layout="compact" ref="guestBox" @focus="showKeyboard">
+                <template v-if="dataSelected['flagChangeGuest']" v-slot:append>
+                  <q-icon @click="openDialogSelectGuest" name="mdi-magnify" class="cursor-pointer" />
+                </template>
+              </SInput>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col q-pr-sm">
+                <SInput outlined v-model="time" label-text="Time" :disable="true" readonly/>              
+            </div>
+            <div class="col">
                 <SInput outlined v-model="saldo" label-text="Amount" :disable="true" readonly/>
-              </div>
+            </div>
           </div>
 
           <vue-touch-keyboard 

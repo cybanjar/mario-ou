@@ -17,10 +17,18 @@
                   </img>
                 </q-btn>
               </h5>
+              
+              <q-btn-group rounded flat class="q-ml-lg" style="margin-top: -30px" >
+                <q-btn rounded color="primary" label="All" icon="mdi-food" style="width: 150px" />
+                <q-btn rounded outline color="primary" label="Food" icon="mdi-noodles" style="width: 150px" />
+                <q-btn rounded outline color="primary" label="Beverange" icon="mdi-coffee" style="width: 150px" />
+                <q-btn rounded outline color="primary" label="Other" icon="mdi-dots-grid" style="width: 150px" />
+              </q-btn-group>
+
               <div class="q-gutter-y-md">                
-                <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 220px">
+                <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 200px">
                   <template v-for="datarow in dataFilteredSubGroup">
-                    <q-card flat bordered class="my-card" 
+                    <q-card flat bordered 
                       style="width:240px" 
                       :key="datarow['zknr']" 
                       @click="onClickSubGroup(datarow)">
@@ -33,7 +41,7 @@
               </div>
 
               <div>
-                <q-card class="q-ml-md searching-restaurant">
+                <q-card flat class="q-ml-md searching-restaurant">
                   <div class="row justify-between items-center">
                     <div class="col-4 ">
                       <strong :style="{ fontSize: '22px' }">MENU</strong>
@@ -64,7 +72,7 @@
                     </div>
                   </div>
                 </q-card>
-                <div class="q-pa-md row items-start scroll overflow" style="height: 220px">
+                <div class="q-pa-md row items-start scroll overflow" style="height: 200px">
                   <template v-for="datarow in dataFilteredArticle">
                     <q-card flat bordered
                       class="my-card q-mr-md q-mb-md" 
@@ -279,7 +287,7 @@
               </div>
 
               <!-- Bill Number -->
-              <q-card class="bg-dark q-pa-md q-ml-lg q-mt-sm">
+              <q-card class="bg-dark rounded-xl q-pa-md q-ml-lg q-mt-sm">
                 <div class="row text-white"> 
                   <div class="col-6">
                     <p class="text-subtitle1 text-grey-7">Bill Number : <span class="q-ml-sm text-white text-weight-bold">{{dataTable['rechnr']}}</span></p>
