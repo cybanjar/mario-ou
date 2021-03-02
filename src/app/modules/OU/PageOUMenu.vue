@@ -82,7 +82,7 @@
 
             <div class="col-md-4">
               <div class="q-ml-lg q-gutter-y-md row justify-between">
-                  <q-btn class="col" flat >
+                  <q-btn @click="onClickTableTransfer" class="col" flat >
                     <q-img
                       class="img-collage"
                       src="../../icons/OU/collage/TableTransfer.svg"
@@ -92,7 +92,7 @@
                       </q-tooltip>
                     </q-img>
                   </q-btn>
-                  <q-btn class="col" flat >
+                  <q-btn @click="onClickDialogSelectOrderTaker()" class="col" flat >
                     <q-img
                       class="img-collage"
                       src="../../icons/OU/collage/SelectOrderTakers.svg"
@@ -102,7 +102,7 @@
                       </q-tooltip>
                     </q-img>
                   </q-btn>
-                  <q-btn class="col" flat >
+                  <q-btn @click="onClickDiscount()" class="col" flat >
                     <q-img
                       class="img-collage"
                       src="../../icons/OU/collage/Discount.svg"
@@ -112,7 +112,7 @@
                       </q-tooltip>
                     </q-img>
                   </q-btn>
-                  <q-btn class="col" flat >
+                  <q-btn @click="flagPrintOrderCheckerEnable ? onClickPrintOrderChecker : null" class="col" flat >
                     <q-img
                       class="img-collage"
                       src="../../icons/OU/collage/PrintOrderChecker.svg"
@@ -132,7 +132,7 @@
                       </q-tooltip>
                     </q-img>
                   </q-btn>
-                  <q-btn class="col" flat >
+                  <q-btn @click="onClickPrintBill = true" class="col" flat >
                     <q-img
                       class="img-collage"
                       src="../../icons/OU/collage/BillPrint.svg"
@@ -3521,11 +3521,11 @@ export default defineComponent({
         icon: 'OU/Icon-ChangeOutlet',
       },
       {
-        handler: () => onClickChangeOutlet(),
+        handler: () => onClickDialogChangeUser(),
         icon: 'OU/collage/ChangeUser',
       },
       {
-        handler: () => onClickChangeOutlet(),
+        handler: () => getRestInvOpenStandTable(),
         icon: 'OU/collage/StandingMode',
       },
     ]);
