@@ -3,7 +3,7 @@
     <div id="input" class="q-pa-md">
       <q-form @submit="onSearch">
         <SInput v-if="shape == '2'" label-text="Description" v-model="description"/>
-        <SInput v-else label-text="Article Number" v-model="articleNumber"/>
+        <SInput v-else label-text="Article Number" v-model="articleNumber" mask="##########"/>
         <div id="radio">
           <q-radio size="xs" v-model="shape" val="1" label="Article Number" />
           <q-radio size="xs" v-model="shape" val="2" label="Description" />

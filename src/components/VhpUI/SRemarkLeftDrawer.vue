@@ -1,8 +1,17 @@
 <template>
   <div class="q-mb-md">
-    <p class="q-mb-sm">
-      {{ label }}
-    </p>
+    <div class="label-layout">
+      <p class="q-mb-sm">
+        {{ label }}
+      </p>
+      <img
+        v-if="icon"
+        :src="require(`~/app/icons${icon}`)"
+        alt="icon"
+        class="q-mb-sm cursor-pointer"
+        @click="onClickIcon"
+      />
+    </div>
 
     <div class="remark q-pa-xs" :class="[right && 'text-right']">
       {{ value }}
@@ -14,15 +23,24 @@
 import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
+  inheritAttrs: false,
   props: {
     label: { type: String, required: true },
     value: { type: String, default: null },
     right: { type: Boolean, default: false },
+    icon: { type: String },
+    onClickIcon: { type: Function },
   },
 });
 </script>
 
 <style lang="scss" scoped>
+.label-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .remark {
   overflow-x: scroll;
   color: #2887d2;

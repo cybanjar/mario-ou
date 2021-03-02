@@ -56,7 +56,7 @@ export default defineComponent({
       state.prepare.last2Yr = resPrepare.currYr - 2;
       state.prepare.closeYear = resPrepare.closeYear;
       state.filters.coaOptions = resCoa
-        ? mapSelectItems(resCoa, 'fibukonto', 'bezeich')
+        ? mapSelectItems(resCoa, 'bezeich', 'fibukonto')
         : [];
       state.filters.mainAccounts = resMainAccounts
         ? resMainAccounts.map(

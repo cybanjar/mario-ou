@@ -56,14 +56,14 @@ import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 import {displayTime} from '../utilsOU/utils';
 import { date, Notify } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
-import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
+// import style from '~/css/custom/vue-touch-keyboard.scss';
 import Vue from 'vue';
 
 // import numkeyboard from 'vue-numkeyboard';
 // import 'vue-numkeyboard/style.css';
 
 Vue.use(VueTouchKeyboard);
-Vue.use(style);
+// Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 
 // Vue.use(numkeyboard);
@@ -143,22 +143,53 @@ export default defineComponent({
           }
           state.pax = responsePrepare['pax'];
           state.tableno = dataSelected['tableno'];
+
           let time = dataSelected['timestart'];
           state.timefrom = time.slice(0, 2) + ":" + time.slice(2);
           time = dataSelected['timeend'];
           state.timeto = time.slice(0, 2) + ":" + time.slice(2);
-          console.log('state', state);
         }
       }
       asyncCall();
     }
 
     const prepareSaveData = () => {
-       async function asyncCall() {
+      const fromTime = state.timefrom.replace(':', '');
+      const toTime = state.timeto.replace(':', '');
+
+      console.log('fromTime', parseInt(fromTime));
+      console.log('toTime', parseInt(toTime));
+
+      console.log('request : ', JSON.stringify({
+        pvlLanguage: 1,
+        movedTisch: state.tableno,
+        sRecid: 0,
+        currDept: 1,
+        currDate: date.formatDate(props.dataSelected.currdate, 'MM/DD/YYYY'),
+        vonZeit: fromTime,
+        bisZeit: toTime,
+        pax: state.pax,
+        telefon: state.phone,
+        gname: state.guestname,
+        userInit: '01',
+        comments: state.remarks,
+      }));
+
+      async function asyncCall() {
         const [dataPrepare] = await Promise.all([
-          $api.outlet.getOUPrepare('resPlanMkresPrepare', {
+          $api.outlet.getOUPrepare('resPlanMkresBtnExit', {
+            pvlLanguage: 1,
+            movedTisch: state.tableno,
             sRecid: 0,
-            currDept: 1
+            currDept: 1,
+            currDate: date.formatDate(props.dataSelected.currdate, 'MM/DD/YYYY'),
+            vonZeit: fromTime,
+            bisZeit: toTime,
+            pax: state.pax,
+            telefon: state.phone == '' ? ' ': state.phone,
+            gname: state.guestname,
+            userInit: '01',
+            comments: state.remarks,
           }),
         ]);
 
@@ -168,6 +199,8 @@ export default defineComponent({
           // state.dataPrepare = responsePrepare;   
 
           const okFlag = responsePrepare['outputOkFlag'];
+          const msgStr = responsePrepare['msgStr'];
+
           if (!okFlag) {
             Notify.create({
               message: 'Failed when retrive data, please try again',
@@ -176,41 +209,27 @@ export default defineComponent({
             state.isLoading = false;
             return false;
           }
-          async function asyncCall() {
-            const [dataPrepare] = await Promise.all([
-              $api.outlet.getOUPrepare('resPlanMkresBtnExit44', {
-                pvlLanguage: 1,
-                movedTisch: state.tableno,
-                sRecid: 0,
-                currDept: 1,
-                currDate: '',
-                vonZeit: '',
-                bisZeit: '',
-                pax: '',
-                telefon: '',
-                gname: '',
-                userInit: '',
-                comments: '',
-              }),
-            ]);
 
-            if (dataPrepare) {
-              const responsePrepare = dataPrepare || [];
-              console.log("response prepare save : ", responsePrepare);
-              // state.dataPrepare = responsePrepare;   
-
-              const okFlag = responsePrepare['outputOkFlag'];
-              if (!okFlag) {
-                Notify.create({
-                  message: 'Failed when retrive data, please try again',
-                  color: 'red',
-                });
-                state.isLoading = false;
-                return false;
-              }
-            }
+          if (msgStr != '') {
+            Notify.create({
+              message: msgStr,
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } else {
+            state.guestname = ' ';
+            state.dataSearchSelected= {};
+            state.guestname= '';
+            state.phone= '';
+            state.pax= '';
+            state.tableno= '';
+            state.timefrom= '';
+            state.timeto= '';
+            state.remarks= '';
+            emit('onDialogNewReservation', false);
           }
-          asyncCall();
+          state.isLoading = false;
         }
       }
       asyncCall();
@@ -219,7 +238,7 @@ export default defineComponent({
     watch(
       () => props.dialogNewReservation, (show) => {
         if ((props.dialogNewReservation) && (props.selected != undefined)) {
-          console.log('watch: ', props.dataSelected);
+          console.log('watch ' + props.caseType +' : ', props.dataSelected);
           state.dataSearchSelected = props.dataSelected;
           restDataLoad(props.dataSelected);
         }
@@ -247,7 +266,7 @@ export default defineComponent({
       state.numpadVisible = false;
       console.log('state', state);
       // convertTime24H(state.timefrom);
-      // prepareSaveData();
+      prepareSaveData();
             
       // emit('onDialogNewReservation', false);
     }

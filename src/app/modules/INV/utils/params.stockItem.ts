@@ -20,7 +20,8 @@ export const data_table = (data) => {
             'ek-letzter': `${formatterMoney(items['ek-letzter'])}.00`,
             'vk-preis': formatterMoney(Number(result)) + last_result,
             lieferfrist: items.lieferfrist,
-            fibukonto: items.fibukonto.substring(0, 8)
+            fibukonto: items.fibukonto.substring(0, 8),
+            selected: false
         }
         return data
     })

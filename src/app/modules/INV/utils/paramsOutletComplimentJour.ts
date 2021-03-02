@@ -2,9 +2,11 @@ import { date } from 'quasar';
 import {formatterMoney} from 'src/app/helpers/formatterMoney.helper'
 export const dataState = (GET_DATA, key) => {
   const dataDate = date.formatDate(GET_DATA.lastAcctdate, 'MM-DD-YYYY');
+  const datadate = new Date(dataDate)
+  datadate.setDate(datadate.getDate()+1)
   const data = () => ({
     fromDate: key == 'prepare' ? new Date(dataDate) : GET_DATA.searches.fromDate,
-    toDate: key == 'prepare' ? new Date(dataDate) : GET_DATA.searches.toDate,
+    toDate: key == 'prepare' ? datadate : GET_DATA.searches.toDate,
     refNum: key == 'prepare' ? '' : GET_DATA.searches.refNum,
     des: key == 'prepare' ? '' : GET_DATA.searches.des,
     hasilDebit: key == 'prepare' ? 0 : formatterMoney(GET_DATA.debits),

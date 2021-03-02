@@ -1,6 +1,6 @@
 export enum ModuleAbbr {
   GL = 'GeneralLedger',
-  // FOC = 'FrontOfficeCashier',
+  FOC = 'FrontOfficeCashier',
   HK = 'Housekeeping',
   AP = 'AccountsPayable',
   AR = 'AccountsReceivable',
@@ -10,6 +10,10 @@ export enum ModuleAbbr {
   FA = 'FixedAssets',
   TO = 'TelephoneOperator',
   INV = 'Inventory',
+  GC = 'GeneralCashier',
+  IA = 'Income Audit',
+  NA = 'Night Audit',
   OU = 'Outlet',
-  GC = 'GeneralCashier'
+  ST = 'Setting',
+  SC = 'SalesAndCatering'
 }

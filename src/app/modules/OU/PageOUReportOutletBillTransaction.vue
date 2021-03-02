@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,8 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
+        row-key="name"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +33,9 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
+import { formatToBL } from '~/app/helpers/formatterDate.helper';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -56,77 +61,93 @@ export default defineComponent({
         {
             label: "Date",
             field: "datum",
+            name: "datum",
             sortable: false,
-            align: "center",
+            align: "left",
             width: 120,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatToBL(val),
         },{
-            label: "TbNo", 
+            label: "Table Number", 
             field: "tabelno",
+            name: "tabelno",
             sortable: false,
-            align: "right",
+            align: "left",
             width: 200,
             divider: true
         }, {
-            label: "Bill-No", 
+            label: "Bill Number", 
             field: "billno",
+            name: "billno",
             sortable: false,
-            align: "right",
+            align: "left",
             width: 150,
             divider: true
         }, {
-            label: "Art-No", 
+            label: "Article Number", 
             field: "artno",
+            name: "artno",
             sortable: false,
-            align: "right",
+            align: "left",
             width: 150, 
             divider: true
         },{
             label: "Description", 
-            field: "dscr",
+            field: "descr",
+            name: "descr",
             sortable: false,
             align: "left",
             width: 150, 
             divider: true
         }, {
-            label: "Qty", 
+            label: "Quantity", 
             field: "qty",
+            name: "qty",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },{
             label: "Sales", 
             field: "sales",
+            name: "sales",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Payment", 
             field: "payment",
+            name: "payment",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
             label: "Department", 
             field: "depart",
+            name: "depart",
             sortable: false,
             align: "left",
         },  {
-            label: "ID", 
+            label: "Posting ID", 
             field: "id",
+            name: "id",
             sortable: false,
-            align: "center",
+            align: "left",
         },  {
             label: "Time", 
             field: "zeit",
+            name: "zeit",
             sortable: false,
-            align: "center",
+            align: "left",
         },  {
             label: "Guest Name", 
             field: "gname",
+            name: "gname",
             sortable: false,
             align: "left",
         }
@@ -221,9 +242,9 @@ export default defineComponent({
         ]);
             
         if (dataResponse) {
-          const data  = dataResponse || [];
-          const okFlag = data ['outputOkFlag'];
-          if (!okFlag ) {
+          const data = dataResponse || [];
+          const okFlag = data['outputOkFlag'];
+          if (!okFlag) {
             Notify.create({
               message: 'Failed when retrive data, please try again',
               color: 'red',
@@ -266,6 +287,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Outlet Bill Transaction');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -273,6 +300,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

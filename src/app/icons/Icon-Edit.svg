@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="48px" height="45px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 48 45"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#CF6100}
+    .fil1 {fill:white}
+    .fil3 {fill:#CF6100;fill-rule:nonzero}
+    .fil5 {fill:url(#id0)}
+    .fil2 {fill:url(#id1)}
+    .fil4 {fill:url(#id2)}
+   ]]>
+  </style>
+  <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="26.8772" y1="22.7764" x2="38.0575" y2="8.28898">
+   <stop offset="0" style="stop-opacity:1; stop-color:#E3AB4B"/>
+   <stop offset="0.631373" style="stop-opacity:1; stop-color:#D98626"/>
+   <stop offset="1" style="stop-opacity:1; stop-color:#CF6100"/>
+  </linearGradient>
+  <linearGradient id="id1" gradientUnits="userSpaceOnUse" x1="1.33937" y1="11.2559" x2="5.51575" y2="5.63622">
+   <stop offset="0" style="stop-opacity:1; stop-color:#FFCC00"/>
+   <stop offset="0.631373" style="stop-opacity:1; stop-color:#E79700"/>
+   <stop offset="1" style="stop-opacity:1; stop-color:#CF6100"/>
+  </linearGradient>
+  <linearGradient id="id2" gradientUnits="userSpaceOnUse" xlink:href="#id1" x1="18.1181" y1="32.5335" x2="18.3449" y2="27.0035">
+  </linearGradient>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_790383240">
+   <path class="fil0" d="M32 4l0 6 -15 15 6 6 9 -9 0 23c0,0 -32,-1 -32,0 0,1 0,-33 0,-33l5 -8 1 0c0,0 26,0 26,0zm-10 28l-6 -6 -2 8 8 -2z"/>
+   <path class="fil1" d="M31 5l0 6 -14 14 6 6 8 -7 0 19c0,0 -30,0 -30,0 0,1 0,-30 0,-30l5 -7 0 -1c0,0 25,0 25,0zm-9 27l-6 -6 -2 8 8 -2z"/>
+   <g>
+    <path class="fil2" d="M6 5l0 5c0,0 0,2 -1,2 -1,0 -5,0 -5,0l6 -7 0 0z"/>
+    <path id="1" class="fil3" d="M6 10l0 0 0 0 0 -5 0 0 0 5zm0 0l0 0 0 0 0 0zm-1 2l0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0zm-4 0l-1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 1 0zm5 -7l0 0 0 0 -5 7 -1 0 6 -7zm0 0l0 -1 0 1 0 0zm0 0l0 0 0 0 0 0 0 0 0 0zm0 0l0 0 0 0 0 0z"/>
+   </g>
+   <g id="_790383696">
+    <polygon class="fil4" points="22,32 16,26 14,34 "/>
+    <polygon class="fil5" points="23,31 17,25 42,0 48,6 "/>
+   </g>
+  </g>
+ </g>
+</svg>

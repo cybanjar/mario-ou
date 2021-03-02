@@ -29,3 +29,26 @@ export function formatterMoney(
     throw e;
   }
 }
+
+export function moneyDecimal(
+  money: string,
+  decimalCount = 2,
+  decimal = '.',
+  thousands = ',',
+  addDecimal = false
+) {
+  try {
+    const decimalRe = new RegExp(
+      `(?<=.)\\${decimal}\\d{${decimalCount}}$`,
+      'g'
+    );
+    const thousandRe = new RegExp(`${thousands}(?<!\\d{3})`, 'g');
+
+    const prime = addDecimal ? money : money.replace(decimalRe, '');
+    const realNumber = prime.replace(thousandRe, '');
+
+    return parseFloat(realNumber);
+  } catch (e) {
+    throw e;
+  }
+}

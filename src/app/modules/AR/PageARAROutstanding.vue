@@ -1,60 +1,46 @@
 <template>
   <q-page>
     <q-drawer :value="true" side="left" bordered :width="250" persistent>
-      <SearchOutstandingBalance @search="onSearch" />
+      <SearchOutstanding @search="onSearch" />
     </q-drawer>
-    <div class="q-pa-lg">
-      <div class="q-mb-md">
-        <q-btn flat round class="q-mr-lg" @click="tablePrep.refetch">
-          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
-        </q-btn>
+    <div class="q-pa-lg row">
+      <SharedModuleActions @onActions="mapActions" />
+      <div class="col-12">
+        <TableOutstanding
+          :loading="tablePrep.data.isLoading"
+          :is-manual-inv-checked="searchFilter && searchFilter.showInv"
+          :data="tablePrep.result"
+          @action:delete="onDelete"
+          @action:edit="onEdit"
+        />
       </div>
-      <TableOutstandingBalance
-        :loading="tablePrep.data.isLoading"
-        :is-manual-inv-checked="searchFilter && searchFilter.showInv"
-        :data="tablePrep.result"
-        @action:delete="onDelete"
-        @action:edit="onEdit"
-      />
     </div>
     <DialogManualAR
-      :value="showManualAR.status"
-      @hide="showManualAR.hide"
+      :value="manualARDialog.status"
+      @hide="manualARDialog.hide"
     ></DialogManualAR>
   </q-page>
 </template>
 <script lang="ts">
-import {
-  defineComponent,
-  inject,
-  onUnmounted,
-  onMounted,
-  ref,
-  unref,
-} from '@vue/composition-api';
-import { IconSymbol } from '~/layouts/MainLayout.vue';
+import { defineComponent, ref, unref } from '@vue/composition-api';
 import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
 import { reformDebitListData } from './utils/reformData';
 import { useDialog } from '~/app/shared/compositions/use-dialog.composition';
+import { useExtraMenu } from '~/app/shared/compositions/use-extra-menu';
 export default defineComponent({
   setup(props, { root: { $api, $q } }) {
-    const menu: any = inject(IconSymbol);
     const searchFilter = ref();
     const billNumber = ref('');
-    const showManualAR = useDialog();
-    onMounted(() => {
-      if (menu?.value) {
-        menu.value.push({
-          handler: () => {
-            showManualAR.show();
-          },
-          icon: require('../../icons/AR/Icon-ManualAR.svg'),
-        });
-      }
-    });
+    const manualARDialog = useDialog(false);
+
+    useExtraMenu([
+      {
+        handler: () => {
+          manualARDialog.show();
+        },
+        icon: 'AR/Icon-ManualAR',
+      },
+    ]);
 
     const tablePrep = usePrepare(
       false,
@@ -91,14 +77,8 @@ export default defineComponent({
       };
     }
 
-    onUnmounted(() => {
-      if (menu?.value) {
-        menu.value = [];
-      }
-    });
-
     function hideManualAR() {
-      showManualAR.status.value = false;
+      // showManualAR.status.value = false;
     }
 
     function onSearch(filter, billNum) {
@@ -123,8 +103,19 @@ export default defineComponent({
       editPrep.refetch(params);
     }
 
+    function mapActions(name: string) {
+      switch (name) {
+        case 'onRefresh':
+          tablePrep.refetch();
+          break;
+        default:
+          break;
+      }
+    }
+
     return {
-      showManualAR,
+      manualARDialog,
+      mapActions,
       onSearch,
       tablePrep,
       searchFilter,
@@ -134,10 +125,10 @@ export default defineComponent({
   },
   components: {
     DialogManualAR: () => import('./components/DialogManualAR.vue'),
-    SearchOutstandingBalance: () =>
-      import('./components/SearchOutstandingBalance.vue'),
-    TableOutstandingBalance: () =>
-      import('./components/TableOutstandingBalance.vue'),
+    SearchOutstanding: () => import('./components/SearchAROutstanding.vue'),
+    TableOutstanding: () => import('./components/TableAROutstanding.vue'),
+    SharedModuleActions: () =>
+      import('../../shared/components/SharedModuleActions.vue'),
   },
 });
 </script>

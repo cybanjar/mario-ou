@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +32,8 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -83,8 +86,8 @@ export default defineComponent({
         const [dataOrderTakerList] = await Promise.all([
           $api.outlet.getOUTableList('getOrderTakerList', {
             usrNr: state2.userID.value,
-            fromDate: date.formatDate(state2.date.start, 'MM/DD/YYYY'),
-            toDate: date.formatDate(state2.date.end, 'MM/DD/YYYY'),
+            fromDate: date.formatDate(state2.inputDate.start, 'MM/DD/YYYY'),
+            toDate: date.formatDate(state2.inputDate.end, 'MM/DD/YYYY'),
           }),
         ]);
 
@@ -119,73 +122,89 @@ export default defineComponent({
         label: 'Date',
         field: 'datum',
         name: 'datum',
-        align: 'right',
+        align: 'left',
         sortable: false,
       },
       {
-        label: 'TbNo',
+        label: 'Table Number',
         field: 'tableno',
         name: 'tableno',
-        align: 'center',
+        align: 'left',
         sortable: false,
       },
       {
-        label: 'Bill-No',
+        label: 'Bill Number',
         field: 'billno',
         name: 'billno',
-        align: 'right',
+        align: 'left',
         sortable: false,
       },
 
       {
-        label: 'ArtNo',
+        label: 'Article Number',
         field: 'artno',
         name: 'artno',
+        align: 'left',
         sortable: false,
       },
       {
         label: 'Description',
         field: 'bezeich',
         name: 'bezeich',
+        align: 'left',
         sortable: false,
       },
       {
-        label: 'Qty',
+        label: 'Quantity',
         field: 'qty',
         name: 'qty',
         sortable: false,
+        align: 'right',
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Amount',
         field: 'amount',
         name: 'amount',
         sortable: false,
+        align: 'right',
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Department',
         field: 'departement',
         name: 'departement',
+        align: 'left',
         sortable: false,
       },
       {
         label: 'Time',
         field: 'zeit',
         name: 'zeit',
+        align: 'left',
         sortable: false,
       },
       {
-        label: 'ID',
+        label: 'Posting ID',
         field: 'id',
         name: 'id',
+        align: 'left',
         sortable: false,
       },
       {
-        label: 'TB',
+        label: 'Payment ID',
         field: 'tb',
         name: 'tb',
+        align: 'left',
         sortable: false,
       },
     ];
+
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Order Taker');
+      }
+    }
 
     return {
       ...toRefs(state),
@@ -194,6 +213,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

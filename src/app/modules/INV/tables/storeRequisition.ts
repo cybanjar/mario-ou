@@ -246,6 +246,7 @@ export const use_input = [
     name : 'From Store',
     right: '10px',
     width: '180px',
+    disable: false,
     value: '',
     options: [],
     onClick: '1'
@@ -253,6 +254,7 @@ export const use_input = [
   {
     name : 'To Store',
     right: '10px',
+    disable: false,
     width: '180px',
     value: '',
     options: []
@@ -261,6 +263,7 @@ export const use_input = [
     name : 'Account',
     right: '10px',
     width: '180px',
+    disable: false,
     value: '',
     onclick: '2'
   },
@@ -277,8 +280,16 @@ export const use_input1 = [
     name : 'Departement',
     width: '300px',
     top: '-20px',
-    disable: true,
+    disable: false,
     value: '',
+    options: [],
+  },
+  {
+    name : 'Date',
+    width: '300px',
+    disable: false,
+    value: '',
+    right: '10px',
     options: [],
   },
   {
@@ -287,6 +298,7 @@ export const use_input1 = [
     width: '200px',
     top: '-20px',
     options: [],
+    disable: false,
     value: ''
   },
   {
@@ -310,6 +322,7 @@ export const use_input1 = [
     right: '10px',
     width: '200px',
     top: '-10px',
+    disable: false,
     value: '',
     keyup: '1'
   },

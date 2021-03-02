@@ -5,45 +5,43 @@
         :module="module"
         :credit="creaditAcc"
         :debit="debitAcc"
+        :journal-type="journalType"
         @search="findTrans"
         @update:sort="changeSort"
       />
     </q-drawer>
 
     <div class="q-pa-lg">
-      <div class="q-mb-md">
-        <q-btn flat round class="q-mr-lg" @click="refetch">
-          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
-        </q-btn>
-      </div>
-
+      <SharedModuleActions @onActions="mapActions" />
       <TableLedger
-        :loading="resCode.isLoading"
-        :error="resCode.isError"
-        :data="tableData"
+        :loading="tablePrep.data.isLoading"
+        :data="tablePrep.result"
         :display="tableDisplay"
         @update:selected="handleSelect"
         @action:view="showViewTrans"
         @action:edit="showEditTrans"
       />
     </div>
-    <template v-if="selectTrans">
+    <template v-if="viewDialog.status === true">
       <ViewDialogTrans
         :value="viewDialog.status"
-        :transaction="selectTrans"
+        :jnr="selectTrans.jnr"
+        :refno="selectTrans.refno"
+        :record-id="selectTrans.recordId"
         @hide="viewDialog.hide"
         @onOKClick="viewDialog.hide"
         @onCancelClick="viewDialog.hide"
       ></ViewDialogTrans>
+    </template>
+    <template v-if="editDialog.status === true">
       <JournalTransEdit
         ref="editDialog"
+        :set="(ref = selectTrans.refno)"
+        :title="`G/L Journal Edit - ${ref}`"
         :value="editDialog.status"
+        :journaltype="3"
         :jnr="selectTrans.jnr"
-        @dismit="refetch"
-        @hide="editDialog.hide"
+        @hide="editDialog.hide() && tablePrep.refetch()"
         @onOKClick="editDialog.hide"
         @onCancelClick="editDialog.hide"
       ></JournalTransEdit>
@@ -69,42 +67,45 @@ export default defineComponent({
     const searchParams = ref();
     const { acc: debitAcc, add: addDebitAcc } = useMoney(0);
     const { acc: creaditAcc, add: addCreditAcc } = useMoney(0);
-    const tableData = ref<LedgerData[]>([]);
     const selectTrans = ref<LedgerData>();
-    const permission = ref(true); // allow all by default
-    const tableDisplay = ref(SortType.DESC);
+    const tableDisplay = ref(SortType.REMARK);
     const editDialog = useDialog();
     const viewDialog = useDialog();
 
-    const { data: resCode, refetch } = usePrepare(
+    const tablePrep = usePrepare(
       true,
-      () => {
-        tableData.value = []; // clear table
-        return $api.common.getGLJoulistData(searchParams.value);
-      },
-      (data) => {
-        tableData.value = reformLedgerData(data);
-      }
+      () => $api.common.getGLJoulistData(searchParams.value),
+      undefined,
+      (data) => reformLedgerData(data),
+      []
     );
 
-    usePrepare(
+    const permPrep = usePrepare(
       false,
-      () => $api.common.checkPermission({ arrayNr: params.ACCESS_NR }),
+      () =>
+        $api.common.checkPermission({
+          arrayNr: params.ACCESS_NR,
+          expectedNr: params.CODE,
+        }),
       (data) => {
-        // has a permission to perform edit
-        permission.value = data.zugriff === 'true';
-      }
+        if (data.zugriff === 'false') {
+          $q.notify({
+            type: 'negative',
+            message: data.messStr,
+          });
+        }
+      },
+      (data) => data.zugriff === 'true',
+      false
     );
 
     function findTrans(params) {
       searchParams.value = params;
-      refetch();
+      tablePrep.refetch();
     }
 
     function changeSort(type) {
-      if (tableData.value.length) {
-        tableDisplay.value = type;
-      }
+      tableDisplay.value = type;
     }
 
     function handleSelect(rows: LedgerData[]) {
@@ -117,16 +118,11 @@ export default defineComponent({
       });
     }
 
-    function showEditTrans(ledger: LedgerData) {
-      // check permission
-      if (permission.value === true) {
+    async function showEditTrans(ledger: LedgerData) {
+      await permPrep.refetch();
+      if (permPrep.result.value === true) {
         selectTrans.value = ledger;
         editDialog.show();
-      } else {
-        $q.notify({
-          type: 'negative',
-          message: "Don't Have Access To Edit",
-        });
       }
     }
 
@@ -135,12 +131,22 @@ export default defineComponent({
       viewDialog.show();
     }
 
+    function mapActions(name) {
+      switch (name) {
+        case 'onRefresh':
+          tablePrep.refetch();
+          break;
+          break;
+        default:
+          break;
+      }
+    }
+
     return {
       debitAcc,
-      refetch,
+      tablePrep,
       findTrans,
-      resCode,
-      tableData,
+      mapActions,
       viewDialog,
       handleSelect,
       creaditAcc,
@@ -150,6 +156,7 @@ export default defineComponent({
       editDialog,
       showViewTrans,
       showEditTrans,
+      journalType: params.CODE,
     };
   },
   components: {
@@ -157,6 +164,8 @@ export default defineComponent({
     TableLedger: () => import('./components/TableLedger.vue'),
     ViewDialogTrans: () => import('./components/ViewDialogTrans.vue'),
     JournalTransEdit: () => import('./components/JournalTransEdit.vue'),
+    SharedModuleActions: () =>
+      import('../../shared/components/SharedModuleActions.vue'),
   },
 });
 </script>

@@ -1,18 +1,15 @@
 <template>
   <section class="mt-7">
     <div class="q-pa-md">
-      <v-date-picker mode="range" v-model="searches.date" :columns="2" :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="Date"
-          slot-scope="{ inputProps }"
-          placeholder="Select Date"
-          readonly
-          v-bind="inputProps"
-          @clear="searches.date = null" />
-      </v-date-picker>
+      
+      <DateRangeInput
+        label-text="Date"
+        :position-fixed="true"
+        v-model="searches.date"
+      />
 
       <SSelect
-        label-text="From Department"
+        label-text="From Outlet Name"
         :options="searches.fromDept"
         v-model="searches.fromDeptVal"
         @input="onChange($options, true)">
@@ -26,7 +23,7 @@
       </SSelect>
 
       <SSelect
-        label-text="To Department"
+        label-text="To Outlet Name"
         :options="searches.toDept"
         v-model="searches.toDeptVal"
         @input="onChange($options, false)">
@@ -46,26 +43,17 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs, computed } from '@vue/composition-api';
-import { setupCalendar, DatePicker } from 'v-calendar';
-import { watch } from 'fs';
-import { date } from 'quasar';
-
-setupCalendar({
-  firstDayOfWeek: 2,
-});
-
+import DateRangeInput from '~/app/modules/FR/components/common/DateRangeInput.vue';
 
 export default defineComponent({
+  components: {
+    DateRangeInput,
+  },
+
   props: {
     searches: { type: Object, required: true },
   },
   setup(props, { emit }) {
-    // const state = reactive({
-    //   fromDept: ref(null),
-    //   toDept: ref(null),
-    //   date: {start: ref(new Date()), end: ref(new Date())}
-    // });
-
     const onSearch = () => {
       emit('onSearch', { ...props.searches });
     };
@@ -107,9 +95,6 @@ export default defineComponent({
       onChange,
     };
   },
-  components: {
-    'v-date-picker': DatePicker,
-  }
 });
 </script>
 

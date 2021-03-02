@@ -18,7 +18,8 @@ export const data_table = (data) => {
         'f-cash': formatterMoney(x['f-cash']),
         'c-ledger': formatterMoney(x['c-ledger']),
         creditcard: formatterMoney(x.creditcard),
-        gname: x.gname
+        gname: x.gname,
+        // username: x.
     }))
 }
 

@@ -14,21 +14,30 @@ export type TransRecord = {
   time?: string;
   created?: string;
   changeBy?: string;
+  bemerk?: any;
+  userinit?: any;
+  sysdate?: any;
+  description?: any;
+  fibukonto?: any;
+  chgdate?: any;
+  zeit?: any;
+  chginit?: any;
+  bezeich?: any;
   changedDate?: string;
 } & Trans;
 
 export type Journal = {
-  date: string;
+  date: Date;
   referenceNo: string;
   description: string;
-  debits: number;
-  credits: number;
-  remaining: number;
+  debits?: number;
+  credits?: number;
+  remaining?: number;
 };
-
 export type TransTable = { key: number } & TransRecord;
 export type JournalTrans = Journal & TransTable;
 // mode: 'del' | 'save' | 'set' | 'capture'
+export type SaveRecord = { mode: 'add' | 'chg' | 'del' } & JournalTrans;
 type Mode = {
   del: TransTable;
   save: JournalTrans[];

@@ -8,15 +8,7 @@
     </q-drawer>
 
     <div class="q-pa-lg">
-      <div class="q-mb-md">
-        <q-btn flat round class="q-mr-lg">
-          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
-        </q-btn>
-      </div>
-
+      <SharedModuleActions @onActions="mapActions" />
       <HKRoomingListRoomTable
         :filter-rooms="filterRooms"
         :selected-room.sync="selectedRoom"
@@ -49,16 +41,28 @@ export default defineComponent({
       state.filterRooms = filterRooms;
     }
 
+    function mapActions(name) {
+      switch (name) {
+        case 'onRefresh':
+          break;
+        default:
+          break;
+      }
+    }
+
     return {
       ...toRefs(state),
       onChangeSelectedRoom,
       onFilterChange,
+      mapActions,
     };
   },
   components: {
     HKRoomingListRoomTable: () =>
       import('./components/HKRoomingListRoomTable.vue'),
     SearchRoomingList: () => import('./components/SearchRoomingList.vue'),
+        SharedModuleActions: () =>
+      import('../../shared/components/SharedModuleActions.vue'),
   },
 });
 </script>

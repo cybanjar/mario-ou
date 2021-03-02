@@ -3,14 +3,14 @@ import { formatterMoney } from '../../../helpers/formatterMoney.helper'
 import {date} from 'quasar'
 export const tableHeaders: TableHeader[] = [
   {
-    label: 'St',
+    label: 'Store',
     field: 'st',
     name: 'st',
     align: 'left',
     sortable: false,
   },
   {
-    label: 'Articel Number',
+    label: 'Articles Number',
     field: 'artNumber',
     name: 'artNumber',
     align: 'left',
@@ -39,8 +39,8 @@ export const tableHeaders: TableHeader[] = [
   },
   {
     label: 'Amount',
-    field: 'price',
-    name: 'price',
+    field: 'amount',
+    name: 'amount',
     align: 'left',
     sortable: false,
   },
@@ -74,9 +74,11 @@ export const dataTable = (item) => {
     artNumber: item.artNumber,
     des : item.des,
     price: item.price,
-    qty: item.qty+'.000',
+    qty: item.qty,
     date: date.formatDate(item.date, 'DD/MM/YYYY'),
     creattedBy: item.creattedBy,
     time: date.formatDate(new Date(), 'hh:mm:ss'),
+    amount: item.amount,
+    stock: item.label.substring(item.label.indexOf('-')+2)
   }
 }

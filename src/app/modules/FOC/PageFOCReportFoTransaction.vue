@@ -138,14 +138,14 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" @click="onPrint"/>
         </q-btn>
       </div>
 
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -175,9 +175,10 @@ import {
   ref,
   watch,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportFoTransaction.table';
-import { ResReportFoTransactionList } from './models/report-fo-transaction-list.model';
+import { ResTableHeaders } from './tables/Report/reportFoTransaction.table';
+import { ResTableLists } from './models/Report/reportFoTransaction.model';
 import { setupCalendar, DatePicker } from 'v-calendar';
+import {PrintJs} from '~/app/helpers/PrintJs'
 
 setupCalendar({
   firstDayOfWeek: 2,
@@ -285,9 +286,9 @@ export default defineComponent({
       state.dialogReportFoTransaction = dialogBody.dialog;
     };
 
-    const selected = ref<ResReportFoTransactionList[]>([]);
+    const selected = ref<ResTableLists[]>([]);
 
-    const onRowClick = async (_, row: ResReportFoTransactionList) => {
+    const onRowClick = async (_, row: ResTableLists) => {
       if ([row][0]['c'] === 'M') {
         selected.value = [row];
 
@@ -405,20 +406,27 @@ export default defineComponent({
       state.table.data = [];
     };
 
+    const onPrint = () => {
+      if (state.table.data.length !== 0) {
+        PrintJs(state.table.data, ResTableHeaders, 'Fo Transaction')
+      }
+    }
+
     return {
-      tableHeaders,
+      ResTableHeaders,
       selected,
       onRowClick,
       onSearch,
       onDialogReportFoTransaction,
       onResets,
+      onPrint,
       ...toRefs(state),
     };
   },
   components: {
     'v-date-picker': DatePicker,
     DialogReportFoTransaction: () =>
-      import('./components/Dialog/DialogReportFoTransaction.vue'),
+      import('./components/Dialog/Report/DialogReportFoTransaction.vue'),
   },
 });
 </script>
@@ -426,7 +434,7 @@ export default defineComponent({
 <style lang="scss">
 .selected-row-foc {
   tbody tr.selected td {
-    background: #2d00e2 !important;
+    background: #1485cb !important;
     color: #fff;
   }
 }

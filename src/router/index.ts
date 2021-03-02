@@ -25,7 +25,7 @@ const changeModule = (to: Route) => {
   if (to.meta.module) {
     currentModule = {
       subModules: PAGE_MENU[to.meta.module],
-      ...PAGE_META[to.path],
+      ...PAGE_META[to.name],
     };
   }
 

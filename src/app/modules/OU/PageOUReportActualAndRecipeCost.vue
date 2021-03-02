@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -30,6 +31,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -49,7 +52,7 @@ export default defineComponent({
 
     const tableHeaders = [
         {
-            label: "ArtNo",
+            label: "Article Number",
             field: "artnr",
             sortable: false,
             align: "right",
@@ -63,19 +66,21 @@ export default defineComponent({
             width: 200,
             divider: true
         }, {
-            label: "Qty-(Actual)", 
+            label: "Actual Quantity", 
             field: "sQty2",
             sortable: false,
             align: "right",
             width: 120,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
-            label: "Qty-(Recipe)", 
+            label: "Recipe Quantity", 
             field: "sQty1",
             sortable: false,
             align: "right",
             width: 120, 
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Variance", 
             field: "dval",
@@ -84,19 +89,21 @@ export default defineComponent({
             width: 120,
             divider: true
             },{
-            label: "Amount-(Actual)", 
+            label: "Actual Amount", 
             field: "val2",
             sortable: false,
             align: "right",
             width: 180,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
-            label: "Amount-(Recipe)", 
+            label: "Recipe Amount", 
             field: "val1",
             sortable: false,
             align: "right",
             width: 180,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
             label: "Variance", 
             field: "sQty3",
@@ -208,6 +215,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Actual And Recipe Cost');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -215,6 +228,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

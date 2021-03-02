@@ -25,7 +25,7 @@
           <SSelect
             :key="i.name"
             v-for="i in searches.use_input.filter(x => [
-            'From Store', 'To Store', 'Articel Name'
+            'From Store', 'To Store', 'Article Name'
             ].includes(x.name))"
             :label-text="i.name"
             :style="{width: i.width, marginTop: i.top, marginRight: i.right}"
@@ -43,10 +43,11 @@
             :style="{width: i.width, marginRight: i.right}"
             :disable="i.disable"
             v-model="i.value"
+            @input="quantity(i.value)"
           />
           <q-btn
             color="primary"
-            style="height: 25px; width: 146px; right: -166px; marginTop: 10px"
+            style="height: 25px; width: 146px; marginTop: 25px;"
             icon="mdi-plus"
             size="sm"
             label="Add"
@@ -62,7 +63,7 @@
           <SRemarkLeftDrawer 
             class="col" 
             label="Total Amount" 
-            :value="searches.totalPrice" />
+            :value="totalamount" />
         </div>
     </div>
 </template>
@@ -76,6 +77,8 @@ import {
   ref,
 } from '@vue/composition-api';
 import { DatePicker } from 'v-calendar';
+import {formatterMoney} from '~/app/helpers/formatterMoney.helper'
+import {Notify} from 'quasar'
 
 export default defineComponent({
     props: {
@@ -83,10 +86,20 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const state = reactive({
-          price: 0
+          price: 0 as any,
+          totalamount: 0 as any
         })
+
+        const NotifyCreate = (mess, col?, position?,) => Notify.create({
+          message: mess,
+          color: col,
+          position
+        });
+
         const ADD = () => {
             emit('ADD', {...props})
+            state.price = '0'
+            state.totalamount = '0'
         }
         const x: Object = (value: any) => {
           const xi = props.searches.use_input
@@ -94,15 +107,29 @@ export default defineComponent({
             xi[0].value = value.value.code
           }
            if(value.onClikc == '2'){
-            state.price = xi[2].value.price
+             state.price = formatterMoney(xi[2].value.price)
            }
         } 
+        const quantity = (qty) => {
+          const xi = props.searches.use_input
+          if (!isNaN(qty)) {
+            if (Number(qty) <= xi[2].value.qty) {              
+              const hasil = Number(qty) * Number(state.price.replace(/,/g,''))
+              state.totalamount  = formatterMoney(hasil)
+            } else {
+              NotifyCreate('Wrong quantity', 'red', 'top')
+              xi[3].value = ''
+            }
+          }
+        }
+        
         return {
           ...toRefs(state),
           date: new Date(2018, 0, 25),
           DatePicker,
           ADD ,
-          x
+          x,
+          quantity
         }
     },
     components: {

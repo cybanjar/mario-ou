@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div class="q-pa-md">
+  <section class="mt-7 q-pa-md">
+    <div v-if="searchPrep.data.isLoading" class="q-pa-md text-center">
+      <q-spinner color="primary" size="4em" :thickness="3" />
+    </div>
+    <template v-else>
       <q-form @submit="onSearch">
         <SelectFilter
           label-text="Article Number"
@@ -24,12 +27,7 @@
           hide-bottom-space
           :rules="[]"
         ></SInput>
-        <SInput
-          label-text="By Date"
-          hide-bottom-space
-          v-model="formData.byDate"
-          :rules="['date']"
-        ></SInput>
+        <SDateInput label-text="By Date" v-model="formData.byDate" />
         <q-btn
           block
           color="primary"
@@ -40,101 +38,111 @@
           class="q-mt-md full-width"
         />
       </q-form>
-    </div>
-    <q-separator style="border-width: 1px;" class="q-mt-md" />
-    <div class="q-pa-md">
-      <q-btn
-        block
-        @click="onRemark"
-        :disable="disableRemark"
-        color="primary"
-        max-height="28"
-        label="Remark"
-        class="q-mb-md full-width"
-      />
-      <SInput
-        label-text="Bill Receiver Address"
-        type="textarea"
-        rows="5"
-        :value="debtPayRemarks"
-        disable
-      />
-      <SRemarkLeftDrawer label="Balance" :value="totalBalance" />
-    </div>
-  </div>
+      <q-separator style="border-width: 1px" class="q-mt-md" />
+      <div class="q-pa-md">
+        <q-btn
+          block
+          @click="() => $emit('remark', payment[0])"
+          :disable="remarkDisable"
+          color="primary"
+          max-height="28"
+          label="Remark"
+          class="q-mb-md full-width"
+        />
+        <SInput
+          label-text="Bill Receiver Address"
+          type="textarea"
+          rows="5"
+          :value="billAddresses"
+          disable
+        />
+        <SRemarkLeftDrawer label="Balance" :value="totalBalance | money" />
+      </div>
+    </template>
+  </section>
 </template>
 <script lang="ts">
-import { date } from 'quasar';
 import {
   defineComponent,
   reactive,
   computed,
-  watch,
-  toRaw,
+  onMounted,
+  ref,
 } from '@vue/composition-api';
 import { ResPaymentDebtPayList } from '../models/payment.model';
-import { formatterMoney } from '../../../helpers/formatterMoney.helper';
 import { loadArticleList } from '../shared/article-list.comp';
-import { loadPayDate } from '../shared/pay-date.comp';
+import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
+import { mapWithBezeich } from '~/app/helpers/mapSelectItems.helpers';
 
 export default defineComponent({
   props: {
-    selectedRemark: { type: String },
-    selectedRow: {
+    payment: {
       type: Array as () => Array<ResPaymentDebtPayList>,
-      default: [],
+      required: true,
     },
+    totalBalance: { type: Number, required: true, default: 0 },
   },
   setup(props, { root: { $api }, emit }) {
-    const { payDate, isPrefetch } = loadPayDate($api);
     const formData = reactive({
-      article: null,
+      article: 1,
       preloadData: false,
       billingReceiver: '',
       billingNumber: '',
       balance: 0,
-      byDate: '',
+      byDate: null,
     });
-
-    watch(isPrefetch, (prefetch) => {
-      prefetch
-        ? (formData.byDate = date.formatDate(toRaw(payDate).value, 'DD/MM/YYYY'))
-        : undefined;
-    });
-
-    // Start setup form options
-    const { articleOptions } = loadArticleList($api);
-
-    const debtPayRemarks = computed(() =>
-      disableRemark ? props.selectedRow[0]?.remarks : ''
+    const articleOptions = ref([]);
+    const searchPrep = usePrepare(
+      false,
+      () =>
+        Promise.all([
+          $api.accountReceivable.getARClosePayDate(),
+          $api.accountReceivable.getReadArticleList({
+            caseType: '13',
+            dept: 0,
+            actFlag: true,
+          }),
+        ]),
+      ([tempData, asd]) => {
+        formData.byDate = new Date(tempData.billDate);
+        articleOptions.value = mapWithBezeich(asd, 'artnr');
+        console.log('');
+      }
     );
-    const totalBalance = computed(() => {
-      const sumBalance = (props.selectedRow as ResPaymentDebtPayList[]).reduce(
-        (accumulator, currentValue) => accumulator + currentValue['tot-debt'],
-        0
-      );
-      return formatterMoney(sumBalance);
+
+    onMounted(() => {
+      searchPrep.refetch().then(() => onSearch());
     });
 
-    const disableRemark = computed(() => props.selectedRow.length !== 1);
-    // End setup form options
+    const billAddresses = computed(() =>
+      props.payment.length === 1 ? props.payment[0].billReceiverAddress : ''
+    );
+
+    const remarkDisable = computed(() => {
+      return props.payment.length < 0 || props.payment.length > 1;
+    });
 
     function onSearch() {
-      emit('onSearch', formData);
-    }
-
-    function onRemark() {
-      emit('onRemark', true, debtPayRemarks.value);
+      const param = {
+        artSelected: 0,
+        artnr: formData.article,
+        billNr: formData.billingNumber,
+        tempArt2: formData.article,
+        billDate: formData.byDate,
+        billName: ' ',
+        toName: formData.billingReceiver,
+        billSaldo: formData.balance,
+      };
+      emit('search', param);
     }
 
     return {
       formData,
       articleOptions,
       onSearch,
-      debtPayRemarks,
-      totalBalance,
-      disableRemark,
-      onRemark,
+      billAddresses,
+      remarkDisable,
+      searchPrep,
     };
   },
   components: {

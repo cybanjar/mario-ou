@@ -24,6 +24,7 @@
               label-text="Description" 
               style="width: 130px; marginTop: 15px" 
               v-model="filterDes" 
+              :disable="sort_value == '1'? true: false"
               unmasked-value />
               <div style="marginTop: -10px; marginLeft: -9px" >
                 <q-option-group 
@@ -147,11 +148,11 @@ export default defineComponent({
         data1: [],
         columns2: [],
         data2: [],
-        hide_bottom: true,
+        hide_bottom: false,
         filterDes: '',
         sort_data: [
           {
-            label: 'Article Number',
+            label: 'Recipe Number',
             value: '1',
           },
           {
@@ -183,9 +184,9 @@ export default defineComponent({
     const FETCH_API = async (api, body?) => {
         const GET_DATA = await $api.inventory.FetchAPIINV(api, body)
         dataRecipe = GET_DATA
+        state.isFetching1 = false
         setTimeout(() => {
           state.data1 = dataRepetitionArticelNumber(dataRecipe.tLArtikel['t-l-artikel'])
-          state.isFetching1 = false
         }, 1000)
     }
 
@@ -196,7 +197,7 @@ export default defineComponent({
     watch(() => props.dialogChildRecipe.openModalChild, 
     (openModalChild) => {
       if(openModalChild){
-      state.isFetching1 = true
+      state.isFetching1 = false
       state.group = '1'
       state.data1 = []
       state.data2 = []
@@ -257,7 +258,7 @@ export default defineComponent({
             state.columns2 = []
             state.data2 = []
             state.columns1 = stockArticle
-            state.isFetching1 = true
+            state.isFetching1 = false
             setTimeout(() => {
               state.data1 = dataRepetitionArticelNumber(dataRecipe.tLArtikel['t-l-artikel'])
               state.isFetching1 = false
@@ -266,7 +267,7 @@ export default defineComponent({
             state.columns1 = []
             state.data1 = []
             state.columns2 = Recipe
-            state.isFetching = true
+            state.isFetching = false
             setTimeout(()=> {
               state.isFetching = false
               state.data2 = dataRepetitionRecipe(dataRecipe.tHRezept['t-h-rezept'])

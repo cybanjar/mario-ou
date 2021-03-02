@@ -1,18 +1,12 @@
 <template>
   <section class="mt-7">
     <div id="input" class="q-pa-md">
-        <v-date-picker 
-          v-model="search"  
-          :popover="{ visibility: 'click' }">
-          <SInput
-            label-text="Billing Date"
-            slot-scope="{ inputProps }"
-            readonly
-            v-bind="inputProps"
-            clearable
-            placeholder="Select Date"
+
+        <DateInput
+          label-text="Billing Date"
+          v-model="search"
         />
-        </v-date-picker>
+
         <q-btn
           color="primary"
           icon="mdi-magnify"
@@ -30,9 +24,13 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { DatePicker } from 'v-calendar';
+import DateInput from '~/app/modules/FR/components/common/DateInput.vue';
 
 export default defineComponent({
+  components: {
+    DateInput,
+  },
+
     props: {
         search: {} as any
     },
@@ -44,9 +42,6 @@ export default defineComponent({
       return {
           onSearch
       }
-    },
-    components: {
-      'v-date-picker': DatePicker,
     },
 })
 </script>

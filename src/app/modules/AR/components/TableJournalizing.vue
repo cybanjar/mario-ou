@@ -1,15 +1,29 @@
 <template>
   <STable
     row-key="key"
-    :loading="loading"
     :columns="journalizingColumns"
     :data="data"
-    :pagination="{ rowsPerPage: 10 }"
-    :rows-per-page-options="[10]"
+    virtual-scroll
     :selected.sync="selected"
-    selection="multiple"
+    :pagination.sync="pagination"
+    :rows-per-page-options="[0]"
+    fixed-header
+    fixed-width
+    v-bind="$attrs"
     v-on="$listeners"
   >
+    <template v-slot:body="props">
+      <q-tr
+        class="cursor-pointer"
+        :props="props"
+        @click="toggleSingleRow(props.row)"
+      >
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          {{ col.value }}
+        </q-td>
+      </q-tr>
+    </template>
+
     <template #body-cell-actions="props">
       <q-td :props="props" class="fixed-col right">
         <q-icon name="mdi-dots-vertical" size="16px">
@@ -37,15 +51,17 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, watch } from '@vue/composition-api';
-import { journalizingColumns } from '../tables/journalizing.table';
+import { journalizingColumns } from '../tables/journalizing-main.table';
 
 export default defineComponent({
+  inheritAttrs: true,
   props: {
     loading: { type: Boolean, required: true },
     data: { type: Array, required: true },
   },
   setup(props) {
-    const selected = ref<[]>([]);
+    const selected = ref([]);
+    const pagination = ref();
 
     watch(
       () => props.loading,
@@ -60,10 +76,17 @@ export default defineComponent({
       console.log('view bill');
     }
 
+    // With no key pressed - single selection
+    function toggleSingleRow(row) {
+      selected.value = [row];
+    }
+
     return {
       journalizingColumns,
       selected,
       onView,
+      pagination,
+      toggleSingleRow,
     };
   },
 });

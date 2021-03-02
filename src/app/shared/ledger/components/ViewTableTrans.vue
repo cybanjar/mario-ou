@@ -4,14 +4,17 @@
     :loading="loading"
     :columns="viewTransColumns"
     :data="data"
-    :pagination="{ rowsPerPage: 5 }"
-    :rows-per-page-options="[5]"
+    virtual-scroll
+    :pagination.sync="pagination"
+    :rows-per-page-options="[0]"
+    fixed-header
+    height="180px"
     v-on="$listeners"
   />
 </template>
 <script lang="ts">
 import { defineComponent, ref } from '@vue/composition-api';
-import { viewTransColumns } from '../tables/transaction-view.tables';
+import { viewTransColumns } from '../tables/journal-view.tables';
 
 export default defineComponent({
   props: {
@@ -20,6 +23,7 @@ export default defineComponent({
   },
   setup(_, { emit }) {
     const selected = ref([]);
+    const pagination = ref();
 
     function viewTransaction(key) {
       emit('action:view', key);
@@ -33,6 +37,7 @@ export default defineComponent({
       selected,
       viewTransaction,
       editTransaction,
+      pagination,
     };
   },
 });

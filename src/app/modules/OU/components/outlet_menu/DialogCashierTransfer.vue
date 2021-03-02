@@ -8,33 +8,32 @@
 
         <div class="row">
             <div class="col-5">
-                <q-card-section>
-                <STable
-                    class=""
-                    grid
-                    hide-header
-                    hide-bottom
-                    :loading="isLoading"
-                    :columns="tableHeaders"
-                    :data="data.dataDetailOrderTaker"
-                    row-key="name"
-                    separator="cell"
-                    :rows-per-page-options="[0]"
-                    :pagination.sync="pagination">
-                    <template v-slot:loading>
-                        <q-inner-loading showing color="primary" />
-                    </template>
+                <q-card-section style="max-height: 70vh" class="scroll">
+                  <STable
+                      class=""
+                      grid
+                      hide-header
+                      hide-bottom
+                      :loading="isLoading"
+                      :columns="tableHeaders"
+                      :data="data.dataDetailOrderTaker"
+                      row-key="name"
+                      separator="cell"
+                      :rows-per-page-options="[0]"
+                      :pagination.sync="pagination">
+                      <template v-slot:loading>
+                          <q-inner-loading showing color="primary" />
+                      </template>
 
-                    <template v-slot:item="props">
-                      <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
-                        <q-card flat bordered>
-                          <q-card-section @click="onRowClickOrderTaker(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
-                              <strong>{{ props.row.bezeich }}</strong>
-                          </q-card-section>
-                        </q-card>
-                      </div>
-                    </template>
-
+                      <template v-slot:item="props">
+                        <div class="q-pa-xs col-xl-3 col-sm-3 col-md-3">
+                          <q-card flat bordered>
+                            <q-card-section @click="onRowClickOrderTaker(props.row)" :class="props.row['selected'] ? 'bg-cyan text-center text-white' : 'bg-white text-center text-black'">
+                                <strong>{{ props.row.bezeich }}</strong>
+                            </q-card-section>
+                          </q-card>
+                        </div>
+                      </template>
                   </STable>
 
                   <div class="row">
@@ -48,7 +47,7 @@
                 </q-card-section>
             </div>
             <div class="col-7">
-                <q-card-section>
+                <q-card-section style="max-height: 70vh" class="scroll">
                     <div class="q-ma-sm row q-gutter-xs">
                         <div class="col">
                             <STable

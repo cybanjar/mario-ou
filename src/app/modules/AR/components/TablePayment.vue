@@ -1,94 +1,91 @@
 <template>
-  <STable
-    row-key="key"
-    :loading="isFetching"
-    :columns="paymentListColumns"
-    :data="paymentList"
-    :pagination="{ rowsPerPage: 0 }"
-    :rows-per-page-options="[0]"
-    class="payment-list-table"
-    :selected.sync="selected"
-    selection="multiple"
-    @row-click="onRowClick"
-  >
-    <template #body-cell-actions="props">
-      <q-td :props="props" class="fixed-col right">
-        <q-icon name="mdi-dots-vertical" size="16px">
-          <q-menu auto-close anchor="bottom right" self="top right">
-            <q-list>
-              <q-item clickable v-ripple>
-                <q-item-section>Print Selected Payment</q-item-section>
-              </q-item>
-              <q-item clickable v-ripple>
-                <q-item-section
-                  >Print All Payment With Same Bill Number</q-item-section
-                >
-              </q-item>
-              <q-separator></q-separator>
-              <q-item clickable v-ripple>
-                <q-item-section>Cancel AR Payment</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-icon>
-      </q-td>
-    </template>
-  </STable>
+  <div>
+    <STable
+      v-bind="$attrs"
+      row-key="key"
+      :columns="paymentListColumns"
+      :data="data"
+      :selected.sync="selected"
+      :pagination.sync="pagination"
+      :rows-per-page-options="[0]"
+      virtual-scroll
+      fixed-header
+      fixed-width
+    >
+      <template v-slot:body="props">
+        <q-tr :props="props" @click="onRowClick(props.row)">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <STooltip
+              :key="col.name"
+              v-if="col.name !== 'actions'"
+              :value="col.value"
+              :spacing="8"
+              @set:tip="updateTooltip"
+            />
+          </q-td>
+        </q-tr>
+      </template>
+    </STable>
+    <q-tooltip
+      :target="tooltip.target"
+      anchor="top middle"
+      self="bottom middle"
+      :offset="[10, 10]"
+    >
+      <strong>{{ tooltip.value }}</strong>
+    </q-tooltip>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api';
+import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
 import { ResPaymentDebtPayList } from '../models/payment.model';
 import { paymentListColumns } from '../tables/payment-list.table';
 
 export default defineComponent({
+  inheritAttrs: true,
   props: {
-    isFetching: { type: Boolean, required: true },
-    paymentList: {
+    data: {
       type: Array as () => Array<ResPaymentDebtPayList & { key: number }>,
       required: true,
     },
   },
   setup(props, { emit }) {
     const selected = ref<(ResPaymentDebtPayList & { key: number })[]>([]);
+    const pagination = ref();
+    const tooltip = reactive({
+      target: false,
+      value: null,
+    });
 
-    watch(
-      () => props.paymentList,
-      () => (selected.value = [])
-    );
+    function onRowClick(row: ResPaymentDebtPayList & { key: number }) {
+      const rr = selected.value.findIndex((it) => it.key === row.key);
 
-    function onRowClick(_, row: ResPaymentDebtPayList & { key: number }) {
-      if (selected.value.find((item) => item.key === row.key)) {
-        selected.value = selected.value.filter((item) => item.key !== row.key);
-        emit('onRowClick', '');
+      if (rr >= 0) {
+        selected.value = [
+          ...selected.value.slice(0, rr),
+          ...selected.value.slice(rr + 1),
+        ];
       } else {
         selected.value = [...selected.value, row];
-        // emit('onRowClick', row.comments);
       }
+      emit('update:selected', { selected: selected.value });
     }
 
-    watch(selected, (newValue) => {
-      const selectedRow: ResPaymentDebtPayList[] = newValue.map(
-        ({ key, ...item }) => {
-          item.selected = true;
-          return item;
-        }
-      );
-
-      emit('onSelection', selectedRow);
-    });
+    function updateTooltip({ selector, text }) {
+      tooltip.target = selector;
+      tooltip.value = text;
+      console.log(selector, text);
+    }
 
     return {
       paymentListColumns,
       selected,
+      tooltip: toRefs(tooltip),
       onRowClick,
+      updateTooltip,
+      pagination,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.payment-list-table {
-  max-height: 80vh;
-}
-</style>

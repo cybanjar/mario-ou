@@ -56,12 +56,12 @@ export interface AccountReceivableEndpoints {
   manualARAdd: (body?: any) => Promise<any[]>;
   getPrepareARDebtlist: () => Promise<any>;
   getLoadArticle: (body: any) => Promise<any>;
+  getLoadArticle1: (body: any) => Promise<any>;
   getDebitList: (body: any) => Promise<any>;
   manualARDelete: (body: any) => Promise<any>;
   writeDebitor: (body: any) => Promise<any>;
   getPrepareARSubledger: (body: any) => Promise<any>;
   arSubledgerCreateAgeList: (body: any) => Promise<any>;
-  transferGLLoadData: (body: any) => Promise<any>;
   transferGLUpdate: (body: any) => Promise<any>;
   // Aging Balance
   getPrepareARAging: (body: any) => Promise<any>;
@@ -69,6 +69,22 @@ export interface AccountReceivableEndpoints {
   getPrepareARAge1: (body: any) => Promise<any>;
   getReadBill: (body: any) => Promise<any>;
   getBillDetail: (body: any) => Promise<any>;
+  getARPaymentList: (body: any) => Promise<any>;
+  prepareARPaymentList: () => Promise<any>;
+  // Outlet Trasaction
+  getARHJournal: (body: any) => Promise<any>;
+  getPrepareARHJournal: () => Promise<any>;
+  // FO Transaction
+  getARJournal: (body: any) => Promise<any>;
+  prepareARJournal: () => Promise<any>;
+  // Journalizing
+  transferGLLoadData: (body: any) => Promise<any>;
+  transferGLCheckBL: (body: any) => Promise<any>;
+  transferGLPrepare: (body: any) => Promise<any>;
+  // Detail Transaction
+  getARSubledgerDispFOBill: (body: any) => Promise<any>;
+  // Payment
+  arPaymentReadWaehrung: (body: any) => Promise<any>;
 }
 
 interface AccountReceivableBodyRequest {
@@ -164,6 +180,10 @@ export default (doFetch: DoRequest): AccountReceivableEndpoints => ({
     doFetch({ url: `${AR_URL}/getLoadArticle`, body }).then(
       ([, res]) => res?.tArtikel?.['t-artikel']
     ),
+  getLoadArticle1: (body) =>
+    doFetch({ url: `${AR_URL}/getLoadArticle`, body }).then(
+      ([, response]) => response.artikelList['artikel-list']
+    ),
   getDebitList: (body) =>
     doFetch({ url: `${AR_URL}/getDebitList`, body }).then(
       ([, res]) => res?.outputList?.['output-list']
@@ -203,5 +223,41 @@ export default (doFetch: DoRequest): AccountReceivableEndpoints => ({
   getPrepareARAging: (body) =>
     doFetch({ url: `${AR_URL}/getPrepareARAging`, body }).then(
       ([, res]) => res
+    ),
+
+  prepareARPaymentList: () =>
+    doFetch({ url: `${AR_URL}/prepareARPaymentList` }).then(([, res]) => res),
+  getPrepareARHJournal: () =>
+    doFetch({ url: `${AR_URL}/getPrepareARHJournal` }).then(([, res]) => res),
+  getARPaymentList: (body) =>
+    doFetch({ url: `${AR_URL}/getARPaymentList`, body }).then(
+      ([, res]) => res?.outputList?.['output-list']
+    ),
+  getARHJournal: (body) =>
+    doFetch({ url: `${AR_URL}/getARHJournal`, body }).then(
+      ([, response]) => response?.outputList?.['output-list']
+    ),
+  prepareARJournal: () =>
+    doFetch({ url: `${AR_URL}/prepareARJournal` }).then(([, res]) => res),
+  getARJournal: (body) =>
+    doFetch({ url: `${AR_URL}/getARJournal`, body }).then(
+      ([, response]) => response?.outputList?.['output-list']
+    ),
+  transferGLCheckBL: (body) =>
+    doFetch({ url: `${AR_URL}/transferGLCheckBL`, body }).then(
+      ([, res]) => res
+    ),
+  transferGLPrepare: (body) =>
+    doFetch({ url: `${AR_URL}/transferGLPrepare`, body }).then(
+      ([, res]) => res
+    ),
+  getARSubledgerDispFOBill: (billNumber) =>
+    doFetch({
+      url: `${AR_URL}/getARSubledgerDispFOBill`,
+      body: { aRechnr: billNumber },
+    }).then(([, res]) => res),
+  arPaymentReadWaehrung: (body) =>
+    doFetch({ url: `${AR_URL}/arPaymentReadWaehrung`, body }).then(([, res]) =>
+      res.tWaehrung ? res.tWaehrung['t-waehrung'] : []
     ),
 });

@@ -17,20 +17,6 @@ const headerMaps = headerData => headerData
     }))
 
 export function PrintJs(data, header, Name) {
-  console.log('Data aja : ', data);
-  
-  for (let i = 0; i < data.length; i++) {
-    var dataRow = data[i];
-
-    let size = 0;
-    for (let k in dataRow) {
-      if (dataRow[k] === null || dataRow[k] === undefined || dataRow[k] === "undefined" || dataRow[k] === "null") {
-        dataRow[k] = " ";
-      }
-      size++
-    }
-  }
-
   printJS({
         printable: data, 
         header: rawHeader(Name),

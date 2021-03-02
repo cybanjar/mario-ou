@@ -35,31 +35,36 @@ export interface ReqPaymentDebtPayList {
 }
 
 export interface ResPaymentDebtPayList {
-  selected: boolean;
-  'ar-recid': number;
-  rechnr: number;
-  refno: number;
-  counter: number;
-  gastnr: number;
-  billname: string;
-  gastnrmember: number;
-  gastname: string;
-  zinr: string;
-  rgdatum: string;
-  'user-init': string;
-  debt: number;
-  'debt-foreign': number;
+  billName: string;
+  billNumber: string;
+  billDate: Date;
+  arAmount: string;
+  paymentAmount: string;
+  balance: string;
+  referenceNumber: number;
+  remark: string;
+  roomNumber: string;
+  id: string;
+  guestName: string;
+  arForeignAmount: string;
   currency: string;
-  credit: number;
-  'tot-debt': number;
-  'vouc-nr': string;
-  prevdate: any;
-  remarks: string;
-  'b-resname': string;
-  'ci-date': any;
-  'co-date': any;
+  voucherNumber: string;
+  billReceiverAddress: string;
+  balanceOri: number;
+  selected: string;
+  recid: number;
+  counter: string;
+  gastnr: string;
+  gastnrmember: string;
+  billDateOri: string;
+  debt: string;
+  foreignDebt: string;
+  creditOri: string;
+  prevdate: string;
+  bresname: string;
+  cidate: string;
+  codate: string;
 }
-
 export interface ResArtikelBaseList {
   artart: number;
   artnr: number;

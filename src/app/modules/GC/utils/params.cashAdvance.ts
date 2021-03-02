@@ -47,8 +47,11 @@ export const dataChildInput = (data) => {
         Search[0].options = groupMap2(name, 'username', 'nr')
     } else if (data.tGcPiacct) {
         const account = data.tGcPiacct['t-gc-piacct']
+        for(const items of account){
+            items['fibukonto'] = format_number(items['fibukonto'])
+        }
         use_inputchild.Payment[4].options = groupMap(account, 'bezeich', 'fibukonto')
-        input_giro[2].options = groupMap(account, 'bezeich', 'fibukonto')
+        input_giro[1].options = groupMap(account, 'bezeich', 'fibukonto')
         use_input[0].options = groupMap(account, 'bezeich', 'fibukonto')
     } else if (data.supplyList) {
         const supplier = data.supplyList['supply-list']

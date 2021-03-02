@@ -49,14 +49,14 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" @click="onPrint"/>
         </q-btn>
       </div>
 
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -96,9 +96,10 @@ import {
   onMounted,
   ref,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportTodayDepartedGuest.table';
+import { ResTableHeaders } from './tables/Report/reportTodayDepartedGuest.table';
 import { setupCalendar, DatePicker } from 'v-calendar';
-import { ResReportTodayDepartedGuestList } from './models/report-today-departed-guest-list.model';
+import { ResTableLists } from './models/Report/reportTodayDepartedGuest.model';
+import {PrintJs} from '~/app/helpers/PrintJs'
 
 setupCalendar({
   firstDayOfWeek: 2,
@@ -258,9 +259,9 @@ export default defineComponent({
       }
     };
 
-    const selected = ref<ResReportTodayDepartedGuestList[]>([]);
+    const selected = ref<ResTableLists[]>([]);
 
-    const onRowClick = async (_, row: ResReportTodayDepartedGuestList) => {
+    const onRowClick = async (_, row: ResTableLists) => {
       state.table.isFetching = true;
 
       const getState: any = state;
@@ -321,8 +322,14 @@ export default defineComponent({
       state.table.data = [];
     };
 
+    const onPrint = () => {
+      if (state.table.data.length !== 0) {
+        PrintJs(state.table.data, ResTableHeaders, 'Today Departed Guest')
+      }
+    }
+
     return {
-      tableHeaders,
+      ResTableHeaders,
       onSearch,
       selected,
       onRowClick,
@@ -330,17 +337,18 @@ export default defineComponent({
       onDialogReportTodayDepartedMaster,
       onDialogReportTodayDepartedDetail,
       onResets,
+      onPrint,
       ...toRefs(state),
     };
   },
   components: {
     'v-date-picker': DatePicker,
     DialogReportTodayDepartedGuest: () =>
-      import('./components/Dialog/DialogReportTodayDepartedGuest.vue'),
+      import('./components/Dialog/Report/DialogReportTodayDepartedGuest.vue'),
     DialogReportTodayDepartedMaster: () =>
-      import('./components/Dialog/DialogReportTodayDepartedMaster.vue'),
+      import('./components/Dialog/Report/DialogReportTodayDepartedMaster.vue'),
     DialogReportTodayDepartedDetail: () =>
-      import('./components/Dialog/DialogReportTodayDepartedDetail.vue'),
+      import('./components/Dialog/Report/DialogReportTodayDepartedDetail.vue'),
   },
 });
 </script>
@@ -348,7 +356,7 @@ export default defineComponent({
 <style lang="scss">
 .selected-row-foc {
   tbody tr.selected td {
-    background: #2d00e2 !important;
+    background: #1485cb !important;
     color: #fff;
   }
 }

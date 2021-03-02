@@ -85,14 +85,14 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" @click="onPrint"/>
         </q-btn>
       </div>
 
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -111,8 +111,9 @@ import {
   toRefs,
   onMounted,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportFoCancellation.table';
+import { ResTableHeaders } from './tables/Report/reportFoCancellation.table';
 import { setupCalendar, DatePicker } from 'v-calendar';
+import {PrintJs} from '~/app/helpers/PrintJs'
 
 setupCalendar({
   firstDayOfWeek: 2,
@@ -155,6 +156,12 @@ export default defineComponent({
         longDigit: false,
       },
     });
+
+    const onPrint = () => {
+      if (state.table.data.length !== 0) {
+        PrintJs(state.table.data, ResTableHeaders, 'Fo Cancellation')
+      }
+    }
 
     onMounted(async () => {
       state.table.isFetching = false;
@@ -262,9 +269,10 @@ export default defineComponent({
     };
 
     return {
-      tableHeaders,
+      ResTableHeaders,
       onSearch,
       onResets,
+      onPrint,
       ...toRefs(state),
     };
   },

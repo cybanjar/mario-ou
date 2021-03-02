@@ -3,7 +3,7 @@
     <q-layout view="HHh LpR fFf">
       <LayoutMainHeader />
       <q-page-container
-        :style="{ 'padding-right': hasReports ? '50px' : '0px' }"
+        :style="{ 'padding-right': hasReports && DrawerRight ? '50px' : '0px' }"
       >
         <router-view />
       </q-page-container>
@@ -13,6 +13,7 @@
         bordered
         :width="50"
         persistent
+        v-if="DrawerRight"
       >
         <div class="column full-height">
           <q-list padding>
@@ -30,10 +31,13 @@
               </q-item-section>
             </q-item>
           </q-list>
-          <q-list padding v-for="(item, index) in menu" :key="index">
+          <q-list padding v-for="(item, index) in extraMenu" :key="index">
             <q-item clickable v-ripple class="q-px-sm" @click="item.handler">
               <q-item-section class="items-center">
-                <img :src="item.icon" height="30px" />
+                <img
+                  :src="require(`~/app/icons/${item.icon}.svg`)"
+                  height="30px"
+                />
               </q-item-section>
             </q-item>
           </q-list>
@@ -49,9 +53,8 @@
       </q-drawer>
     </q-layout>
 
-    <q-layout v-if="hasReports">
+    <q-layout v-if="hasReports && DrawerRight">
       <LayoutReportDrawer :drawer.sync="reportDrawer" />
-
       <q-page-sticky position="bottom-right" :offset="[18, 28]">
         <q-btn
           v-if="!rightDrawer"
@@ -72,10 +75,14 @@ import {
   ref,
   provide,
   computed,
+  reactive,
+  toRefs,
 } from '@vue/composition-api';
+import {
+  ExtraMenuItem,
+  extraMenuKey,
+} from '~/app/shared/compositions/use-extra-menu';
 import { store } from '~/store';
-
-export const IconSymbol = Symbol('icons');
 
 export default defineComponent({
   setup() {
@@ -84,15 +91,20 @@ export default defineComponent({
     const reportItems = ref<any[]>([]);
     const hasReports = computed(() => reportItems.value.length !== 0);
     const currentModule = computed(() => store.state.layout.currentModule);
-    const menu = ref([]);
-    provide(IconSymbol, menu);
+    const state = reactive({
+      DrawerRight: true,
+    });
 
     watch(
       currentModule,
       () => {
         if (currentModule.value) {
           reportItems.value = currentModule.value.reports;
-
+          if (currentModule.value.title == 'Night Audit') {
+            state.DrawerRight = false;
+          } else {
+            state.DrawerRight = true;
+          }
           if (hasReports.value) {
             rightDrawer.value = true;
           }
@@ -106,11 +118,26 @@ export default defineComponent({
       }
     );
 
+    /* Setup Extra Menu */
+    const extraMenu = ref<ExtraMenuItem[]>([]);
+
+    function SET_EXTRA_MENU(extraMenuItems: ExtraMenuItem[]) {
+      extraMenu.value = extraMenuItems;
+    }
+
+    function RESET_EXTRA_MENU() {
+      extraMenu.value = [];
+    }
+
+    provide(extraMenuKey, { SET_EXTRA_MENU, RESET_EXTRA_MENU });
+    /* End Setup Extra Menu */
+
     return {
       rightDrawer,
       reportDrawer,
       hasReports,
-      menu,
+      extraMenu,
+      ...toRefs(state),
     };
   },
   components: {

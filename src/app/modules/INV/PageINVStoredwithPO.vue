@@ -50,10 +50,11 @@ import {
   ref,
   watch
 } from '@vue/composition-api';
+import {Notify} from 'quasar'
 import { tableHeaders } from './tables/StoredwithPO.tables';
 import {data_table} from './utils/params.storedwithpo'
 export default defineComponent({
-  setup(_, { root: { $api }, root }) {
+  setup(_, { root: { $api, $router } }) {
     let charts;
     const state = reactive({
       data: [] as any,
@@ -62,6 +63,12 @@ export default defineComponent({
       isFetching: false
     });
 
+    const NotifyCreate1 = () => Notify.create({
+      message: `Data not found`,
+      timeout: 2000,
+      color: 'red'
+      });
+
     const FETCH_API = async (api, body?) => {
       const GET_DATA = await $api.inventory.FetchAPIINV(api, body)
       switch (api) {
@@ -69,13 +76,19 @@ export default defineComponent({
           state.orderDate = GET_DATA
           break;
         default:
-          setTimeout(() => {
-            state.data = data_table(GET_DATA.q2List['q2-list'])
+          const data = data_table(GET_DATA.q2List['q2-list'])
+          if (data.length !== 0 ) {            
+            setTimeout(() => {
+              state.data = data_table(GET_DATA.q2List['q2-list'])
+              state.isFetching = false
+              if (state.data.length !== 0) {
+                state.hide_bottom = true
+              }
+            },1000)
+          } else {
+            NotifyCreate1()
             state.isFetching = false
-            if (state.data.length !== 0) {
-              state.hide_bottom = true
-            }
-          },1000)
+          }
           break;
       }
     }
@@ -96,7 +109,7 @@ export default defineComponent({
     })
 
     const incomingStock = () => {
-      root.$router.push('/inv/incomingstock');
+      $router.push('/inv/incomingstock');
     };
 
     const onSearch = (val) => {

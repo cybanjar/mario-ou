@@ -1,11 +1,11 @@
 import { TableHeader } from '~/components/VhpUI/typings';
 
-export const tableHeaders: TableHeader[] = [
+export const ResTableHeaders: TableHeader[] = [
   {
-    label: 'Department',
+    label: 'Outlet',
     field: 'dept',
     name: 'dept',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
@@ -17,43 +17,36 @@ export const tableHeaders: TableHeader[] = [
   },
   {
     label: 'Description',
-    field: 'desc',
-    name: 'desc',
+    field: 'bezeich',
+    name: 'bezeich',
     align: 'left',
     sortable: true,
   },
   {
     label: 'Room Number',
-    field: 'room',
-    name: 'room',
-    align: 'right',
+    field: 'zinr',
+    name: 'zinr',
+    align: 'left',
     sortable: true,
   },
   {
     label: 'Quantity',
-    field: 'qty',
-    name: 'qty',
+    field: 'anzahl',
+    name: 'anzahl',
     align: 'right',
     sortable: true,
   },
   {
     label: 'Price',
-    field: 'price',
-    name: 'price',
+    field: 'preis',
+    name: 'preis',
     align: 'right',
     sortable: true,
   },
   {
     label: 'Amount',
-    field: 'amount',
-    name: 'amount',
-    align: 'right',
-    sortable: true,
-  },
-  {
-    label: 'Voucher Number',
-    field: 'voucher',
-    name: 'voucher',
+    field: 'betrag',
+    name: 'betrag',
     align: 'right',
     sortable: true,
   },

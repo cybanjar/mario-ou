@@ -37,7 +37,7 @@ export const tableHeaders: TableHeader[] = [
     sortable: false,
   },
   {
-    label: 'Curr',
+    label: 'Currency',
     field: 'wabkurz',
     name: 'wabkurz',
     align: 'left',

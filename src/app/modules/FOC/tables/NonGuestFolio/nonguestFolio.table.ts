@@ -1,0 +1,75 @@
+import { TableHeader } from '~/components/VhpUI/typings';
+
+export const ResTableHeaders: TableHeader[] = [
+  {
+    label: 'Article',
+    field: 'artnr',
+    name: 'artnr',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Quantity',
+    field: 'anzahl',
+    name: 'anzahl',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Description',
+    field: 'bezeich',
+    name: 'bezeich',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Price',
+    field: 'epreis',
+    name: 'epreis',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Amount',
+    field: 'betrag',
+    name: 'betrag',
+    align: 'right',
+    sortable: true,
+  },
+  {
+    label: 'Room',
+    field: 'zinr',
+    name: 'zinr',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Billing Date',
+    field: 'bill-datum',
+    name: 'bill-datum',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'ID',
+    field: 'userinit',
+    name: 'userinit',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'System Date',
+    field: 'sysdate',
+    name: 'sysdate',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    label: 'Time',
+    field: 'zeit',
+    name: 'zeit',
+    align: 'right',
+    sortable: true,
+  },
+  { name: 'actions', field: 'actions' },
+];

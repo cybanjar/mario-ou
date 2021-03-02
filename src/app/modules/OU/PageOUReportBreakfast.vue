@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +32,8 @@
 <script lang="ts">
 import {defineComponent, onMounted, toRefs, reactive} from '@vue/composition-api';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatToBL } from '~/app/helpers/formatterDate.helper';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -42,7 +45,7 @@ export default defineComponent({
       build: [],
       dataPrepare:{},
       searches: {
-        date: {start: (new Date()), end: (new Date())},
+        inputDate: {start: (new Date()), end: (new Date())},
         reservationDetail: '',
         reservationComments: '',
         adult: 0,
@@ -96,7 +99,7 @@ export default defineComponent({
 
     const tableHeaders = [
         {
-            label: "Room No",
+            label: "Room Number",
             field: "zinr",
             align: "left",
         },{
@@ -106,49 +109,50 @@ export default defineComponent({
         }, {
             label: "Segment Code", 
             field: "segmentcode",
-            align: "right",
+            align: "left",
         }, {
             label: "Arrival", 
             field: "ankunft",
-            align: "center",
+            align: "left",
+            format: (val) => (val == 0) ? '' : formatToBL(val),
         },{
             label: "Nights", 
             field: "anztage",
-            align: "right",
+            align: "left",
         }, {
-            label: "Depart", 
+            label: "Departure", 
             field: "abreise",
-            align: "center",
+            align: "left",
         },{
-            label: "Cat", 
+            label: "Category", 
             field: "kurzbez",
             align: "left",
         }, {
-            label: "Argt Code", 
+            label: "Arrangement Code", 
             field: "arrangement",
             align: "left",
         },  {
             label: "Adult", 
             field: "erwachs",
-            align: "right",
+            align: "left",
         },  {
-            label: "Ch", 
+            label: "Child", 
             field: "kind1",
-            align: "right",
+            align: "left",
         },  {
-            label: "Compl", 
+            label: "Compliment", 
             field: "gratis",
-            align: "right",
+            align: "left",
         },  {
-            label: "Qty", 
+            label: "Quantity", 
             field: "zimmeranz",
-            align: "right",
+            align: "left",
         },  {
-            label: "Res Status", 
+            label: "Reservation Status", 
             field: "resstatusstr",
             align: "left",
         },  {
-            label: "Res No", 
+            label: "Reservation Number", 
             field: "resnr",
             align: "left",
         },  {
@@ -180,9 +184,9 @@ export default defineComponent({
         }
         state.dataPrepare = responsePrepare; 
         
-        const date = new Date(responsePrepare.ciDate);
-        state.searches.date.start = date;
-        state.searches.date.end = date;
+        // const date = new Date(responsePrepare.ciDate);
+        // state.searches.inputDate.start = date;
+        // state.searches.inputDate.end = date;
         
         state.isFetching = false;
       } else {
@@ -197,12 +201,11 @@ export default defineComponent({
 
     const onSearch = (state2) => {
       state.isFetching = true;
-        
       async function asyncCall() {
         const [dataResponse] = await Promise.all([
           $api.outlet.getOUTableList('abfList', {
-            fdate: date.formatDate(state2.date.start, 'MM/DD/YYYY'),
-            tdate: date.formatDate(state2.date.end, 'MM/DD/YYYY'),
+            fdate: date.formatDate(state2.inputDate.start, 'MM/DD/YYYY'),
+            tdate: date.formatDate(state2.inputDate.end, 'MM/DD/YYYY'),
             bfastArtnr: state.dataPrepare['bfastArtnr'],
             bfastDept	: state.dataPrepare['bfastDept']
           }),
@@ -265,6 +268,12 @@ export default defineComponent({
       state.searches.reservationComments = dataRow.comments;
     };
 
+     function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Breakfast');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -273,6 +282,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

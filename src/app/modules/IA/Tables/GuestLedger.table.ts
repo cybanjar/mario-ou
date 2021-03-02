@@ -1,0 +1,88 @@
+import { TableHeader } from '~/components/VhpUI/typings';
+
+export const tableHeaders: TableHeader[] = [
+    {
+        label: '',
+        field: 'artnr',
+        name: 'artnr',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Guest Name',
+        field: 'bezeich',
+        name: 'bezeich',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Room Number',
+        field: 'munit',
+        name: 'munit',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Folio Number',
+        field: 'inhalt',
+        name: 'inhalt',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Description',
+        field: 'qty',
+        name: 'qty',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Provious Balance',
+        field: 'qty1',
+        name: 'qty1',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Debit',
+        field: 'avrg-amount',
+        name: 'avrg-amount',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Credit',
+        field: 'amount',
+        name: 'amount',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Balance',
+        field: 'amount',
+        name: 'amount',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Depature',
+        field: 'amount',
+        name: 'amount',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Arrival',
+        field: 'amount',
+        name: 'amount',
+        align: 'left',
+        sortable: false,
+    },
+    {
+        label: 'Check-in Time',
+        field: 'amount',
+        name: 'amount',
+        align: 'left',
+        sortable: false,
+    },
+];

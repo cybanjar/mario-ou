@@ -39,8 +39,8 @@
               :key="col.label"
               v-for="col in useInputModal.filter(cols => ![ 
               'Category Number',
-              'content', 'Quantity', 'Loss Factor', 
-              'Recipe Cost', 'Articel Number'].includes(cols.label))"
+              'Content', 'Quantity', 'Loss Factor (%)', 
+              'Recipe Cost', 'Articles Number'].includes(cols.label))"
               :style="{width: col.width, marginRight: col.marginRight}"
               :label-text="col.label"
               v-model="col.value"
@@ -59,7 +59,7 @@
               <SInput
               :key="col.label"
               v-for="col in useInputModal.filter(cols => [
-              'Articel Number'].includes(cols.label))"
+              'Articles Number'].includes(cols.label))"
               :style="{width: col.width, marginRight: col.marginRight}"
               :label-text='col.label'
               @click="onClickAN"
@@ -69,11 +69,12 @@
               <SInput
               :key="col.label"
               v-for="col in useInputModal.filter(cols => [
-              'content', 'Quantity', 'Loss Factor', 'Recipe Cost'].includes(cols.label))"
+              'Content', 'Quantity', 'Loss Factor (%)', 'Recipe Cost'].includes(cols.label))"
               :style="{width: col.width, marginRight: col.marginRight}"
               :label-text="col.label"
               v-model="col.value"
-              :disable="col.disable"   
+              :disable="col.disable"
+              @input="inputData(col)" 
               />
             </div>
             <q-btn
@@ -190,8 +191,10 @@ export default defineComponent({
       displacement: true, 
       dialogChildRecipe: {
         openModalChild: false,
-        dataChildRecipe: [] as any
+        dataChildRecipe: [] as any,
+        data: []
       },
+      useInputModal: useInputModal
     });
 
     const NotifyCreate = (mess, col?, type?) => Notify
@@ -215,7 +218,7 @@ export default defineComponent({
 
     // FETCH API
 
-    const FETCH_API = async (api, body) => {
+    const FETCH_API = async (api, body?) => {
       const [GET_DATA, GET_COMMON] = await Promise.all([
         $api.inventory.FetchAPIINV(api, body),
         $api.inventory.FetchCommon(api, body)
@@ -483,6 +486,14 @@ export default defineComponent({
         useInputModal[2].value =''
       }
     }
+    const inputData = (value) => {
+      if (value.onClick == "quantity") {
+        if (isNaN(value.value)) {
+          NotifyCreate('Wrong Quantity', 'red')
+          value.value = ''
+        }
+      }
+    }
 
     return {
       onClickAN,
@@ -493,9 +504,9 @@ export default defineComponent({
       back_input,
       onClickDataAN,
       deleteDataTable,
-      useInputModal,
       addDataRecipe,
       tableDialogRecipe,
+      inputData,
       ...toRefs(state),
       pagination: { page: 1, rowsPerPage: 0 },
     };

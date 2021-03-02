@@ -1,81 +1,141 @@
 <template>
-  <SModulePage @onActions="onActions"> </SModulePage>
+  <SModulePage
+    @onActions="onActions"
+    :actions="[{ name: 'Add', position: 'prefix' }]"
+  >
+    <template #filters>
+      <SearchPUPurchaseOrder
+        :filters="filterOptions"
+        :is-preparing="isPreparing"
+        @search="onSearch"
+      />
+    </template>
+
+    <template #table>
+      <TablePUPurchaseOrder :is-fetching="isFetching" :rows="tableRows" />
+    </template>
+
+    <DialogPUPurchaseOrder :dialog.sync="dialog" />
+  </SModulePage>
 </template>
 
 <script lang="ts">
-import { defineComponent, toRefs, reactive } from '@vue/composition-api';
-import { mapWithBezeich } from '~/app/helpers/mapSelectItems.helpers';
+import { defineComponent, toRefs, reactive, ref } from '@vue/composition-api';
+import { date } from 'quasar';
 
-// interface State {
-//   isFetching: boolean;
-//   tableColumns: ResChartOfAccounts[];
-//   filterOptions: {
-//     mains: any[];
-//     categories: any[];
-//     departments: any[];
-//   };
-//   filters: any;
-//   remark: string;
-//   accountId: string | null;
-//   dialog: boolean;
-// }
+interface State {
+  isPreparing: boolean;
+  isFetching: boolean;
+  filterOptions: {
+    users: any[];
+    departments: any[];
+    suppliers: any[];
+  };
+  tableRows: any[];
+}
 
 export default defineComponent({
-  setup(_, { root: { $api, $route } }) {
-    const state = reactive({
-      isFetching: true,
-      tableColumns: [],
+  components: {
+    SearchPUPurchaseOrder: () =>
+      import('./components/SearchPUPurchaseOrder.vue'),
+    TablePUPurchaseOrder: () => import('./components/TablePUPurchaseOrder.vue'),
+    DialogPUPurchaseOrder: () =>
+      import('./components/DialogPUPurchaseOrder.vue'),
+  },
+
+  setup(_, { root: { $api } }) {
+    const state = reactive<State>({
+      isPreparing: true,
+      isFetching: false,
       filterOptions: {
-        mains: [],
-        categories: [],
+        users: [],
         departments: [],
+        suppliers: [],
       },
-      filters: {},
-      remark: 'Select a row',
-      accountId: null,
-      dialog: false,
+      tableRows: [],
     });
 
     // Fetch columns
-    async function fetchColumns() {
-      state.isFetching = true;
+    (async function () {
+      state.isPreparing = true;
 
-      const [resChart, resMain, resTypes, resDepart] = await Promise.all([
-        $api.generalLedger.getChartOfAccount(),
-        $api.generalLedger.getGLMainAccount(),
-        $api.generalLedger.getGLFSType(),
-        $api.generalLedger.getGLDeptAccount(),
+      const [resPrepare, resDepartments, resSuppliers] = await Promise.all([
+        $api.accountsPayable.getPreparePurchaseOrderList(),
+        $api.accountsPayable.readParameter(),
+        $api.accountsPayable.getSupplierList(),
       ]);
-      state.tableColumns = resChart;
-      state.filterOptions.mains = mapWithBezeich(resMain, 'code');
-      state.filterOptions.categories = mapWithBezeich(resTypes, 'nr');
-      state.filterOptions.departments = mapWithBezeich(resDepart, 'nr');
 
-      state.isFetching = false;
-    }
-    fetchColumns();
+      state.filterOptions.users = [
+        { value: '', label: 'All' },
+        ...resPrepare.users.map((user) => {
+          return {
+            label: `${user.userinit} - ${user.username}`,
+            value: user.userinit,
+          };
+        }),
+      ];
 
-    function onRowClick({ bemerk }) {
-      state.remark = bemerk;
-    }
+      state.filterOptions.departments = [
+        { value: '', label: 'All' },
+        ...resDepartments.map((department) => {
+          return {
+            label: `${department.varname} - ${department.vstring}`,
+            value: department.varname,
+          };
+        }),
+      ];
 
-    function onShowBudget(accountId) {
-      state.accountId = accountId;
-      onDialog(true);
-    }
+      state.filterOptions.suppliers = [
+        { value: '', label: 'All' },
+        ...resSuppliers.map((supplier) => {
+          return {
+            label: supplier.firma,
+            value: supplier['lief-nr'],
+          };
+        }),
+      ];
+
+      state.isPreparing = false;
+    })();
+
+    const searches = ref<any>({});
 
     function onSearch(filters) {
-      state.filters = filters;
+      searches.value = filters;
+      fetchPO();
     }
 
-    function onDialog(val) {
-      state.dialog = val;
+    async function fetchPO() {
+      state.isFetching = true;
+
+      const requestData = {
+        usrname: searches.value.user || ' ',
+        poNumber: searches.value.poNumber || ' ',
+        lastDocNr: ' ',
+        dmlOnly: searches.value.dmlOnly,
+        tLiefNo: searches.value.supplier || 0,
+        deptnr: searches.value.department || '-1',
+        allSupp: searches.value.supplier === '',
+        stattype: searches.value.status,
+        sorttype: 1,
+        fromDate: date.formatDate(searches.value.date.start, 'MM/DD/YY'),
+        toDate: date.formatDate(searches.value.date.end, 'MM/DD/YY'),
+        billdate: '01/14/19',
+      };
+
+      state.tableRows = await $api.accountsPayable.getPurchaseOrderList(
+        requestData
+      );
+
+      state.isFetching = false;
     }
 
     function onActions(actions) {
       switch (actions) {
+        case 'onAdd':
+          onAddNewPO();
         case 'onRefresh':
-          fetchColumns();
+          fetchPO();
           break;
         case 'onPrint':
           // TODO: put print logic here
@@ -85,13 +145,18 @@ export default defineComponent({
       }
     }
 
+    const dialog = ref(false);
+
+    function onAddNewPO() {
+      dialog.value = true;
+    }
+
     return {
       ...toRefs(state),
       onSearch,
-      onRowClick,
-      onDialog,
-      onShowBudget,
       onActions,
+
+      dialog,
     };
   },
 });

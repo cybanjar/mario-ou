@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -30,6 +31,7 @@
 <script lang="ts">
 import { defineComponent, toRefs, reactive, } from '@vue/composition-api';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -46,8 +48,8 @@ export default defineComponent({
       async function asyncCall() {
         const [dataCouponList] = await Promise.all([
           $api.outlet.getOUTableList('mealCouponList', {
-            fromDate: date.formatDate(state2.date.start, 'MM/DD/YYYY'),
-            toDate: date.formatDate(state2.date.end, 'MM/DD/YYYY'),
+            fromDate: date.formatDate(state2.inputDate.start, 'MM/DD/YYYY'),
+            toDate: date.formatDate(state2.inputDate.end, 'MM/DD/YYYY'),
           }),
         ]);
 
@@ -103,7 +105,7 @@ export default defineComponent({
     for(let i=0; i<7; i++) {
         if (i == 0) {
             tableHeaders.splice(i, 0, {
-                label: "RmNo",
+                label: "Room Number",
                 field: "zinr",
                 name: "zinr",
                 sortable: false,
@@ -119,7 +121,7 @@ export default defineComponent({
             });
         } else if (i == 2) {
             tableHeaders.splice(i, 0, {
-                label: "ResNo", 
+                label: "Reservation Number", 
                 field: "resnr",
                 name: "resnr",
                 sortable: false,
@@ -163,6 +165,12 @@ export default defineComponent({
 
         }
     }
+
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Meal Coupon');
+      }
+    }
     
     return {
       ...toRefs(state),
@@ -171,6 +179,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

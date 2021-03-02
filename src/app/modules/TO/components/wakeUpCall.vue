@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="dataWakeupcall.dialogWakeupcall" persistent>
-        <q-card style="width: 455px; height: 700px;  max-width: 90vw;">
+        <q-card style="width: 455px;  max-width: 90vw;">
             <q-toolbar>
                 <q-toolbar-title class="text-white text-weight-medium">WAKE UP CALL </q-toolbar-title>
             </q-toolbar>
@@ -62,36 +62,38 @@
                         @click="cekStatus"
                     />
                 </div>
-                <STable 
-                :columns="tableWakeupcall" 
-                :pagination.sync="pagination"
-                class="table-accounting-date"
-                row-key="name"
-                :hide-bottom="dataWakeupcall.hide_bottom"
-                :data="dataWakeupcall.data">
-                <template v-slot:body="props">
-                    <q-tr :props="props">
-                        <q-td
-                        v-for="col in props.cols.filter(
-                            col => !['hour', 'ack', 'result'].includes(col.name)
-                        )"
-                        :key="col.name" 
-                        :props="props"
-                        >{{col.value}}</q-td>
-                        <q-td @click="onColClick(props.row)" :props="props" key="hour">
-                            <q-tr v-if="timeFalidasi !== props.row.zinr">{{props.row.aenderung}}</q-tr>
-                            <q-input @blur="blurTime" v-else v-model="inputTime" borderless  dense/>
-                        </q-td>
-                        <q-td :props="props" key="ack">
-                            <q-checkbox v-if="boxFalidasi" size="xs" v-model="props.row.cekBox" />
-                            <q-checkbox v-on:click.native="checkBoxfalse" v-else size="xs" v-model="checkboxData" />
-                        </q-td>
-                        <q-td :props="props" key="result">
-                            {{props.row.result}}
-                        </q-td>
-                    </q-tr>
-                </template>
-                </STable>
+                <q-responsive :ratio="16/9">
+                    <STable 
+                    :columns="tableWakeupcall" 
+                    :pagination.sync="pagination"
+                    class="table-accounting-date"
+                    row-key="name"
+                    :hide-bottom="dataWakeupcall.hide_bottom"
+                    :data="dataWakeupcall.data">
+                    <template v-slot:body="props">
+                        <q-tr :props="props">
+                            <q-td
+                            v-for="col in props.cols.filter(
+                                col => !['hour', 'ack', 'result'].includes(col.name)
+                            )"
+                            :key="col.name" 
+                            :props="props"
+                            >{{col.value}}</q-td>
+                            <q-td @click="onColClick(props.row)" :props="props" key="hour">
+                                <q-tr v-if="timeFalidasi !== props.row.zinr">{{props.row.aenderung}}</q-tr>
+                                <q-input @blur="blurTime" v-else v-model="inputTime" borderless  dense/>
+                            </q-td>
+                            <q-td :props="props" key="ack">
+                                <q-checkbox v-if="boxFalidasi" size="xs" v-model="props.row.cekBox" />
+                                <q-checkbox v-on:click.native="checkBoxfalse" v-else size="xs" v-model="checkboxData" />
+                            </q-td>
+                            <q-td :props="props" key="result">
+                                {{props.row.result}}
+                            </q-td>
+                        </q-tr>
+                    </template>
+                    </STable>
+                </q-responsive>
             </q-card-section>
         <q-separator style="marginTop: -10px"/>
         <q-card-actions align="right" style="bottom: 0px">
@@ -207,7 +209,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 ::v-deep .table-accounting-date {
-    max-height: 36vh;
     thead tr {
     th {
         position: sticky;

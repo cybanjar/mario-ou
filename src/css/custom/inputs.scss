@@ -7,10 +7,18 @@
 }
 
 .s-input {
-  .q-field__control, .q-field__marginal, &.q-field--auto-height.q-field--dense .q-field__native {
+  .q-field__control,
+  .q-field__marginal,
+  &.q-field--auto-height.q-field--dense .q-field__native {
     min-height: 26px !important;
     height: 26px !important;
     line-height: 26px !important;
+  }
+
+  &.q-select.q-select--multiple .q-field__control,
+  &.q-select.q-select--multiple .q-field__native {
+    height: auto !important;
+    white-space: normal;
   }
 }
 

@@ -10,6 +10,11 @@ export interface OutletEndpoints {
   getOUAction: any;
   getOUDailySalesByUser2List: any;
   getOUTableList: any;
+
+  getOUPrepareSummaryRestaurantReport: any;
+  getOUSummaryRestaurantReport: any;
+  getOUPrepareOutletSoldMenu: any;
+  getOUOutletSoldMenu: any;
 }
 
 export default (doFetch: DoRequest): OutletEndpoints => ({
@@ -37,4 +42,16 @@ export default (doFetch: DoRequest): OutletEndpoints => ({
     doFetch({ url: `${OU_URL}/${api}`, body }).then(
       ([, res]) => res
   ),
+  getOUPrepareSummaryRestaurantReport: (api, body) =>
+    doFetch({ url: `${OU_URL}/${api}`, body }).then(([, res]) => res),
+  getOUSummaryRestaurantReport: (api, body) =>
+    doFetch({ url: `${OU_URL}/${api}`, body }).then(
+      ([, res]) => res?.turnover?.['turnover']
+    ),
+  getOUPrepareOutletSoldMenu: (api, body) =>
+    doFetch({ url: `${OU_URL}/${api}`, body }).then(([, res]) => res),
+  getOUOutletSoldMenu: (body) =>
+    doFetch({ url: `${OU_URL}/fbSalesCostsAnalList`, body }).then(
+      ([, res]) => res
+    ),
 });

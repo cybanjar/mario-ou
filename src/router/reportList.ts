@@ -84,6 +84,11 @@ export const reportList: any = {
         name: 'Aging Balance',
         keyword: 'Accounts Receiviable',
       },
+      {
+        path: 'report/fo-transaction',
+        name: 'FO Transaction',
+        keyword: 'Accounts Receiviable',
+      },
     ],
   },
   PU: {

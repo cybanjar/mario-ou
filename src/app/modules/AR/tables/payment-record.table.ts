@@ -1,55 +1,75 @@
-import { TableHeader } from '~/components/VhpUI/typings';
-// artnr: 3000
-// bezeich: "A/R CLEARANCE"
-// proz: 2
-// betrag: -750
-// f-amt: 0
-// currency: 0
-// curr-str: "Rp"
-// bemerk: ""
-// remain-amt: -750
-// fremain-amt: 0
-export const paymentRecordListColumns: TableHeader[] = [
+import { formatterMoney } from '~/app/helpers/formatterMoney.helper';
+import { TableActionHeader } from '~/components/VhpUI/typings';
+export type PaymentAR = {
+  article: number;
+  description: string;
+  perc: number;
+  amount: number;
+  remark: string;
+  fAmt: string;
+  payDate?: Date;
+};
+
+export const paymentRecordListColumns: TableActionHeader<PaymentAR>[] = [
   {
     label: 'Article Number',
-    field: 'artnr',
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
+    field: 'article',
     name: 'artnr',
     align: 'left',
     sortable: true,
   },
   {
     label: 'Description',
-    field: 'bezeich',
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
+    field: 'description',
     name: 'bezeich',
     align: 'left',
     sortable: true,
   },
   {
     label: 'In %',
-    field: 'proz',
+    style: 'width: 50px',
+    headerStyle: 'width: 50px',
+    field: 'perc',
     name: 'proz',
-    align: 'left',
+    align: 'right',
     sortable: true,
   },
   {
     label: 'Payment Amount',
-    field: 'betrag',
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
+    field: 'amount',
+    format: (v) => (!Number.isNaN(v) ? formatterMoney(v) : ''),
     name: 'betrag',
-    align: 'left',
+    align: 'right',
     sortable: true,
   },
   {
     label: 'Remark',
-    field: 'bemerk',
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
+    field: 'remark',
     name: 'bemerk',
     align: 'left',
     sortable: true,
   },
   {
     label: 'Foregin Amount',
-    field: 'f-amt',
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
+    field: 'fAmt',
     name: 'f-amt',
     align: 'left',
     sortable: true,
+  },
+  {
+    name: 'actions',
+    field: 'actions',
+    style: 'width: 40px',
+    headerStyle: 'width: 40px',
   },
 ];

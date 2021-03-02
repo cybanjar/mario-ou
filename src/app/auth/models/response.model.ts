@@ -7,4 +7,5 @@ export interface ResLogin extends AuthState {
     ['languages-list']: any;
   };
   iResult: number;
+  vhpLicensedate: Date;
 }

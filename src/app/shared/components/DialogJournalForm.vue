@@ -1,44 +1,54 @@
 <template>
   <div>
-    <q-form @submit="onChange" @reset="onReset">
+    <q-form
+      v-if="dateLimit.data.isLoading === false"
+      @keydown.enter.prevent.self
+      @submit="onChange"
+      @reset="onReset"
+    >
       <div class="row justify-between">
         <div class="col-5">
-          <SInput
+          <SDateInput
             label-text="Date"
-            type="date"
-            v-model="record.date"
+            v-model="date"
+            :options="dateOptions"
             :disable="isFixed('date')"
             :readonly="isFixed('date')"
-          ></SInput>
+            @keydown.enter="focusNext"
+          />
         </div>
         <div class="col-5">
           <SInput
             label-text="Reference Number"
-            v-model="record.referenceNo"
+            v-model="referenceNo"
             :disable="isFixed('referenceNo')"
             :readonly="isFixed('referenceNo')"
+            @keydown.enter="focusNext"
           ></SInput>
         </div>
       </div>
       <div class="col-5">
         <SInput
           label-text="Description"
-          v-model="record.description"
+          v-model="description"
           :disable="isFixed('description')"
           :readonly="isFixed('description')"
+          @keydown.enter="focusNext"
         ></SInput>
       </div>
       <q-separator spaced />
       <div class="row justify-between">
         <div class="col-5">
           <SInput
+            ref="accNoEl"
             mask="##.##.####"
-            placeholder="00.00.0000"
             label-text="Account Number"
             unmasked-value
-            v-model="record.accNo"
+            v-model="accNo"
+            :placeholder="accNoPhr"
             :disable="isFixed('accNo')"
             :readonly="isFixed('accNo')"
+            @keydown.enter="focusNext"
           >
             <template v-slot:append>
               <q-btn
@@ -46,7 +56,8 @@
                 round
                 dense
                 flat
-                icon="mdi-magnify"
+                style="color: #167ec9;"
+                icon="mdi-help-circle"
               />
             </template>
           </SInput>
@@ -54,57 +65,52 @@
         <div class="col-5">
           <SInput
             label-text="Account Name"
-            v-model="record.accName"
+            v-model="accName"
             dense
             autogrow
             :disable="isFixed('accName')"
             :readonly="isFixed('accName')"
+            @keydown.enter="focusNext"
           ></SInput>
         </div>
       </div>
       <div class="col-5">
         <SInput
           label-text="Remark"
-          v-model="record.remark"
+          v-model="remark"
           :disable="isFixed('remark')"
           :readonly="isFixed('remark')"
+          @keydown.enter="focusNext"
         ></SInput>
       </div>
       <div class="row justify-between">
         <div class="col-5">
           <SInputMoney
             label-text="Credit"
-            v-model="record.credit"
+            v-model="credit"
             :disable="isFixed('credit')"
             :readonly="isFixed('credit')"
+            @keydown.enter="focusNext"
           ></SInputMoney>
         </div>
         <div class="col-5">
           <SInputMoney
             label-text="Debit"
-            v-model="record.debit"
+            v-model="debit"
             :disable="isFixed('debit')"
             :readonly="isFixed('debit')"
+            @keydown.enter="focusNext"
           ></SInputMoney>
         </div>
       </div>
-      <div class="width-full row q-gutter-md q-mb-md">
-        <q-btn
-          outline
-          flat
-          type="reset"
-          color="white"
-          class="col"
-          text-color="black"
-          label="Reset"
-          :disable="isFixed('btn')"
-          :readonly="isFixed('btn')"
-        />
+      <div
+        class="width-full q-py-sm row q-gutter-md q-mb-md items-center justify-center"
+      >
         <q-btn
           type="submit"
           color="white"
           icon="mdi-export"
-          class="col"
+          class="col-7"
           text-color="black"
           :label="label"
           :disable="isFixed('btn')"
@@ -117,14 +123,14 @@
         <SRemarkLeftDrawer
           right
           label="Total Debit"
-          :value="formatterMoney(credits)"
+          :value="formatterMoney(debits)"
         />
       </div>
       <div class="col-5">
         <SRemarkLeftDrawer
           right
           label="Total Credit"
-          :value="formatterMoney(debits)"
+          :value="formatterMoney(credits)"
         />
       </div>
     </div>
@@ -137,11 +143,7 @@
         />
       </div>
       <div class="col-5">
-        <q-checkbox
-          v-model="record.print"
-          left-label
-          label="Summary Per Date"
-        />
+        <q-checkbox v-model="print" left-label label="Summary Per Date" />
       </div>
     </div>
     <AccDialog
@@ -154,64 +156,85 @@
 <script lang="ts">
 import {
   defineComponent,
-  watchEffect,
   reactive,
+  ref,
   toRefs,
+  watch,
 } from '@vue/composition-api';
 import { JournalTrans } from '../models/journal.model';
 import { formatterMoney } from '../../helpers/formatterMoney.helper';
 import { date } from 'quasar';
 import { useDialog } from '../compositions/use-dialog.composition';
-
-const journalTrans: JournalTrans = {
-  key: -1,
-  date: date.formatDate(new Date(), 'YYYY-MM-DD'),
-  referenceNo: '',
-  description: '',
-  debits: 0,
-  credits: 0,
-  remaining: 0,
-  accNo: '',
-  accName: '',
-  debit: 0,
-  credit: 0,
-  remark: '',
-  jnr: 0,
-  recid: '',
-};
+import { usePrepare } from '../compositions/use-prepare.composition';
 
 export default defineComponent({
   props: {
     label: { type: String, required: true },
+    journaltype: { type: Number, required: true },
     debits: { type: Number, required: false, default: 0 },
     credits: { type: Number, required: false, default: 0 },
     remaining: { type: Number, required: false, default: 0 },
     param: {
       type: Object as () => JournalTrans,
-      required: false,
-      default: () => journalTrans,
+      required: true,
     },
     validator: { type: Function, required: false },
-    disable: { type: Boolean, required: false, default: true },
+    disable: { type: Boolean, required: false, default: false },
     fixeds: {
       type: Array as () => string[],
       required: false,
       default: () => [],
     },
   },
-  setup(props, { emit }) {
+  setup(props, { emit, root: { $api } }) {
     const accDialog = useDialog();
-    const state = reactive({
-      record: props.param,
-    });
+    const filter = reactive({ ...props.param });
+    const accNoEl = ref();
+    const accNoPhr = ref('99.99.9999');
 
-    watchEffect(() => {
-      state.record = props.param;
-    });
+    watch(
+      () => props.param,
+      (val) => {
+        // focust to this first
+        if (!val.accNo && !isFixed('accNo')) {
+          accNoEl?.value.$children[0].focus(); // focust accNo
+        }
+        Object.assign(filter, val);
+      }
+    );
+
+    const dateLimit = usePrepare(
+      true,
+      () =>
+        Promise.all([
+          $api.common.getGeneralParam(props.journaltype, 558),
+          $api.common.getGeneralParam(props.journaltype, 110),
+          $api.common.getGeneralParam(3, 977),
+        ]),
+      ([_, generalSatuSatuPuluh, accInit]) => {
+        filter.date = new Date(generalSatuSatuPuluh.fdate);
+
+        accNoPhr.value = accInit.fchar.replace(/\-/g, '.');
+      },
+      ([generalLimaLimaLapan, generalSatuSatuPuluh]) => {
+        const closeMonth = date.formatDate(
+          generalLimaLimaLapan.fdate,
+          'YYYY/MM/DD'
+        );
+        const billingDate = date.formatDate(
+          generalSatuSatuPuluh.fdate,
+          'YYYY/MM/DD'
+        );
+        return {
+          closeMonth,
+          billingDate,
+        };
+      }
+    );
 
     function fillAccField(account) {
-      state.record.accNo = account.accountNumber;
-      state.record.accName = account.accountName;
+      filter.accNo = account.accountNumber;
+      filter.accName = account.accountName;
       accDialog.hide();
     }
 
@@ -219,28 +242,53 @@ export default defineComponent({
       return props.fixeds.includes(label) || props.disable;
     }
 
+    function focusNext(e) {
+      const inputs: any[] = Array.from(
+        e.target.form.querySelectorAll('input, textarea')
+      );
+      const index = inputs.indexOf(e.target);
+
+      if (index < inputs.length) {
+        emit('stage', index, filter);
+        inputs[index + 1].focus();
+      }
+    }
     function onChange() {
-      emit('commit', state.record);
+      // validate here
+      const param = { ...filter };
+      param.debit = param.debit | 0;
+      param.credit = param.credit | 0;
+      emit('commit', param);
     }
 
     function onReset() {
-      state.record = props.param;
-      emit('reset', state.record);
+      Object.assign(filter, props.param);
+      emit('reset', filter);
     }
 
     function pickAcc() {
       accDialog.show();
     }
 
+    function dateOptions(date: string) {
+      const { billingDate, closeMonth } = dateLimit.result.value;
+      return date > closeMonth && date <= billingDate;
+    }
+
     return {
-      ...toRefs(state),
+      ...toRefs(filter),
+      accNoEl,
+      accNoPhr,
       isFixed,
+      focusNext,
       onChange,
       pickAcc,
       accDialog,
       fillAccField,
       formatterMoney,
       onReset,
+      dateOptions,
+      dateLimit,
     };
   },
   components: {

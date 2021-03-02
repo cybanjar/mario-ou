@@ -1,13 +1,15 @@
 import { date } from 'quasar';
+import {formatterMoney} from '~/app/helpers/formatterMoney.helper'
 
 export const dataIncomingJournalizing = (GET_DATA?, prepare?) => {
   const date1 = date.formatDate(GET_DATA.lastAcctdate, 'MM-DD-YYYY');
+  const dataDate = new Date(date1)
+  dataDate.setDate(dataDate.getDate()+1)
   const data = (key) => ({
-    fromDate:
-      key == 'prepare' ? new Date(date1) : new Date(GET_DATA.searches.fromDate),
-    toDate: key == 'prepare' ? new Date(date1) : GET_DATA.searches.toDate,
-    hasilCredit: key == 'prepare' ? 0 : GET_DATA.credits,
-    hasilDebit: key == 'prepare' ? 0 : GET_DATA.debits,
+    fromDate: key == 'prepare' ? new Date(date1) : GET_DATA.searches.fromDate,
+    toDate: key == 'prepare' ? dataDate: GET_DATA.searches.toDate,
+    hasilCredit: key == 'prepare' ? 0 : formatterMoney(GET_DATA.credits),
+    hasilDebit: key == 'prepare' ? 0 : formatterMoney(GET_DATA.debits),
     lebelSearch: key == 'prepare' ? 'search' : 'journalizing',
     disableButton:
       key == 'search'
@@ -54,8 +56,8 @@ export const paramsReorg = (val) => ({
 
 export const paramsIncomingJournalizing = (val?) => ({
   pvILanguage: 0,
-  linkOut: val.dataKey == 'outgoing' ? true : false,
-  linkIn: val.dataKey == 'outgoing' ? false : true,
+  linkOut: val.dataKey == 'outgoing' ? false : true,
+  linkIn: val.dataKey == 'outgoing' ? true : false,
   fromGrp:
     val.dataKey == 'outgoing'
       ? val.value !== '' ? val.dataGroup.value : 0

@@ -1,8 +1,17 @@
 <template>
   <div>
-    <label v-if="labelText" class="inline-block q-mb-xs">
-      {{ labelText }}
-    </label>
+    <div class="label-layout">
+      <label v-if="labelText" class="inline-block q-mb-xs">
+        {{ labelText }}
+      </label>
+      <img
+        v-if="icon"
+        :src="require(`~/app/icons${icon}`)"
+        alt="icon"
+        class="q-mb-sm cursor-pointer"
+        @click="onClickIcon"
+      />
+    </div>
     <q-input
       dense
       outlined
@@ -34,6 +43,8 @@ export default defineComponent({
     value: { required: false },
     labelText: { type: String, default: null },
     inputClasses: { type: String, default: 'q-mb-md' },
+    icon: { type: String },
+    onClickIcon: { type: Function },
   },
   setup(_, { emit }) {
     const onChange = (event) => {
@@ -46,3 +57,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.label-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>

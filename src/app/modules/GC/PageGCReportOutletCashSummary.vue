@@ -8,7 +8,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
         </q-btn>
       </div>
@@ -35,6 +35,8 @@ import {
 import {tableHeaders}  from './tables/ReportOutletCashSummary.table'
 import {outletcashsummary, data_map, oprtions, table_data} from './utils/params.reportOutletCashSummary'
 import {date} from 'quasar'
+import {PrintJs} from '~/app/helpers/PrintJs'
+
 export default defineComponent({
     setup(_, {root: {$api}}){
       const state = reactive({
@@ -44,7 +46,8 @@ export default defineComponent({
           date: null,
           createdId: [],
           departement: [],
-          oprtions: oprtions
+          exchgRate: 0,
+          oprtions: [],
         }
       })
 
@@ -56,6 +59,8 @@ export default defineComponent({
             state.search.date = new Date(datadate),
             state.search.createdId = data_map(GET_DATA)
             state.search.departement = outletcashsummary(GET_DATA)
+            state.search.exchgRate = GET_DATA.exchgRate
+            state.search.oprtions = oprtions
             break;
           default:
             state.data = table_data(GET_DATA)
@@ -72,24 +77,30 @@ export default defineComponent({
 
       const onSearch = (value) => {
         let dataBinelist = []
-        if (value.checbox1) {
-            for(const i of state.search.createdId){
-              dataBinelist.push(i.data)
-            }
+        for (const x of value.cretedid) {
+          dataBinelist.push(x.data)
         }
+        
         FETCH_API('restdayMercureBtnGo', {
           blineList:{
             'bline-list': dataBinelist,
           },
-          Shift: 0,
-          fromDate: '09/01/18',
-          exchgRate: 12000
+          shift: value.shift.value,
+          fromDate: date.formatDate(value.date, 'MM/DD/YY'),
+          exchgRate: state.search.exchgRate
         })
       }
+
+    function doPrint() {
+      if (state.data.length !== 0) {     
+        PrintJs(state.data, tableHeaders, 'Outlet Cash Summary')   
+      }
+    }
       return {
         ...toRefs(state),
         tableHeaders,
-        onSearch
+        onSearch,
+        doPrint
       }
     },
     components: {

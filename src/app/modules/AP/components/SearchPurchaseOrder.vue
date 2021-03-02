@@ -1,7 +1,7 @@
 <template>
   <section>
     <!-- Unset the position so v-date-picker can show up -->
-    <q-form @submit="onSearch" style="position: unset;">
+    <q-form @submit="onSearch" style="position: unset">
       <div class="q-pa-md">
         <SSelect
           label-text="Status"
@@ -17,26 +17,31 @@
       <q-separator />
       <div class="q-pa-md">
         <v-date-picker
-          mode="range"
           v-model="formData.date"
+          :masks="{ input: 'DD/MM/YY' }"
           :columns="2"
-          :popover="{ visibility: 'click' }"
-          :masks="{ input: 'DD/MM/YYYY' }"
+          :popover="{
+            visibility: 'click',
+            placement: 'bottom-start',
+          }"
+          is-range
         >
-          <SInput
-            label-text="Date"
-            slot-scope="{ inputProps }"
-            placeholder="From - Until"
-            readonly
-            v-bind="inputProps"
-          >
-            <template v-slot:append>
-              <q-icon name="mdi-calendar" />
-            </template>
-          </SInput>
+          <template #default="{ inputValue, inputEvents }">
+            <SInput
+              label-text="Date"
+              placeholder="From - Until"
+              readonly
+              :value="`${inputValue.start} - ${inputValue.end}`"
+              v-on="inputEvents.start"
+            >
+              <template #append>
+                <q-icon name="mdi-calendar" />
+              </template>
+            </SInput>
+          </template>
         </v-date-picker>
 
-        <SelectFilter
+        <select-filter
           label-text="User"
           :mapping="false"
           :options="userOptions"
@@ -48,7 +53,7 @@
           v-model="formData.documentNumber"
         />
 
-        <SelectFilter
+        <select-filter
           label-text="Department"
           :options="departmentOptions"
           option-value="nr"
@@ -56,7 +61,7 @@
           v-model="formData.department"
         />
 
-        <SelectFilter
+        <select-filter
           label-text="Supplier"
           :options="supplierOptions"
           option-value="lief-nr"
@@ -128,7 +133,6 @@ export default defineComponent({
     const supplierOptions = ref<ResSupplierList[]>([]);
     (async () => {
       const response = await $api.accountsPayable.getPreparePurchaseOrderList();
-
       const users = response.users;
       userOptions.value = users.map((user) => user.username);
 
@@ -145,7 +149,6 @@ export default defineComponent({
     // End setup form options
 
     function onSearch() {
-      // TODO: Need to use toRaw to pass formData. But still not supported
       emit('onSearch', { ...formData });
     }
 

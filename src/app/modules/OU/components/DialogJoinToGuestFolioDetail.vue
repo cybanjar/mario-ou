@@ -120,13 +120,14 @@ export default defineComponent({
 
     const tableHeaders = [
       {
-            label: "ArtNo",
+            label: "Article Number",
             field: "artnr",
-            align: "right",
+            align: "left",
         },{
-            label: "Qty", 
+            label: "Quantity", 
             field: "anzahl",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Description", 
             field: "bezeich",
@@ -135,14 +136,16 @@ export default defineComponent({
             label: "Price", 
             field: "epreis",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Balance", 
             field: "betrag",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
             },{
-            label: "No", 
+            label: "Number", 
             field: "waehrungsnr",
-            align: "center",
+            align: "left",
         }, {
             label: "Bill Date", 
             field: "bill-datum",

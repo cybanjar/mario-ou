@@ -3,34 +3,9 @@
     <div class="q-pa-md">
       <div class="row q-gutter-xs">
         <div class="col">
-          <v-date-picker v-model="searches.date" :popover="{ visibility: 'click' }">
-            <SInput
-              label-text="Date"
-              placeholder="Select Date"
-              slot-scope="{ inputProps }"
-              readonly
-              v-bind="inputProps"/>
-          </v-date-picker>
-        </div>
-
-        <div class="col">
-          <div class="row q-gutter-xs">
-            <div class="col">
-              <q-btn color="white" text-color="black" label="L" />
-            </div>
-
-            <div class="col">
-              <q-btn color="white" text-color="black" label="R" />
-            </div>
-              
-            <div class="col">
-              <q-btn color="white" text-color="black" label="D" />
-            </div>
-
-            <div class="col">
-              <q-btn color="white" text-color="black" label="U" />
-            </div>
-          </div>
+          <DateInput
+            label-text="Date"
+            v-model="searches.date" />
         </div>
 
         <div class="col">
@@ -40,9 +15,6 @@
             </template>
           </q-field>
         </div>
-
-          <!-- <q-btn dense color="primary" icon="mdi-magnify" label="Search" class="q-mt-md full-width" @click="onSearch"/> -->
-
       </div>
     </div>
     
@@ -50,14 +22,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs, watchEffect } from '@vue/composition-api';
-import { setupCalendar, DatePicker } from 'v-calendar';
-import { watch } from 'fs';
-import { date } from 'quasar';
+import { defineComponent, ref, reactive, toRefs, watch } from '@vue/composition-api';
+import DateInput from '~/app/modules/FR/components/common/DateInput.vue';
 
-setupCalendar({
-  firstDayOfWeek: 2,
-});
+// import { setupCalendar, DatePicker } from 'v-calendar';
+// import { watch } from 'fs';
+// import { date } from 'quasar';
+
 
 export default defineComponent({
   props: {
@@ -72,26 +43,28 @@ export default defineComponent({
         child: 0,
         comp: 0
     });
+    
+    watch(
+      () => props.searches.date, (dates) => {
+        console.log('date change');
+        emit('getResPlanDataLoad', { ...props.searches });
+      }
+    );
 
-    const onSearch = () => {
-      emit('onSearch', { ...props.searches });
-    };
-
-    watchEffect(() => {
-        console.log(" ")
-        // state.date = props.searches.date;
-        // state.adult = props.searches.adult;
-        // state.child = props.searches.child;
-        // state.comp = props.searches.comp;
-    })
+    // watchEffect(() => {
+    //     console.log(" ")
+    //     // state.date = props.searches.date;
+    //     // state.adult = props.searches.adult;
+    //     // state.child = props.searches.child;
+    //     // state.comp = props.searches.comp;
+    // })
 
     return {
       ...toRefs(state),
-      onSearch,
     };
   },
   components: {
-    'v-date-picker': DatePicker,
+    DateInput,
   }
 });
 </script>

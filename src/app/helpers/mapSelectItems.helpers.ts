@@ -27,11 +27,57 @@ export const mapLabelPrefixBezeich = (
 
 export const mapSelectItems = (
   items: any[],
-  prefixKey: string,
-  valueKey: string
+  valueKey: string,
+  prefixKey?: string
 ): SelectItem[] =>
+  items.map((item) => {
+    let label = prefixKey ? `${item[prefixKey]} - ` : '';
+    label += item[valueKey];
+
+    return {
+      label,
+      value: item[valueKey],
+    };
+  });
+
+export const mapWithadjustmain = (items, prefix) =>
+  items
+    ? items.map((item) => ({
+        label: `${item[prefix]} - ${item.bezeich}`,
+        value: item.endkum,
+      }))
+    : [];
+
+export const mapWithadjuststore = (items, prefix) =>
+  items
+    ? items.map((item) => ({
+        label: `${item[prefix]} - ${item.bezeich}`,
+        value: item['lager-nr'],
+      }))
+    : [];
+
+export const mapWithPrefix = (items, prefix): SelectItem[] =>
+  items
+    ? items.map((item) => ({
+        label: `${item[prefix]} - ${item.bezeich}`,
+        value: item[prefix],
+      }))
+    : [];
+
+export const mapWithMeal = (items, prefix) =>
+  items
+    ? items.map((item) => ({
+        label: `${item[prefix]} - ${item.depart}`,
+        value: item.num,
+      }))
+    : [];
+export const mapBaseDropdown = (
+  items: any[],
+  valueKey: string,
+  labelKey: string
+) =>
   items.map((item) => ({
-    label: `${item[prefixKey]} - ${item[valueKey]}`,
+    label: item[labelKey],
     value: item[valueKey],
   }));
 

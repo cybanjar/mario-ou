@@ -1,109 +1,59 @@
 <template>
   <SInput
-    v-model="displayValue"
-    v-bind="$attrs"
-    v-on="forkListener"
-    :rules="[dateRangeRule]"
-    mask="####/##/## - ####/##/##"
-    hide-bottom-space
+    label-text="Date"
+    placeholder="From - Until"
+    ref="inputDate"
+    :value="range.dateInput"
+    readonly
   >
     <template v-slot:append>
-      <q-icon name="mdi-calendar" class="cursor-pointer">
-        <q-popup-proxy
-          ref="popupElRef"
-          transition-show="scale"
-          transition-hide="scale"
-        >
-          <div class="row q-px-sm flex-p-center justify-center items-center">
-            <div class="col">
-              <q-input v-model="afterLabel" borderless :rules="['date']" />
-            </div>
-            <div class="col-1">-</div>
-            <div class="col">
-              <q-input v-model="beforeLabel" borderless :rules="['date']" />
-            </div>
-          </div>
-          <q-date v-model="afterLabel" @input="onChange" minimal />
-          <q-date @input="handleInput" v-model="beforeLabel" minimal />
-        </q-popup-proxy>
-      </q-icon>
+      <q-icon name="mdi-calendar" />
     </template>
   </SInput>
 </template>
+
 <script lang="ts">
-import { QPopupProxy, date } from 'quasar';
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  ref,
-  computed,
-} from '@vue/composition-api';
+import { defineComponent, ref, onMounted } from '@vue/composition-api';
+import Litepicker from 'litepicker';
+import { date } from 'quasar';
 
-type Range = {
-  before: Date;
-  after: Date;
-};
+interface Props {
+  range: {
+    startDate: string;
+    endDate: string;
+    dateInput: string;
+  };
+}
 
-export default defineComponent({
-  inheritAttrs: false,
+export default defineComponent<Props>({
   props: {
-    value: { type: Object as () => Range, required: true },
+    range: { type: Object, default: null },
   },
-  setup(props, { emit, listeners }) {
-    const { input, ...forkListener } = listeners;
-    const state = reactive({
-      before: props.value.before,
-      after: props.value.after,
+  setup(props, { emit }) {
+    const inputDate = ref<any>(null);
+
+    onMounted(() => {
+      const inputEl = inputDate.value.$refs.sInput.$refs.input;
+      new Litepicker({
+        element: inputEl,
+        singleMode: false,
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        format: 'DD/MM/YY',
+        startDate: date.extractDate(props.range.startDate, 'DD/MM/YY'),
+        endDate: date.extractDate(props.range.endDate, 'DD/MM/YY'),
+        showTooltip: false,
+        onSelect: function (sDate, eDate) {
+          const startDate = date.formatDate(sDate, 'DD/MM/YY');
+          const endDate = date.formatDate(eDate, 'DD/MM/YY');
+          const dateInput = `${startDate} - ${endDate}`;
+          emit('update:range', { startDate, endDate, dateInput });
+        },
+      });
     });
-
-    const popupElRef = ref<QPopupProxy>();
-
-    const beforeLabel = computed({
-      get: () => date.formatDate(state.before, 'YYYY/MM/DD'),
-      set: (val) => (state.before = new Date(val)),
-    });
-    const afterLabel = computed({
-      get: () => date.formatDate(state.after, 'YYYY/MM/DD'),
-      set: (val) => (state.after = new Date(val)),
-    });
-
-    const displayValue = computed({
-      get: () =>
-        date.formatDate(state.after, 'YYYY/MM/DD') +
-        ' - ' +
-        date.formatDate(state.before, 'YYYY/MM/DD'),
-      set: (v) => {
-        state.before = new Date(v.split(' - ')[1]);
-        state.after = new Date(v.split(' - ')[0]);
-        onChange();
-      },
-    });
-
-    const dateRangeRule = (sDate) =>
-      /^-?[\d]+\/[0-1]\d\/[0-3]\d\s-\s-?[\d]+\/[0-1]\d\/[0-3]\d$/.test(sDate);
-
-    function handleInput() {
-      popupElRef.value?.hide();
-      onChange();
-    }
-
-    function onChange() {
-      const before = new Date(state.before);
-      const after = new Date(state.after);
-      emit('input', { before, after });
-    }
 
     return {
-      ...toRefs(state),
-      handleInput,
-      forkListener,
-      onChange,
-      popupElRef,
-      displayValue,
-      beforeLabel,
-      afterLabel,
-      dateRangeRule,
+      inputDate,
     };
   },
 });

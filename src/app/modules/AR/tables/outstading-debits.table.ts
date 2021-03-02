@@ -7,15 +7,17 @@ export const mainListColumns: TableHeader<any>[] = [
     field: 'date',
     name: 'date',
     align: 'left',
-    format: (it) => formatToBL(it),
+    format: (it) => (it ? formatToBL(it) : ''),
     sortable: true,
+    headerStyle: 'width: 100px',
   },
   {
     label: 'Bill Number',
     field: 'billNo',
     name: 'billNo',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    headerStyle: 'width: 100px',
   },
 ];
 
@@ -26,6 +28,7 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'rmNo',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 100px',
   },
   {
     label: 'Bill Receiver',
@@ -33,22 +36,23 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'billReceiver',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 190px',
   },
   {
     label: 'Amount',
     field: 'debtAmount',
     name: 'debtAmount',
-    align: 'left',
-    format: (it) => formatterMoney(it),
+    align: 'right',
     sortable: true,
+    headerStyle: 'width: 150px',
   },
   {
     label: 'Foreign Amount',
     field: 'foreignAmount',
     name: 'foreignAmount',
-    format: (it) => formatterMoney(it),
-    align: 'left',
+    align: 'right',
     sortable: true,
+    headerStyle: 'width: 150px',
   },
   {
     label: 'Currency',
@@ -56,6 +60,7 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'currency',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 110px',
   },
   {
     label: 'Id',
@@ -63,6 +68,7 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'id',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 50px',
   },
   {
     label: 'Invoice Date',
@@ -70,6 +76,7 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'mailDate',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 100px',
   },
   {
     label: 'Remark',
@@ -77,13 +84,15 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'additionalInfo',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 150px',
   },
   {
     label: 'Company Number',
     field: 'compNo',
     name: 'compNo',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    headerStyle: 'width: 100px',
   },
   {
     label: 'Reference Number',
@@ -91,6 +100,7 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'refNo',
     align: 'left',
     sortable: true,
+    headerStyle: 'width: 110px',
   },
   {
     label: 'Arrival',
@@ -98,6 +108,8 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'arrival',
     align: 'left',
     sortable: true,
+    format: (it) => (it ? formatToBL(it) : ''),
+    headerStyle: 'width: 110px',
   },
   {
     label: 'Departure',
@@ -105,15 +117,18 @@ export const outstandDebtColumns: TableHeader<any>[] = [
     name: 'departure',
     align: 'left',
     sortable: true,
+    format: (it) => (it ? formatToBL(it) : ''),
+    headerStyle: 'width: 110px',
   },
   {
     label: 'Night',
     field: 'night',
     name: 'night',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    headerStyle: 'width: 85px',
   },
-  { name: 'actions', field: 'actions' },
+  { name: 'actions', field: 'actions', headerStyle: 'width: 50px' },
 ];
 
 export function getOutstandDebtColumns(
@@ -128,6 +143,7 @@ export function getOutstandDebtColumns(
         name: 'invoiceNumber',
         align: 'left',
         sortable: true,
+        headerStyle: 'width: 100px',
       },
       ...outstandDebtColumns,
     ];

@@ -2,17 +2,11 @@
   <section class="mt-7">
     <div class="q-pa-md">
       
-      <!-- <SDateRange :range.sync="range" /> -->
-
-      <v-date-picker mode="range" v-model="searches.date" :columns="2" :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="Date"
-          slot-scope="{ inputProps }"
-          placeholder="Select Date"
-          readonly
-          v-bind="inputProps"
-          @clear="searches.date = null" />
-      </v-date-picker>
+      <DateRangeInput
+        label-text="Date"
+        :position-fixed="true"
+        v-model="searches.date"
+      />
 
       <SSelect @input="onChange($options, true)" label-text="From Outlet" :options="searches.fromDept" v-model="searches.fromDeptVal" />
       <SSelect  @input="onChange($options, false)" label-text="To Outlet" :options="searches.toDept" v-model="searches.toDeptVal" />
@@ -65,15 +59,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs, computed } from '@vue/composition-api';
-import { date } from 'quasar';
-import { setupCalendar, DatePicker } from 'v-calendar';
-
-setupCalendar({
-  firstDayOfWeek: 2,
-});
-
+import DateRangeInput from '~/app/modules/FR/components/common/DateRangeInput.vue';
 
 export default defineComponent({
+  components: {
+    DateRangeInput,
+  },
+
   props: {
     searches: { type: Object, required: true },
   },
@@ -180,9 +172,6 @@ export default defineComponent({
       onChangeAllSub
     };
   },
-  components: {
-    'v-date-picker': DatePicker,
-  }
 });
 </script>
 

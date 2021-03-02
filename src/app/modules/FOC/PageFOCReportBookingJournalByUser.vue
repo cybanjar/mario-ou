@@ -114,7 +114,7 @@
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -133,7 +133,7 @@ import {
   toRefs,
   onMounted,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportBookingJournalByUser.table';
+import { ResTableHeaders } from './tables/Report/reportBookingJournalByUser.table';
 import { setupCalendar, DatePicker } from 'v-calendar';
 
 setupCalendar({
@@ -319,7 +319,7 @@ export default defineComponent({
     };
 
     return {
-      tableHeaders,
+      ResTableHeaders,
       onSearch,
       onResets,
       ...toRefs(state),

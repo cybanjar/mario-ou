@@ -55,6 +55,7 @@ export default defineComponent<Props>({
           emit('onActions', `on${name}`);
         },
       };
+
       if (typeof action !== 'string' && action.position === 'prefix') {
         btnActions.unshift(actionItem);
       } else {

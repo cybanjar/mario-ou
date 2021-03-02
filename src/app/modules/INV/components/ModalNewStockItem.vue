@@ -201,6 +201,7 @@ export default defineComponent({
   setup(props, { emit, root: { $api } }) {
     const state = reactive({
       isLoading: false,
+      inputCategory: inputCategory,
       splitterModel: 20,
       totalBudget: 0,
       columns: [],
@@ -371,8 +372,8 @@ export default defineComponent({
         const x = {
           pvILanguage: 1,
             caseType: 2, 
-            inpInt: inputCategory[0].value.value, 
-            inpInt2: inputCategory[1].value.value,
+            inpInt: inputCategory[1].value.value, 
+            inpInt2: inputCategory[0].value.value,
             inpChar: ' ',
           }
         FETCH_API('getInvArtNo', x)
@@ -390,7 +391,13 @@ export default defineComponent({
         state.dataAccount.dialog = true
       }
     }
-const data = () => {
+
+    const saveData = () => {
+      FETCH_API('addInvArticle', {
+        
+      })
+    }
+    const data = () => {
 
 
 
@@ -445,12 +452,11 @@ const data = () => {
     //   }
     //   saveData();
     // }
-}
+    }
 
 
 
     return {
-      inputCategory,
       valueDelUnit,
       modalRecipe,
       UnitPrice,
@@ -460,6 +466,7 @@ const data = () => {
       clickMainGrup,
       inputUnitPrice,
       inputAdditional,
+      saveData,
       ...toRefs(state),
       pagination: { page: 1, rowsPerPage: 0 },
     };

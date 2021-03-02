@@ -53,15 +53,15 @@ export const tableHeaders: TableHeader[] = [
   },
   {
     label: 'Time',
-    field: 'amount',
-    name: 'amount',
+    field: 'zeit',
+    name: 'zeit',
     align: 'left',
     sortable: false,
   },
   {
     label: 'Chg-ID',
-    field: 'fibukonto',
-    name: 'fibukonto',
+    field: 'chginit',
+    name: 'chginit',
     align: 'left',
     sortable: false,
   },
@@ -73,6 +73,18 @@ export const tableHeaders: TableHeader[] = [
     align: 'left',
   },
 ];
+
+function time(date) {
+  let sec_num = parseInt(date, 10)
+  let hours   = Math.floor(sec_num / 3600) as any;
+  let minutes = Math.floor((sec_num - (hours * 3600)) / 60) as any;
+  let seconds = sec_num - (hours * 3600) - (minutes * 60) as any;
+
+  if (hours < 10) {hours = "0"+hours}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+    return hours + ':' + minutes + ':' + seconds;
+}
 
 export const dataTable = (items) => {
   return items.tGList['t-g-list'].map((item) => ({
@@ -86,12 +98,12 @@ export const dataTable = (items) => {
     credit: formatterMoney(item.credit),
     bemerk: item.bemerk,
     userinit: item.userinit,
-    sysdate: date.formatDate(item.sysdate, 'DD/MM/YYYYYY'),
+    sysdate: date.formatDate(item.sysdate, 'DD/MM/YYYY'),
     content: item.content,
     einzelpreis: item.einzelpreis,
     actions: '',
     selected: false,
-    zeit: item.zeit,
+    zeit: time(item.zeit),
     chgdate: item.chgdate,
     duplicate: item.duplicate,
     'add-note': item['add-note']

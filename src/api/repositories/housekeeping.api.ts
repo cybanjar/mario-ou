@@ -1,5 +1,6 @@
 import { DoRequest } from '../config/repository';
 import { date } from 'quasar';
+import { injectPermPar } from './common.api';
 
 const HK_URL = 'HouseKeeping';
 
@@ -14,6 +15,15 @@ export interface HousekeepingEndpoints {
   deactivateOOOandOM: any;
   getRoomingList: any;
   getStoreRoomDiscrepancyList: any;
+  getLostAndFound: any;
+  deleteLostAndFound: any;
+  getRoomAddLostFound: any;
+  updateAddLostAndFound: any;
+  getGuestPreferenceList: any;
+  getGuestPreferenceAddList: any;
+  getGuestPreferenceChgList: any;
+  getGuestPreferenceQueryRooms: any;
+  getGuestPreferenceDeleteList: any;
 }
 
 const reformBody = {
@@ -89,4 +99,49 @@ export default (doFetch: DoRequest): HousekeepingEndpoints => ({
       url: `${HK_URL}/getStoreRoomDiscrepancyList`,
       body: reformBody.getStoreRoomDiscrepancyList(payload),
     }),
+  getLostAndFound: (body) =>
+    doFetch({
+      url: `${HK_URL}/getLostAndFound`,
+      body,
+    }).then(([_, response]) => response.sList['s-list']),
+  deleteLostAndFound: (body) =>
+    doFetch({
+      url: `${HK_URL}/deleteLostAndFound`,
+      body: injectPermPar(body),
+    }).then(([_, response]) => response),
+  getRoomAddLostFound: (roomNumber: number) =>
+    doFetch({
+      url: `${HK_URL}/getRoomAddLostFound`,
+      body: { zinr: roomNumber },
+    }).then(([_, response]) => response),
+  updateAddLostAndFound: (body) =>
+    doFetch({
+      url: `${HK_URL}/updateAddLostAndFound`,
+      body,
+    }).then(([_, response]) => response),
+  getGuestPreferenceList: (payload) =>
+    doFetch({
+      url: `${HK_URL}/getGuestPreferenceList`,
+      body: payload,
+    }).then(([_, response]) => response?.tQueasy?.['t-queasy']),
+  getGuestPreferenceAddList: (payload) =>
+    doFetch({
+      url: `${HK_URL}/getGuestPreferenceAddList`,
+      body: injectPermPar(payload),
+    }).then(([_, response]) => response),
+  getGuestPreferenceChgList: (caseType, payload) =>
+    doFetch({
+      url: `${HK_URL}/getGuestPreferenceChgList`,
+      body: { caseType, ...payload },
+    }).then(([_, response]) => response),
+  getGuestPreferenceQueryRooms: (body) =>
+    doFetch({
+      url: `${HK_URL}/getGuestPreferenceQueryRooms`,
+      body,
+    }).then(([_, response]) => response),
+  getGuestPreferenceDeleteList: (body) =>
+    doFetch({
+      url: `${HK_URL}/getGuestPreferenceDeleteList`,
+      body,
+    }).then(([_, response]) => response),
 });

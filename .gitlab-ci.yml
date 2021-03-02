@@ -9,6 +9,6 @@ before_script:
 deploy_staging:
   type: deploy
   script:
-    - ssh vuedev@18.138.115.229 "cd /usr/share/nginx/vhp-web && git pull origin master && yarn && yarn build && exit"
+    - ssh webdev@52.74.104.143 -p 8022 "cd /usr/share/nginx/vhp-web && git pull origin master && yarn && yarn build && exit"
   only:
     - master

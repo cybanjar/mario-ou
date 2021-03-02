@@ -63,8 +63,7 @@ export const tableHeaders: TableHeader[] = [
     field: 'einzelpreis',
     name: 'einzelpreis',
     sortable: false,
-  },
-  { name: 'actions', field: 'actions' },
+  }
 ];
 
 export const dataTable = (items) => {
@@ -77,7 +76,7 @@ export const dataTable = (items) => {
     credit: formatterMoney(item.credit),
     bemerk: item.bemerk,
     userinit: item.userinit,
-    sysdate: date.formatDate(item.sysdate, 'DD/MM/YYYYYY'),
+    sysdate: date.formatDate(item.sysdate, 'DD/MM/YYYY'),
     content: item.content,
     einzelpreis: item.einzelpreis,
     actions: '',

@@ -36,9 +36,9 @@ import {
   toRefs,
   reactive,
 } from '@vue/composition-api';
-import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date } from 'quasar';
 import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -58,7 +58,6 @@ export default defineComponent({
         }),
       ]);
       responsePrepare = data || [];
-      console.log('test', responsePrepare.ttArtnr['tt-artnr']);
     });
 
     const onSearch = (state2) => {
@@ -84,11 +83,8 @@ export default defineComponent({
             fromDate: date.formatDate(state2.date, 'YYYY-MM-DD'),
           }),
         ]);
-        console.log(dataSummaryRestaurantList);
-
         charts = dataSummaryRestaurantList[0] || [];
         state.build = charts['turnover']['turnover'];
-        console.log(state2.date, 'data1');
       }
       asyncCall();
     };
@@ -112,8 +108,9 @@ export default defineComponent({
         label: 'Food Harris Cafe',
         field: 'food',
         name: 'food',
-        align: 'left',
+        align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Beverange Harris Cafe',
@@ -121,18 +118,22 @@ export default defineComponent({
         name: 'beverage',
         align: 'left',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: "B'fast Harris Cafe",
         field: 'cigarette',
         name: 'cigarette',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Other Harris Cafe',
         field: 'discount',
         name: 'discount',
+        align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Service',
@@ -140,6 +141,7 @@ export default defineComponent({
         name: 't-service',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Tax',
@@ -147,6 +149,7 @@ export default defineComponent({
         name: 't-tax',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Total',
@@ -154,6 +157,7 @@ export default defineComponent({
         name: 't-debit',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Cash USD',
@@ -161,6 +165,7 @@ export default defineComponent({
         name: 'p-cash1',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Cash Rp',
@@ -168,6 +173,7 @@ export default defineComponent({
         name: 'p-cash',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Transfer',
@@ -175,13 +181,15 @@ export default defineComponent({
         name: 'r-transfer',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
-        label: 'CC/CL',
+        label: 'Card / City Ledger',
         field: 'c-ledger',
         name: 'c-ledger',
         align: 'right',
         sortable: false,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
     ];
 

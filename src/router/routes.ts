@@ -31,6 +31,11 @@ const routes: RouteConfig[] = [
     name: 'Login',
     component: () => import('~/app/auth/PageAuthLogin.vue'),
   },
+  {
+    path: '/deposit-payment-receipt',
+    name: 'DepositPaymentReceipt',
+    component: () => import('~/app/modules/FOC/DepositPaymentReceipt.vue'),
+  },
 ];
 
 // Always leave this as last one

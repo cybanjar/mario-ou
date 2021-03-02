@@ -2,7 +2,8 @@
   <section class="mt-7">
     <div id="input" class="q-pa-md">
       <q-form @submit="onSearch">
-        <SInput label-text="Supplier" v-model="inputan" unmasked-value />
+        <SInput v-if="group == '1'" label-text="Supplier" v-model="inputan" unmasked-value />
+        <SDateInput v-else label-text="Order Date" v-model="datadate" unmasked-value />
         <SInput label-text="Po-Number" v-model="inputan" unmasked-value />
         <div id="radio">
           <q-option-group

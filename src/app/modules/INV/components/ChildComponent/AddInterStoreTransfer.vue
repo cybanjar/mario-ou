@@ -50,11 +50,11 @@
                     class="text-gray shadow-2"
                     >
                     <q-tab name="mails" label="Header" />
-                    <q-tab name="alarms" label="item" />
+                    <q-tab name="alarms" label="Item" />
                   </q-tabs>
                 </template>
                 <template v-slot:after>
-                    <InterStoreChild 
+                  <InterStoreChild 
                     :dialog="dialog" 
                     :tab="tab" 
                     @clickAdd="trans_code"/>
@@ -68,7 +68,13 @@
           <q-separator />
           <q-card-actions align="right">
             <q-btn color="primary" outline size="sm" @click="close" label="Cancel" />
-            <q-btn unelevated size="sm" :loading="loading" @click="trans_code('3')" color="primary" label="Select" />
+            <q-btn 
+            unelevated 
+            size="sm" 
+            :loading="dialog.loadingSave" 
+            @click="trans_code('3')" 
+            color="primary" 
+            label="Save" />
           </q-card-actions>
         </q-card>
     </q-dialog>
@@ -96,7 +102,6 @@ export default defineComponent({
            use_input : use_input,
            tab: 'mails',
            shape: 15,
-           loading: false,
            dialogSelect: {
              dialog: false
            } 

@@ -3,8 +3,10 @@
     v-bind="$attrs"
     v-on="restListener"
     :title="title"
-    :label="title"
+    :label="label"
     @setRecord="checkAccNo"
+    @delRecord="chgTouchEdit(false)"
+    @editRecord="chgTouchEdit(true)"
   >
     <template
       v-for="slot in Object.keys($scopedSlots)"
@@ -16,18 +18,29 @@
   </DialogJournal>
 </template>
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent, ref } from '@vue/composition-api';
+import { date } from 'quasar';
 import { JournalTrans } from '../models/journal.model';
 
 export default defineComponent({
   inheritAttrs: true,
   props: {
     title: { type: String, required: false, default: 'Add' },
-    label: { type: String, required: false, default: 'Add' },
+    labelAdd: { type: String, required: false, default: 'Add' },
+    labelEdit: { type: String, required: false, default: 'Edit' },
+    resetFields: {
+      type: Array as () => string[],
+      required: false,
+      default: () => [],
+    },
   },
-  setup(_, { root: { $api, $q }, listeners }) {
+  setup(props, { root: { $api, $q }, listeners }) {
     const { setRecord, ...restListener } = listeners;
-    async function checkAccNo(params: JournalTrans) {
+    const touchEdit = ref(false);
+    const label = computed(() =>
+      !touchEdit.value ? props.labelAdd : props.labelEdit
+    );
+    async function checkAccNo(params: JournalTrans, exists, reset) {
       const accExist = await $api.common.glJourtransPostJournalAcct({
         currMode: '',
         elimJournal: '',
@@ -41,13 +54,20 @@ export default defineComponent({
           message: accExist.msgStr,
         });
       } else {
-        setRecord(params);
+        chgTouchEdit(false);
+        setRecord(params, exists, reset);
       }
+    }
+
+    function chgTouchEdit(inEdit: boolean) {
+      touchEdit.value = inEdit;
     }
 
     return {
       restListener,
       checkAccNo,
+      label,
+      chgTouchEdit,
     };
   },
   components: {

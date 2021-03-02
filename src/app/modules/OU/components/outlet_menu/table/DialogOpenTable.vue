@@ -68,8 +68,8 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs, ref, onMounted} from '@vue/composition-api';
-import { formatThousands } from '~/app/helpers/numberFormat.helpers';
-import { date, Notify } from 'quasar';
+// import { formatThousands } from '~/app/helpers/numberFormat.helpers';
+import { Notify } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
 // import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 import Vue from 'vue';

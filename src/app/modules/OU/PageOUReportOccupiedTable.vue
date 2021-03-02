@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -30,6 +31,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -45,26 +48,26 @@ export default defineComponent({
 
     const tableHeaders = [
       {
-        label: 'Dept',
+        label: 'Department',
         field: 'dept',
         sortable: false,
-        align: 'center',
+        align: 'left',
         width: 120,
         divider: true,
       },
       {
-        label: 'TableNo',
+        label: 'Table Number',
         field: 'tischnr',
-        sortable: false,
-        align: 'right',
+        sortable: true,
+        align: 'left',
         width: 200,
         divider: true,
       },
       {
         label: 'Pax',
         field: 'belegung',
-        sortable: false,
-        align: 'right',
+        sortable: true,
+        align: 'left',
         width: 150,
         divider: true,
       },
@@ -77,7 +80,7 @@ export default defineComponent({
         divider: true,
       },
       {
-        label: 'OCC',
+        label: 'Occupied',
         field: 'occupied',
         sortable: false,
         align: 'left',
@@ -88,7 +91,7 @@ export default defineComponent({
         label: 'Served By',
         field: 'name',
         sortable: false,
-        align: 'right',
+        align: 'left',
         width: 150,
         divider: true,
       },
@@ -99,12 +102,13 @@ export default defineComponent({
         align: 'right',
         width: 150,
         divider: true,
+        format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
-        label: 'RmNo',
+        label: 'Room Number',
         field: 'zinr',
         sortable: false,
-        align: 'right',
+        align: 'left',
         width: 150,
         divider: true,
       },
@@ -118,7 +122,7 @@ export default defineComponent({
         label: 'Description',
         field: 'bezeich',
         sortable: false,
-        align: 'center',
+        align: 'left',
       },
     ];
 
@@ -191,6 +195,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Occupied Table');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -198,6 +208,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

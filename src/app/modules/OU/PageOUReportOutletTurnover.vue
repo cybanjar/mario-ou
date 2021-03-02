@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +32,8 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -56,10 +59,10 @@ export default defineComponent({
 
     const tableHeaders = [
         {
-            label: "ArtNo",
+            label: "Article Number",
             field: "artno",
             sortable: false,
-            align: "right",
+            align: "left",
             width: 120,
             divider: true
         },{
@@ -75,47 +78,54 @@ export default defineComponent({
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Day Gross", 
             field: "day-gros",
             sortable: false,
             align: "right",
             width: 150, 
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },{
             label: "%", 
             field: "day-proz",
             sortable: false,
             align: "right",
             width: 150, 
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
-            label: "Todate Nett", 
+            label: "To Date Nett", 
             field: "todate-net",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },{
-            label: "Todate Gross", 
+            label: "To Date Gross", 
             field: "todate-gros",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "%", 
             field: "todate-proz",
             sortable: false,
             align: "right",
             width: 150,
-            divider: true
+            divider: true,
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
-            label: "MTD Qty", 
+            label: "Month to Date Quantity", 
             field: "mqty",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }
     ];
     
@@ -254,6 +264,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Outlet Turn Over');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -261,6 +277,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

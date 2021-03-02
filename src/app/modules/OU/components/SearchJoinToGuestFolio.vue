@@ -14,15 +14,12 @@
               </template>
         </SSelect>
 
-        <v-date-picker mode="range" v-model="date" :columns="2" :popover="{ visibility: 'click' }">
-            <SInput
-            label-text="Date"
-            slot-scope="{ inputProps }"
-            placeholder="Select Date"
-            readonly
-            v-bind="inputProps"
-            @clear="date = null" />
-        </v-date-picker>
+        <DateRangeInput
+          label-text="Date"
+          :position-fixed="true"
+          v-model="date"
+        />
+
 
         <q-btn dense color="primary" icon="mdi-magnify" label="Search" class="q-mt-md full-width" @click="onSearch"/>
     </div>
@@ -31,15 +28,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs, computed } from '@vue/composition-api';
-import { setupCalendar, DatePicker } from 'v-calendar';
 import { watch } from 'fs';
-import { date } from 'quasar';
-
-setupCalendar({
-  firstDayOfWeek: 2,
-});
+import DateRangeInput from '~/app/modules/FR/components/common/DateRangeInput.vue';
 
 export default defineComponent({
+  components: {
+    DateRangeInput,
+  },
+
   props: {
     searches: { type: Object, required: true },
   },
@@ -58,9 +54,6 @@ export default defineComponent({
       onSearch,
     };
   },
-  components: {
-    'v-date-picker': DatePicker,
-  }
 });
 </script>
 

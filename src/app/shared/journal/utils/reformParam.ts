@@ -1,25 +1,26 @@
+import { date } from 'quasar';
 import {
   formatToOB,
   formatToDate,
   dateFormat,
 } from '~/app/helpers/formatterDate.helper';
-import { JournalTrans } from '../../models/journal.model';
+import { Journal, JournalTrans, Trans } from '../../models/journal.model';
 
 /**
  * Add Trans
  * @param form
  * @param record
  */
-export function reformSaveParam(record: JournalTrans) {
+export function reformSaveParam(journal: Journal, trans: Trans[]) {
   const initParam = {
-    bezeich: record.description,
-    credits: record.credits,
-    debits: record.credits,
-    remains: record.remaining,
-    refno: record.referenceNo,
-    datum: formatToOB(formatToDate(record.date, dateFormat)),
+    bezeich: journal.description,
+    credits: journal.credits,
+    debits: journal.credits,
+    remains: journal.remaining,
+    refno: journal.referenceNo,
+    datum: formatToOB(journal.date),
   };
-  const gList = {
+  const gList = trans.map((record) => ({
     jnr: '',
     fibukonto: record.accNo,
     acctFibukonto: '00000000', // investigate
@@ -36,7 +37,7 @@ export function reformSaveParam(record: JournalTrans) {
     taxCode: '',
     taxAmount: '',
     totAmt: '',
-  };
+  }));
 
   return {
     ...initParam,
@@ -44,7 +45,7 @@ export function reformSaveParam(record: JournalTrans) {
     currStep: 2,
     adjustFlag: 'false',
     gList: {
-      'g-list': [gList],
+      'g-list': gList,
     },
   };
 }
@@ -56,26 +57,26 @@ export function reformSaveParam(record: JournalTrans) {
  * @param record
  * @param remaining
  */
-export function reformSaveAddParam(mode: 'chg' | 'add', form: JournalTrans) {
-  const debit = form.debit || 0;
-  const credit = form.credit || 0;
+export function reformSaveAddParam(form: Journal, trans: Trans, mode) {
+  const debit = trans.debit || 0;
+  const credit = trans.credit || 0;
   const initParam = {
-    s: form.accNo,
-    fibukonto: form.accNo,
-    'inp-remains': debit - credit,
-    'inp-debit': debit,
-    'inp-credit': credit,
-    jnr: form.jnr,
-    comments: form.remark,
-    'bez-jouhdr': form.description,
-    'recid-jouhdr': form.recid,
+    s: trans.accNo,
+    fibukonto: trans.accNo,
+    inpRemains: debit - credit,
+    inpDebit: debit,
+    inpCredit: credit,
+    jnr: trans.jnr,
+    comments: trans.remark,
+    bezJouhdr: form.description,
+    recidJouhdr: trans.recid,
     refno: form.referenceNo,
   };
   const gList = {
-    jnr: form.jnr,
-    fibukonto: form.accNo,
-    debit: form.debit,
-    credit: form.credit,
+    jnr: trans.jnr,
+    fibukonto: trans.accNo,
+    debit: trans.debit,
+    credit: trans.credit,
     userinit: ' ',
     sysdate: ' ',
     zeit: ' ',
@@ -88,13 +89,13 @@ export function reformSaveAddParam(mode: 'chg' | 'add', form: JournalTrans) {
     ...initParam,
     pvILanguage: '1',
     currMode: mode,
-    'fibu-defined': true, //
-    'user-init': '',
-    'jou-recid': form.recid || '',
-    'recid-journal': form.recid || '',
+    fibuDefined: true, //
+    userInit: '',
+    jouRecid: trans.recid,
+    recidJournal: trans.recid,
     // recidJouhdr: '',
     gList: {
-      'g-list': [gList],
+      'g-list': gList,
     },
   };
 }

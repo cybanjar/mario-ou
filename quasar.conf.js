@@ -46,11 +46,14 @@ module.exports = configure(function () {
       importStrategy: 'auto',
 
       // Quasar plugins
-      plugins: ['Notify', 'Cookies', 'Dialog'],
+      plugins: ['Notify', 'Cookies', 'Dialog', 'Loading'],
       config: {
         notify: {
           position: 'top',
           timeout: 2000,
+        },
+        loading: {
+          message: 'Please Wait',
         },
       },
     },

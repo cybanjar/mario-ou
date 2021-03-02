@@ -15,7 +15,7 @@ export default (doFetch: DoRequest): AuthEndpoints => ({
   getLanguages: () =>
     doFetch({
       url: `${LOGIN_URL}/loadLanguages`,
-      body: { iCase: 1 },
+      body: { iCase: '?' },
       withAuth: false,
     }).then(([, res]) => res?.tLanguages?.['t-languages']),
 });

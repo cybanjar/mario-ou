@@ -88,6 +88,8 @@
               :columns="columns"
               table-class="journal-table"
               row-key="name"
+              height="150px"
+              fixed-header
             >
               <template #body-cell-accNum="props">
                 <q-td :props="props" width="33.3%" :auto-width="false">

@@ -10,11 +10,12 @@
           <q-btn 
           max-height="5"
           style="height: 25px" 
-          flat 
           size="sm"
+          outline
           label="Cancel" 
           color="primary" 
-          v-close-popup />
+          v-close-popup 
+          />
           <q-btn
           @click="buttonSave" 
           label="OK" 

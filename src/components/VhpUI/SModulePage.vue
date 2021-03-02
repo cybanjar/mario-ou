@@ -5,7 +5,10 @@
     </q-drawer>
 
     <div class="q-pa-lg">
-      <SharedModuleActions @onActions="$emit('onActions', $event)" />
+      <SharedModuleActions
+        @onActions="$emit('onActions', $event)"
+        :actions="actions"
+      />
 
       <slot name="table" />
     </div>
@@ -21,6 +24,13 @@ export default defineComponent({
   components: {
     SharedModuleActions: () =>
       import('~/app/shared/components/SharedModuleActions.vue'),
+  },
+
+  props: {
+    actions: {
+      type: Array,
+      default: () => [],
+    },
   },
 });
 </script>

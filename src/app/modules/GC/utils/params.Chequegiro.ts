@@ -6,7 +6,7 @@ export const data_table = (data) => {
         bankname: x.bankname,
         betrag: x.betrag,
         changed: date.formatDate(x.changed, 'DD/MM/YYYY'),
-        created: x.created,
+        created: date.formatDate(x.created, 'DD/MM/YYYY'),
         'docu-nr': x['docu-nr'],
         dueDate: x.dueDate,
         fibukonto: format_number(x.fibukonto),
@@ -25,7 +25,7 @@ const format_number = (number) => {
     return num.replace('-', '').split('').reverse().join('')
 }
 export const newValues = (e) => {
-    const xii = input_giro[2].value as any
+    const xii = input_giro[1].value as any
     return {
         pvILanguage: "0",
         caseType: e == undefined? 2: 1,
@@ -35,7 +35,7 @@ export const newValues = (e) => {
           "g-list": [
             {
               bankname: input_giro[0].value,
-              gironum: input_giro[3].value,
+              gironum: input_giro[2].value,
               fibukonto: xii.data !== undefined? xii.value: xii.replace(/-/g, ''),
               "giro-status": 0,
               betrag: 0.0,
@@ -60,7 +60,7 @@ export const newValues = (e) => {
 };
 
 export const edit_data = (e) => {
-    const xi = ['bankname', '','fibukonto', 'gironum']
+    const xi = ['bankname','fibukonto', 'gironum']
     for(const i in xi){
         input_giro[i].value = e[xi[i]]
     }

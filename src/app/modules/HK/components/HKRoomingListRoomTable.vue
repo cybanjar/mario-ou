@@ -1,7 +1,12 @@
 <template>
   <div>
     <STable
-      class="table-rooming-list"
+      :class="[
+        'table-rooming-list',
+        {
+          expanded: isTableExpand,
+        },
+      ]"
       :loading="isFetching"
       :columns="roomTableHeaders"
       :data="filterRooms.status === 'Arrival' ? tableArrival : tableRooms"
@@ -19,14 +24,14 @@
             key="icons"
             rowspan="2"
             class="fixed-col left"
-            style="z-index: 4; width: 70px;"
+            style="z-index: 4; width: 70px"
           />
           <q-th
             :props="props"
             key="roomNumber"
             rowspan="2"
             class="fixed-col left"
-            style="z-index: 4; left: 70px;"
+            style="z-index: 4; left: 70px"
           >
             {{ props.colsMap.roomNumber.label }}
           </q-th>
@@ -40,7 +45,7 @@
             key="guestName"
             rowspan="2"
             class="fixed-col right"
-            style="z-index: 4;"
+            style="z-index: 4"
           >
             {{ props.colsMap.guestName.label }}
           </q-th>
@@ -69,7 +74,7 @@
             :props="props"
             key="icons"
             class="fixed-col left"
-            style="padding-left: 8px;"
+            style="padding-left: 8px"
           >
             <template v-if="props.row.statusIcons.length !== 0">
               <span
@@ -79,12 +84,12 @@
                 <q-icon
                   :name="statusIcon.icon"
                   :class="`text-${statusIcon.color}`"
-                  style="font-size: 22px;"
+                  style="font-size: 22px"
                 >
                   <q-tooltip
                     anchor="bottom middle"
                     self="center middle"
-                    style="font-size: 14px;"
+                    style="font-size: 14px"
                   >
                     {{ statusIcon.title }}
                   </q-tooltip>
@@ -97,7 +102,7 @@
             :props="props"
             key="roomNumber"
             class="fixed-col left"
-            style="box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.15); left: 70px;"
+            style="box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 0.15); left: 70px"
           >
             {{ props.row.zinr }}
           </q-td>
@@ -129,32 +134,34 @@
             :props="props"
             key="guestName"
             class="fixed-col right"
-            style="box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.15);"
+            style="box-shadow: -6px 0 6px -4px rgba(0, 0, 0, 0.15)"
           >
             {{ props.row.gname }}
           </q-td>
         </q-tr>
       </template>
+      <template #bottom>
+        <q-expansion-item
+          v-model="isTableExpand"
+          class="q-mb-md col-12"
+          label="Guest History"
+          header-class="bg-primary text-white"
+          expand-icon-class="text-white"
+        >
+        </q-expansion-item>
+      </template>
     </STable>
 
-    <q-expansion-item
-      class="q-mt-md"
-      label="Guest History"
-      header-class="bg-primary text-white"
-      expand-icon-class="text-white"
-      default-opened
-    >
-      <STable
-        class="table-history-list"
-        :data="tableHistory"
-        :columns="historyTableHeaders"
-        :rows-per-page-options="[0]"
-        :pagination.sync="pagination"
-        hide-pagination
-        :filter="guestNumber"
-        :filter-method="filterHistory"
-      />
-    </q-expansion-item>
+    <STable
+      class="table-history-list"
+      :data="tableHistory"
+      :columns="historyTableHeaders"
+      :rows-per-page-options="[0]"
+      :pagination.sync="pagination"
+      hide-pagination
+      :filter="guestNumber"
+      :filter-method="filterHistory"
+    />
   </div>
 </template>
 
@@ -190,6 +197,7 @@ export default defineComponent({
       guestNumber: {},
     });
     const iconHeader = ref<any>(null);
+    const isTableExpand = ref(false);
     let ciDate = '';
 
     async function fetchColumns() {
@@ -249,15 +257,25 @@ export default defineComponent({
       iconHeader,
       filterMain: filterRoomList(ciDate),
       filterHistory: filterHistory,
+      isTableExpand,
       pagination: { page: 1, rowsPerPage: 0 },
     };
   },
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .table-rooming-list {
   max-height: 50vh;
+
+  &.expanded {
+    max-height: 80vh;
+  }
+
+  .q-table__bottom {
+    padding: 0;
+    margin-bottom: 12px;
+  }
 
   thead tr th {
     position: sticky;

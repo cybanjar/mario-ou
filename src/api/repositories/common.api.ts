@@ -3,7 +3,6 @@ import { ResPrepareJurnal } from '~/app/modules/AR/models/journal.model';
 import { store } from '~/store';
 import {
   BodyGetGLJoulist_1,
-  BodyGetGLMainAccount,
   BodyGetHTParam0,
 } from '../models/body/common.body';
 
@@ -41,10 +40,16 @@ export interface CommonEndpoints {
   getGLJoulist_1: () => Promise<any>;
   getGLMainAccount: () => Promise<any>;
   getGLDeptAccount: () => Promise<any>;
+  loadHArtikel: (body: any) => Promise<any>;
+  // FO Transaction
+  readGLAcct: (body: any) => Promise<any>;
   getSupplierList: () => Promise<any>;
+  selectSupplier: () => Promise<any>;
+  getAllArtikel: () => Promise<any>;
+  readCurrency: () => Promise<any>;
 }
 
-function injectPermPar(param) {
+export function injectPermPar(param) {
   const { user } = store.state.auth;
   const init = user.userInit;
   return {
@@ -178,22 +183,58 @@ export default (doFetch: DoRequest): CommonEndpoints => ({
     doFetch({
       url: `${COMMON_URL}/getGLDeptAccount`,
     }).then(([, res]) => res?.tGlDepartment['t-gl-department']),
+  loadHArtikel: (body) =>
+    doFetch({ url: `${COMMON_URL}/loadHArtikel`, body }).then(
+      ([, response]) => response?.tHArtikel?.['t-h-artikel']
+    ),
+  readGLAcct: (body) =>
+    doFetch({
+      url: `${COMMON_URL}/readGLAcct`,
+      body,
+    }).then(([, response]) => response?.tGlAcct?.['t-gl-acct']),
   getSupplierList: () =>
     doFetch({
       url: `${COMMON_URL}/getSupplierList`,
     }).then(([, res]) => res?.supplyList['supply-list']),
+  selectSupplier: () =>
+    doFetch({
+      url: `${COMMON_URL}/selectSupplier`,
+      body: defaultBodies.selectSupplier,
+    }).then(([, res]) => res?.tLLieferant['t-l-lieferant']),
+  getAllArtikel: () =>
+    doFetch({
+      url: `${COMMON_URL}/getAllArtikel`,
+      body: defaultBodies.getAllArtikel,
+    }).then(([, res]) => res?.tLArtikel['t-l-artikel']),
+  readCurrency: () =>
+    doFetch({
+      url: `${COMMON_URL}/readCurrency`,
+      body: {
+        caseType: 8,
+        currencyNo: 0,
+        currBez: '',
+      },
+    }).then(([, res]) => res?.tWaehrung['t-waehrung']),
 });
 
-interface CommonBodyRequest {
-  getGLMainAccount: BodyGetGLMainAccount;
-}
-
-const defaultBodies: CommonBodyRequest = {
+const defaultBodies = {
   getGLMainAccount: {
     caseType: 4,
     char1: '',
     char2: '',
     int1: 0,
     int2: 0,
+  },
+
+  selectSupplier: {
+    caseType: '2',
+    char1: ' ',
+    int1: '?',
+  },
+
+  getAllArtikel: {
+    sorttype: '2',
+    lastArt: '*',
+    lastArt1: '?',
   },
 };

@@ -9,14 +9,14 @@
            </q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section style="height: 390px; marginTop: 10px" class="q-pt-none">
-            <q-btn @click="ADD" flat round class="q-mr-lg">
-              <img :src="require('~/app/icons/Icon-Add.svg')" height="20" />
-            </q-btn>
-            <SInput @keyup="search_bankname" v-model="searchbankname" placeholder="Search Bank Name"/>
-            <STable
+        <q-card-section style="height: 405px" class="q-pt-none">
+        <q-btn @click="ADD" flat round class="q-mr-lg">
+          <img :src="require('~/app/icons/Icon-Add.svg')" height="25" />
+        </q-btn>
+        <SInput style="marginTop: 10px" @keyup="search_bankname" v-model="searchbankname" placeholder="Search Bank Name"/>
+        <q-responsive :ratio="16/6">
+          <STable
               :loading="cheque_giro.isFetching"
-              style="marginTop: 15px"
               :columns="tableHeaders"
               :data="cheque_giro.data"
               :rows-per-page-options="[0]"
@@ -90,10 +90,10 @@
                 <q-menu :props="props" auto-close anchor="bottom right" self="top right">
                   <q-list :props="props">
                     <q-item @click="onEdit(props.row)" :props="props" clickable v-ripple>
-                      <q-item-section>edit</q-item-section>
+                      <q-item-section>Edit</q-item-section>
                     </q-item>
                     <q-item @click="onDelete(props.row)" clickable v-ripple>
-                      <q-item-section>delete</q-item-section>
+                      <q-item-section>Delete</q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -101,13 +101,15 @@
             </q-td>
           </q-tr>
         </template>        
-        </STable>
+          </STable>
+        </q-responsive>
         <div class="row justify-center">
             <q-option-group
               v-model="group"
               :options="options"
               color="primary"
               inline
+              @input="onGroup(group)"
             />
         </div>
         </q-card-section>
@@ -122,6 +124,9 @@
     <DialogChequegiro 
     @savecheckgiro="savecheckgiro"
     :dialogcheck_giro="dialogcheck_giro"/>
+    <DialogDelete
+    @onClickDelete="onClickDelete" 
+    :dialogDelete="dialogDelete"/>
   </div>
 </template>
 
@@ -129,6 +134,8 @@
 import { defineComponent, reactive, toRefs} from '@vue/composition-api';
 import {tableHeaders} from '../tables/Chequegiro.table'
 import {edit_data} from '../utils/params.Chequegiro'
+import {input_giro}from '../Input/cheque_giro'
+
 export default defineComponent({
     props: {
         cheque_giro: {} as any
@@ -137,20 +144,26 @@ export default defineComponent({
       let data = props.cheque_giro.data
       let data_value
         const state = reactive({
-            group: 'op1',
+            group: 'open',
             searchbankname: '',
             options: [
               {
                 label: 'Open',
-                value: 'op1'
+                value: 'open'
               },
               {
                 label: 'Used',
-                value: 'op2'
+                value: 'used'
               }
             ],
             dialogcheck_giro : {
-              dialog : false
+              dialog : false,
+              header: 'New',
+            },
+            dialogDelete: {
+              confirm: false,
+              message: 'Are you sure you want to delete the selected record?',
+              value: ''
             }
         })
         const getDefaultColumns = (cols) => {
@@ -164,11 +177,16 @@ export default defineComponent({
         }
 
         const ADD = () => {
+          for(const i of input_giro){
+            i.value = ''
+          }
           state.dialogcheck_giro.dialog = true
+          state.dialogcheck_giro.header = 'New'
+          input_giro[1].disable = false
         }
 
         const onRowClick = (datarow) => {
-         const x = props.cheque_giro.data
+          const x = props.cheque_giro.data
           for(const i of x){
             i.selected = false
           }
@@ -181,21 +199,40 @@ export default defineComponent({
         }
 
         const search_bankname = () => {
-          emit('search_bankname', state.searchbankname)
+          emit('search_bankname', state.searchbankname, state.group)
+        }
+
+        const onGroup = (group) => {
+          emit('onGroup', group)
         }
 
         const onEdit = (value) => {
+          for(const i of input_giro){
+            i.value = ''
+          }
+          input_giro[1].disable = true
           state.dialogcheck_giro.dialog = true
+          state.dialogcheck_giro.header = 'Edit'
           data_value = value
           edit_data(value)
         }
 
         const onDelete = (e) => {
-        const value = {
-          caseType: 1,
-          int1: e['rec-id']
+          state.dialogDelete.confirm = true
+          state.dialogDelete.value = e
         }
-          emit('onDelete', value)
+
+        const onClickDelete = (e) => {
+          state.dialogDelete.confirm = false
+          const value = {
+            caseType: 1,
+            int1: e.value['rec-id']
+          }
+           emit('onDelete', value)
+        }
+
+        const onCheckGiro = (group) => {
+          emit('onCheckGiro', group)
         }
         
         return {
@@ -207,11 +244,14 @@ export default defineComponent({
             onRowClick,
             savecheckgiro,
             search_bankname,
-            onEdit
+            onEdit,
+            onClickDelete,
+            onGroup
         }
     },
   components: {
-    DialogChequegiro: () => import('./childComponents/DialogChequegiro.vue')
+    DialogChequegiro: () => import('./childComponents/DialogChequegiro.vue'),
+    DialogDelete: () => import('./DialogDelete.vue')
   }
 })
 </script>
@@ -221,7 +261,7 @@ export default defineComponent({
   background: $primary-grad;
 }
 .table-rooming-list {
-  max-height: 40vh;
+  // max-height: 40vh;
   thead tr th {
     position: sticky;
     z-index: 3;

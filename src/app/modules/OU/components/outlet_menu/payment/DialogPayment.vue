@@ -109,7 +109,7 @@
             <q-avatar icon="mdi-help" color="negative" text-color="white" />
           </div>
           <div class="col-md-10">                  
-            <p class="q-ml-md">Make sure you no others transactin with Bill: <br>
+            <p class="q-ml-md">Make sure you no others transaction with Bill: <br>
                   Do you want to continue?</p>
           </div>
         </div>              
@@ -118,6 +118,30 @@
         <q-card-actions align="right">
           <q-btn outline color="primary" label="Cancel" v-close-popup />
           <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmation()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="data.showDialogCloseBill" persistent>
+      <q-card style="max-width: 1500px;width:450px;">
+        <q-toolbar>
+          <q-toolbar-title class="text-white text-weight-medium">Confirm</q-toolbar-title>
+        </q-toolbar>
+
+      <q-card-section class="row items-center">
+        <div class="row">
+          <div class="col-md-2">
+            <q-avatar icon="mdi-help" color="negative" text-color="white" />
+          </div>
+          <div class="col-md-10">                  
+            <p class="q-ml-md">Close the bill?</p>
+          </div>
+        </div>              
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn outline color="primary" label="Cancel" v-close-popup />
+          <q-btn unelevated label="Ok" color="primary" @click="onClickConfirmationCloseBill()"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -197,7 +221,6 @@
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs,} from '@vue/composition-api';
 import { Notify } from 'quasar';
-import DialogPaymentCityLedgerVue from './DialogPaymentCityLedger.vue';
 import { store } from '~/store';
 
 interface State {
@@ -221,6 +244,7 @@ interface State {
     dataPreparePayment: {};
     balance: any,
     dataRestInvBillTransfer: {};
+    showDialogCloseBill: boolean;
   }
   title: string;
   flag: string
@@ -310,6 +334,7 @@ export default defineComponent({
         dataPreparePayment: {},
         balance: 0,
         dataRestInvBillTransfer: {},
+        showDialogCloseBill: false,
       },
       title: '',
       flag: 'payment',
@@ -331,7 +356,7 @@ export default defineComponent({
             const datarow = state.data.dataTablePayment[i];
             datarow['selected'] = false;
           }       
-          // console.log('Dialog Payment Mount: ', props.dataTable);
+          console.log('Dialog Payment Mount: ', props.dataTable);
         }
       }
     );
@@ -562,7 +587,7 @@ export default defineComponent({
           const response = data || [];
           const okFlag = response['outputOkFlag'];
 
-          // console.log('response get saldo: ', response);
+          console.log('response get saldo: ', response);
 
           if (!okFlag) {
             Notify.create({
@@ -575,7 +600,12 @@ export default defineComponent({
 
           state.data.dataPreparePayment['dataTable']['saldo'] = response['amount']; 
 
-          if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+          if (state.data.dataPreparePayment['dataTable']['dataThBill'].length > 0 
+              && state.data.dataPreparePayment['dataTable']['saldo'] == 0
+              && state.data.dataPreparePayment['dataTable']['dataThBill'][0]['tischnr'] != 0) {
+                console.log('Close Bill ? ');
+                state.data.showDialogCloseBill = true;
+          } else if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
             Notify.create({
               message: 'Bill not found or balance already 0',
               color: 'red',
@@ -585,6 +615,17 @@ export default defineComponent({
           } else {
             state.showConfirmationDialog = true;
           }
+
+          // if (state.data.dataPreparePayment['dataTable']['saldo'] == 0) {
+          //   Notify.create({
+          //     message: 'Bill not found or balance already 0',
+          //     color: 'red',
+          //   });
+          //   state.isLoading = false;
+          //   return false;
+          // } else {
+          //   state.showConfirmationDialog = true;
+          // }
           state.isLoading = false;
         } else {
           Notify.create({
@@ -894,6 +935,12 @@ export default defineComponent({
       }
     }
 
+    const onClickConfirmationCloseBill = () => {
+      state.data.showDialogCloseBill = false;
+      emit('onDialogPayment', false, 'ok', {} , 9);
+
+    }
+
 
     // -- On Dialog Method
     const onDialogPaymentCash = (val, flag, data) => {
@@ -1030,6 +1077,7 @@ export default defineComponent({
       onClickConfirmation,
       getRestInvBtnTransfer,
       onDialogDepartment,
+      onClickConfirmationCloseBill,
       pagination: { rowsPerPage: 0 },
     };
   },

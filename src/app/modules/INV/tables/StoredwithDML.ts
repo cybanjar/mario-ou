@@ -2,7 +2,7 @@ import { TableHeader } from '~/components/VhpUI/typings';
 import {fromStore, articelNumber} from '../utils/Params.InterStoreTf'
 export const tableHeaders: TableHeader[] = [
     {
-      label: 'St',
+      label: 'Store',
       field: 'st',
       name: 'st',
       align: 'left',
@@ -96,7 +96,8 @@ export const use_input = [
         name: 'Delivery Note',
         width: '145px',
         right: '0px',
-        value: ''
+        value: '',
+        disable: true
     },
     {
         name: 'Articel Name',

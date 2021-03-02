@@ -1,24 +1,25 @@
 <template>
   <q-dialog v-model="dialogModel">
-    <q-card style="width: 500px;">
+    <q-card style="width: 400px;">
       <q-toolbar>
         <q-toolbar-title class="text-white text-weight-medium">Question</q-toolbar-title>
       </q-toolbar>
 
       <q-card-section>
-        {{ dataSelected }}
+       Delete the phone list:  {{ dataSelected.name }} - {{dataSelected.telephone}}
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn color="white" text-color="blue" label="Cancel" @click="$emit('onDeleted', false)" />
-
+        <q-btn size="sm" @click="$emit('onDeleted', false)" color="primary" outline label="Cancel" />
         <q-btn
-          style="background: #ff0000; color: white"
-          label="Delete"
-          @click="$emit('onDeleted', false)"
-        />
+        size="sm" 
+        :loading="loading2"
+        :disable="disableButtonSave" 
+        color="primary" 
+        @click="$emit('onDeleted', false)"
+        label="Delete"/>
       </q-card-actions>
     </q-card>
   </q-dialog>

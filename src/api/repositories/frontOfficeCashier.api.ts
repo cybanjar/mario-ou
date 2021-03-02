@@ -4,7 +4,7 @@ const COMMON_URL = 'Common';
 const VHP_FOC_URL = 'vhpFOC';
 
 export interface FrontOfficeCashierEndpoints {
-  // FO Guest Folio
+  // Guest Folio
   foInvoicePrepare: any;
   foInvoiceCheckZahlungsart: any;
   foInvoice1Prepare: any;
@@ -13,6 +13,30 @@ export interface FrontOfficeCashierEndpoints {
   selectBill: any;
   readResLine: any;
   readGuest: any;
+  foInvoiceBtnNewInv: any;
+  foInvoicePostDate: any;
+  foInvoiceCheckout: any;
+  readMasterBill: any;
+  readBill1: any;
+  foInvoiceChangeBillAdr: any;
+  foInvoiceChangeCommentSave: any;
+  foInvoiceChangeBillnr1: any;
+  foInvoiceChangeBillnr2: any;
+  foInvoiceChangeBillnr3: any;
+  foInvoiceMasterBill: any;
+
+  // Nonguest Folio
+  selectBill1: any;
+  nsMainLogic: any;
+  nsOpenBill: any;
+
+  // Master Folio
+  mbMainLogic: any;
+  selectBill2: any;
+  mbOpenBill: any;
+
+  // Closed folio
+  ReadBillHis: any;
 
   // Report FO Transaction Report
   bookJournArtPrepare: any;
@@ -69,26 +93,60 @@ export interface FrontOfficeCashierEndpoints {
 
   // Quick Posting To Guest Folio
   quickPostPrepare: any;
+  loadArtikelTwo: any;
+  selectPGuest: any;
+  readCurrency: any;
+  quickPostCreateBill: any;
 
   // Auto Transfer
   foInvoiceMiTransfer: any;
   foInvoiceTransferRoom: any;
   foInvoiceCreateLogfile: any;
   foInvoiceFillRescomment: any;
+  foInvoiceChangeCommentPrepare: any;
+
+  // Individual Checkout
+  checkoutSave: any;
+  arlListFOInvoice: any;
+  checkoutRes: any;
+
+  // Group Checkout
+  checkoutGroupPrepare: any;
+  checkoutGroupSave: any;
+  autoCheckoutPrepare: any;
+  autoCheckout: any;
+
+  // Deposit
+  depositAdminPrepare: any;
+  depositAdmin1: any;
+  depositRefundPrepare: any;
+  depositRefundBtnExit: any;
+  depositPayPrepare: any;
+  depositPayBtnExit: any;
+  depositAdminPrintReceipt1: any;
+
+  // Money Change Posting
+  moneyExchgPrepare: any;
+  getReadArticle1: any;
+  moneyExchgSave: any;
+  foInvoiceBillUpdate: any;
+  foInvoiceSplitBline: any;
+  readBillLine1: any;
+  foInvoiceCalcUnitPrice: any;
 }
 
 const defaultBodies = {
-  // FO Guest Folio
-  foInvoicePrepare: {
+  // Guest Folio
+  foInvoicePrepareBody: {
     bilFlag: 0,
   },
-  foInvoiceCheckZahlungsart: {
+  foInvoiceCheckZahlungsartBody: {
     bilRecid: 26985,
   },
-  foInvoice1Prepare: {
+  foInvoice1PrepareBody: {
     inpRechnr: 0,
   },
-  billListFOInvoice: {
+  billListFOInvoiceBody: {
     bilFlag: 0,
     bilRecid: 91104,
     room: '',
@@ -97,16 +155,21 @@ const defaultBodies = {
     doubleCurrency: false,
     foreignRate: false,
   },
-  getHTParam0: {
+  getHTParam0Body: {
     casetype: 2,
-    inpParam: 87,
+    inpParam: 110,
   },
-  selectBill: {
-    sorttype: '1',
+  selectBillBody: {
+    pvILanguage: 1,
+    sorttype: 1,
     zinr: ' ',
-    bilInt: '0',
+    bilInt: 0,
+    currGastnr: 0,
+    gastname: '',
+    toName: ' ',
+    rechnr: 0,
   },
-  readResLine: {
+  readResLineBody: {
     caseType: 1,
     resNo: 0,
     reslinNo: 0,
@@ -119,12 +182,37 @@ const defaultBodies = {
     kontigNo: 0,
     kontcode: ' ',
   },
-  readGuest: {
+  readGuestBody: {
     caseType: 1,
     gastNo: 36613,
     gname: ' ',
     fname: ' ',
   },
+  foInvoiceBtnNewInvBody: {},
+  foInvoicePostDateBody: {},
+  foInvoiceCheckoutBody: {},
+  readMasterBillBody: {},
+  readBill1Body: {},
+  foInvoiceChangeBillAdrBody: {},
+  foInvoiceChangeCommentPrepareBody: {},
+  foInvoiceChangeCommentSaveBody: {},
+  foInvoiceChangeBillnr1Body: {},
+  foInvoiceChangeBillnr2Body: {},
+  foInvoiceChangeBillnr3Body: {},
+  foInvoiceMasterBillBody: {},
+
+  // Nonguest Folio
+  selectBill1Body: {},
+  nsMainLogicBody: {},
+  nsOpenBillBody: {},
+
+  // Master Folio
+  mbMainLogicBody: {},
+  selectBill2Body: {},
+  mbOpenBillBody: {},
+
+  // Closed Folio
+  ReadBillHisBody: {},
 
   // Report FO Transaction Report
   bookJournArtPrepareBody: {
@@ -187,7 +275,7 @@ const defaultBodies = {
     },
   },
   checkPermissionBody: {
-    userInit: '',
+    userInit: '01',
     arrayNr: 8,
     expectedNr: 2,
   },
@@ -236,46 +324,155 @@ const defaultBodies = {
 
   // Quick Posting To Guest Folio
   quickPostPrepareBody: {},
+  loadArtikel2Body: {},
+  selectPGuestBody: {},
+  readCurrencyBody: {},
+  quickPostCreateBillBody: {},
 
   // Auto Transfer
   foInvoiceMiTransferBody: {},
   foInvoiceTransferRoomBody: {},
   foInvoiceCreateLogfileBody: {},
   foInvoiceFillRescommentBody: {},
+
+  // Individual Checkout
+  checkoutSaveBody: {},
+  arlListFOInvoiceBody: {},
+  checkoutResBody: {},
+
+  // Group Checkout
+  checkoutGroupPrepareBody: {},
+  checkoutGroupSaveBody: {},
+  autoCheckoutPrepareBody: {},
+  autoCheckoutBody: {},
+
+  // Deposit
+  depositAdminPrepareBody: {},
+  depositAdmin1Body: {},
+  depositRefundPrepareBody: {},
+  depositRefundBtnExitBody: {},
+  depositPayPrepareBody: {},
+  depositPayBtnExitBody: {},
+  depositAdminPrintReceipt1Body: {},
+
+  // Money Change Posting
+  moneyExchgPrepareBody: {},
+  getReadArticle1Body: {},
+  moneyExchgSaveBody: {},
+  foInvoiceBillUpdateBody: {},
+  foInvoiceSplitBlineBody: {},
+  readBillLine1Body: {},
+  foInvoiceCalcUnitPriceBody: {},
+
+  moneyEchgSaveBody: {},
 };
 
 export default (doFetch: DoRequest): FrontOfficeCashierEndpoints => ({
-  // FO Guest Folio
-  foInvoicePrepare: (body = defaultBodies.foInvoicePrepare) =>
+  // Guest Folio
+  foInvoicePrepare: (body = defaultBodies.foInvoicePrepareBody) =>
     doFetch({ url: `${VHP_FOC_URL}/foInvoicePrepare`, body }).then(
       ([, res]) => res
     ),
-  foInvoiceCheckZahlungsart: (body = defaultBodies.foInvoiceCheckZahlungsart) =>
+  foInvoiceCheckZahlungsart: (
+    body = defaultBodies.foInvoiceCheckZahlungsartBody
+  ) =>
     doFetch({ url: `${VHP_FOC_URL}/foInvoiceCheckZahlungsart`, body }).then(
       ([, res]) => res
     ),
-  foInvoice1Prepare: (body = defaultBodies.foInvoice1Prepare) =>
+  foInvoice1Prepare: (body = defaultBodies.foInvoice1PrepareBody) =>
     doFetch({ url: `${VHP_FOC_URL}/foInvoice1Prepare`, body }).then(
       ([, res]) => res
     ),
-  billListFOInvoice: (body = defaultBodies.billListFOInvoice) =>
+  billListFOInvoice: (body = defaultBodies.billListFOInvoiceBody) =>
     doFetch({ url: `${VHP_FOC_URL}/billListFOInvoice`, body }).then(
       ([, res]) => res
     ),
-  getHTParam0: (body = defaultBodies.getHTParam0) =>
+  getHTParam0: (body = defaultBodies.getHTParam0Body) =>
     doFetch({ url: `${COMMON_URL}/getHTParam0`, body }).then(([, res]) => res),
-  selectBill: (body = defaultBodies.selectBill) =>
+  selectBill: (body = defaultBodies.selectBillBody) =>
     doFetch({ url: `${COMMON_URL}/selectBill`, body }).then(
       ([, res]) => res?.b1List?.['b1-list']
     ),
-  readResLine: (body = defaultBodies.readResLine) =>
+  readResLine: (body = defaultBodies.readResLineBody) =>
     doFetch({ url: `${COMMON_URL}/readResLine`, body }).then(
       ([, res]) => res?.tResLine?.['t-res-line']
     ),
-  readGuest: (body = defaultBodies.readGuest) =>
+  readGuest: (body = defaultBodies.readGuestBody) =>
     doFetch({ url: `${COMMON_URL}/readGuest`, body }).then(
       ([, res]) => res?.tGuest?.['t-guest']
     ),
+  foInvoiceBtnNewInv: (body = defaultBodies.foInvoiceBtnNewInvBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceBtnNewInv`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoicePostDate: (body = defaultBodies.foInvoicePostDateBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoicePostDate`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceCheckout: (body = defaultBodies.foInvoiceCheckoutBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceCheckout`, body }).then(
+      ([, res]) => res
+    ),
+  readMasterBill: (body = defaultBodies.readMasterBillBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/readMasterBill`, body }).then(
+      ([, res]) => res
+    ),
+  readBill1: (body = defaultBodies.readBill1Body) =>
+    doFetch({ url: `${COMMON_URL}/readBill1`, body }).then(([, res]) => res),
+  foInvoiceChangeBillAdr: (body = defaultBodies.foInvoiceChangeBillAdrBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeBillAdr`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceChangeCommentPrepare: (
+    body = defaultBodies.foInvoiceChangeCommentPrepareBody
+  ) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeCommentPrepare`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceChangeCommentSave: (
+    body = defaultBodies.foInvoiceChangeCommentSaveBody
+  ) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeCommentSave`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceChangeBillnr1: (body = defaultBodies.foInvoiceChangeBillnr1Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeBillnr1`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceChangeBillnr2: (body = defaultBodies.foInvoiceChangeBillnr2Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeBillnr2`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceChangeBillnr3: (body = defaultBodies.foInvoiceChangeBillnr3Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceChangeBillnr3`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceMasterBill: (body = defaultBodies.foInvoiceMasterBillBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceMasterBill`, body }).then(
+      ([, res]) => res
+    ),
+
+  // Nonguest Folio
+  selectBill1: (body = defaultBodies.selectBill1Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/selectBill1`, body }).then(
+      ([, res]) => res?.b1List?.['b1-list']
+    ),
+
+  nsMainLogic: (body = defaultBodies.nsMainLogicBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/nsMainLogic`, body }).then(([, res]) => res),
+
+  nsOpenBill: (body = defaultBodies.nsOpenBillBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/nsOpenBill`, body }).then(([, res]) => res),
+
+  // Master Folio
+  mbMainLogic: (body = defaultBodies.mbMainLogicBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/mbMainLogic`, body }).then(([, res]) => res),
+  selectBill2: (body = defaultBodies.selectBill2Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/selectBill2`, body }).then(([, res]) => res),
+  mbOpenBill: (body = defaultBodies.mbOpenBillBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/mbOpenBill`, body }).then(([, res]) => res),
+  ReadBillHis: (body = defaultBodies.ReadBillHisBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/ReadBillHis`, body }).then(([, res]) => res),
 
   // Report FO Transaction Report
   bookJournArtPrepare: (body = defaultBodies.bookJournArtPrepareBody) =>
@@ -416,6 +613,16 @@ export default (doFetch: DoRequest): FrontOfficeCashierEndpoints => ({
     doFetch({ url: `${VHP_FOC_URL}/quickPostPrepare`, body }).then(
       ([, res]) => res
     ),
+  loadArtikelTwo: (body = defaultBodies.loadArtikel2Body) =>
+    doFetch({ url: `${COMMON_URL}/loadArtikel2`, body }).then(([, res]) => res),
+  selectPGuest: (body = defaultBodies.selectPGuestBody) =>
+    doFetch({ url: `${COMMON_URL}/selectPGuest`, body }).then(([, res]) => res),
+  readCurrency: (body = defaultBodies.readCurrencyBody) =>
+    doFetch({ url: `${COMMON_URL}/readCurrency`, body }).then(([, res]) => res),
+  quickPostCreateBill: (body = defaultBodies.quickPostCreateBillBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/quickPostCreateBill`, body }).then(
+      ([, res]) => res
+    ),
 
   // Auto Transfer
   foInvoiceMiTransfer: (body = defaultBodies.foInvoiceMiTransferBody) =>
@@ -432,6 +639,103 @@ export default (doFetch: DoRequest): FrontOfficeCashierEndpoints => ({
     ),
   foInvoiceFillRescomment: (body = defaultBodies.foInvoiceFillRescommentBody) =>
     doFetch({ url: `${VHP_FOC_URL}/foInvoiceFillRescomment`, body }).then(
+      ([, res]) => res
+    ),
+
+  // Individual Checkout
+  checkoutSave: (body = defaultBodies.checkoutSaveBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/checkoutSave`, body }).then(
+      ([, res]) => res
+    ),
+  arlListFOInvoice: (body = defaultBodies.arlListFOInvoiceBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/arlListFOInvoice`, body }).then(
+      ([, res]) => res
+    ),
+  checkoutRes: (body = defaultBodies.checkoutResBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/checkoutRes`, body }).then(([, res]) => res),
+  checkoutGroupPrepare: (body = defaultBodies.checkoutGroupPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/checkoutGroupPrepare`, body }).then(
+      ([, res]) => res
+    ),
+  checkoutGroupSave: (body = defaultBodies.checkoutGroupSaveBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/checkoutGroupSave`, body }).then(
+      ([, res]) => res
+    ),
+  autoCheckoutPrepare: (body = defaultBodies.autoCheckoutPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/autoCheckoutPrepare`, body }).then(
+      ([, res]) => res
+    ),
+  autoCheckout: (body = defaultBodies.autoCheckoutBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/autoCheckout`, body }).then(
+      ([, res]) => res
+    ),
+
+  // Deposit
+
+  depositAdminPrepare: (body = defaultBodies.depositAdminPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositAdminPrepare`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositAdmin1: (body = defaultBodies.depositAdmin1Body) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositAdmin1`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositRefundPrepare: (body = defaultBodies.depositRefundPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositRefundPrepare`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositRefundBtnExit: (body = defaultBodies.depositRefundBtnExitBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositRefundBtnExit`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositPayPrepare: (body = defaultBodies.depositPayPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositPayPrepare`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositPayBtnExit: (body = defaultBodies.depositPayBtnExitBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositPayBtnExit`, body }).then(
+      ([, res]) => res
+    ),
+
+  depositAdminPrintReceipt1: (
+    body = defaultBodies.depositAdminPrintReceipt1Body
+  ) =>
+    doFetch({ url: `${VHP_FOC_URL}/depositAdminPrintReceipt1`, body }).then(
+      ([, res]) => res
+    ),
+
+  // Money Change Posting
+  moneyExchgPrepare: (body = defaultBodies.moneyExchgPrepareBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/moneyExchgPrepare`, body }).then(
+      ([, res]) => res
+    ),
+  getReadArticle1: (body = defaultBodies.getReadArticle1Body) =>
+    doFetch({ url: `${COMMON_URL}/getReadArticle1`, body }).then(
+      ([, res]) => res
+    ),
+  readBillLine1: (body = defaultBodies.readBillLine1Body) =>
+    doFetch({ url: `${COMMON_URL}/readBillLine1`, body }).then(
+      ([, res]) => res
+    ),
+  moneyExchgSave: (body = defaultBodies.moneyEchgSaveBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/moneyExchgSave`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceBillUpdate: (body = defaultBodies.foInvoiceBillUpdateBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceBillUpdate`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceSplitBline: (body = defaultBodies.foInvoiceSplitBlineBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceSplitBline`, body }).then(
+      ([, res]) => res
+    ),
+  foInvoiceCalcUnitPrice: (body = defaultBodies.foInvoiceCalcUnitPriceBody) =>
+    doFetch({ url: `${VHP_FOC_URL}/foInvoiceCalcUnitPrice`, body }).then(
       ([, res]) => res
     ),
 });

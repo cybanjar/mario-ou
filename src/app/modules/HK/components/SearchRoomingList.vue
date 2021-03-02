@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from '@vue/composition-api';
+import { defineComponent, ref, watch, computed, reactive, toRefs } from '@vue/composition-api';
 import { displayStatuses } from '../models/roomList.model';
 
 export default defineComponent({
@@ -63,7 +63,7 @@ export default defineComponent({
     selectedRoom: { type: Object, default: null },
   },
   setup(props, { emit }) {
-    const filterItems = ref({
+    const filterItems = reactive({
       status: 'All',
       roomNumber: '',
       floor: '',
@@ -79,7 +79,7 @@ export default defineComponent({
 
     return {
       displayStatuses,
-      filterItems,
+      filterItems: toRefs(filterItems),
       comment,
     };
   },

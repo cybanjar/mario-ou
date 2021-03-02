@@ -142,21 +142,22 @@
                 </div>
                 <div class="col-6">
                   <div style="marginTop: -15px">
-                    <q-input
-                      v-if="dataMessage.key == ''"
-                      v-model="dataMessage.dataLoad.tMessages['t-messages'][0].messtext[0]"
+                     <q-editor 
+                     v-if="dataMessage.key == ''"
+                      dense 
+                      v-model="dataMessage.dataLoad.tMessages['t-messages'][0].messtext[0]" 
+                      min-height="4rem" 
+                      max-height="10vh" 
                       disable
-                      filled
-                      autogrow
-                      style="marginTop: -10px"
-                    />
-                    <q-input
+                      :toolbar="[]" />
+
+                     <q-editor 
                       v-else
-                      v-model="newText"
-                      filled
-                      autogrow
-                      style="marginTop: -10px"
-                    />
+                      dense 
+                      v-model="newText" 
+                      min-height="4rem" 
+                      max-height="10vh" 
+                      :toolbar="[]" />
                   </div>
                 </div>
               </div>

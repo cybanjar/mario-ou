@@ -17,6 +17,7 @@
         type="submit"
         class="q-mt-md full-width"
         @click="onSearch"
+        unelevated
       />
     </div>
   </section>

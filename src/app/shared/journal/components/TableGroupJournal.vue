@@ -1,16 +1,19 @@
 <template>
-  <section class="row q-gutter-md">
+  <section class="row q-gutter-md group-table">
     <div class="col">
       <STable
         v-bind="$attrs"
         :columns="activeJournalColumns"
-        :pagination="{ rowsPerPage: 10 }"
-        :rows-per-page-options="[10]"
+        virtual-scroll
+        :data="data"
+        :pagination.sync="pagination"
+        :rows-per-page-options="[0]"
+        fixed-header
         @row-click="fetchJourDetail"
         row-key="key"
       >
         <template v-slot:header="props">
-          <q-tr>
+          <q-tr class="label-group-table">
             <q-th colspan="6" class="text-left">
               {{ tableTitle }}
             </q-th>
@@ -18,7 +21,7 @@
               <q-icon name="mdi-dots-vertical" />
             </q-th>
           </q-tr>
-          <q-tr :props="props">
+          <q-tr>
             <q-th
               v-for="col in props.cols.slice(0, 6)"
               :key="col.name"
@@ -51,27 +54,30 @@
     </div>
     <div class="col">
       <DialogJournalTable
+        :columns="detailColumns"
+        :shape="detailShape"
         :loading="detailPrep.data.isLoading"
         :data="detailPrep.result"
-        :pagination="{ rowsPerPage: 10 }"
-        :rows-per-page-options="[10]"
       />
     </div>
   </section>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from '@vue/composition-api';
+import { defineComponent, computed, ref, watch } from '@vue/composition-api';
 import { activeJournalColumns } from '../table/active-journal.table';
+import { transDetailColumns, colShape } from '../table/trans-detail.table';
 import { usePrepare } from '../../compositions/use-prepare.composition';
 import { reformDetailData } from '../utils/reformData';
 
 export default defineComponent({
   inheritAttrs: true,
   props: {
+    data: { type: Array, required: true },
     sortType: { type: Number, required: false, default: 0 },
   },
   setup(props, { root: { $api, $q }, emit }) {
-    const detailPrep = usePrepare<any[]>(
+    const pagination = ref();
+    const detailPrep = usePrepare(
       false,
       (jnr) =>
         $api.common.glJourtransOnclick({
@@ -80,8 +86,29 @@ export default defineComponent({
       (tempData) => {
         emit('detail', tempData);
       },
-      (tempData) => reformDetailData(tempData, []),
+      (tempData) =>
+        reformDetailData(tempData, [
+          '0',
+          '0',
+          '.',
+          '0',
+          '0',
+          '.',
+          '0',
+          '0',
+          '0',
+          '0',
+        ]),
       []
+    );
+
+    watch(
+      () => props.data,
+      (nVal) => {
+        if (nVal.length <= 0) {
+          detailPrep.refetch();
+        }
+      }
     );
 
     const tableTitle = computed(() =>
@@ -91,16 +118,26 @@ export default defineComponent({
     const delPrep = usePrepare(
       false,
       async (jnr) => {
+        const access = await $api.common.checkPermission({
+          arrayNr: '68',
+          expectedNr: '2',
+        });
         const { flTemp, msgStr } = await $api.common.glJourtransNewjour({
           pvILanguage: '1',
         });
-
-        if (flTemp === 'true') {
+        if (access.zugriff === 'false') {
+          $q.notify({
+            type: 'negative',
+            message: access.msgStr,
+          });
+          throw new Error(access.msgStr);
+        } else if (flTemp === 'true') {
           if (detailPrep.data.raw.length > 0) {
+            const message = 'Journal entries exist, deleting not possible';
             $q.dialog({
-              title: 'Journal entries exist, deleting not possible',
+              title: message,
             });
-            throw new Error();
+            throw new Error(message);
           } else {
             $api.common.glJourtransDelJouhdr({
               caseType: 3,
@@ -138,11 +175,14 @@ export default defineComponent({
 
     return {
       activeJournalColumns,
+      detailColumns: transDetailColumns,
+      detailShape: colShape,
       fetchJourDetail,
       detailPrep,
       tableTitle,
       deleteJournal,
       editJournal,
+      pagination,
     };
   },
   components: {
@@ -150,3 +190,8 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+.group-table .label-group-table {
+  height: 48px !important;
+}
+</style>

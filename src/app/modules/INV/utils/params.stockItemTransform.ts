@@ -29,7 +29,7 @@ export const fromStore = [
 export const articelNumber = [
     {
         label: 'Creamer Stick - 0.00',
-        price: '12.000',
+        price: '12000',
         st: '07',
         artNumber: '1157653',
         des: 'Creamer Stick',
@@ -38,7 +38,7 @@ export const articelNumber = [
     },
     {
         label: 'Nescafe Sachet @gr - 640.0',
-        price: '10.000',
+        price: '10000',
         st: '03',
         des: 'Nescafe Sachet @gr',
         qty: 640,
@@ -48,7 +48,7 @@ export const articelNumber = [
     {
         label: 'Sosro Black Tea 25 Bag/pack - 2.00',
         qty: 2,
-        price: '20.000',
+        price: '20000',
         st: '05',
         des: 'Sosro Black Tea 25 Bag/pack',
         creattedBy: 'SINDATA',
@@ -57,7 +57,7 @@ export const articelNumber = [
     {
         label: 'Sugar Brown Stick- 680.00',
         qty: 680,
-        price: '1.000',
+        price: '1000',
         st: '09',
         des: 'Sugar Brown Stick',
         creattedBy: 'SINDATA',
@@ -65,7 +65,7 @@ export const articelNumber = [
     },
     {
         label: 'Sugar Stick @250 Pcs/pack - 680.00',
-        price: '101.000',
+        price: '101000',
         qty: 680,
         st: '02',
         des: 'Sugar Stick @250 Pcs/pack',

@@ -40,6 +40,7 @@ import {
 import { mapOU, mapGroup } from '~/app/helpers/mapSelectItems.helpers';
 import { date } from 'quasar';
 import { PrintJs} from '~/app/helpers/PrintJs';
+// import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -82,34 +83,40 @@ export default defineComponent({
         label: 'Description',
         field: 'bezeich',
         name: 'bezeich',
-        align: 'right',
+        align: 'left',
         sortable: false,
       },
       {
         label: 'Quantity',
         field: 'qty',
         name: 'qty',
-        align: 'left',
+        align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Percentage',
         field: 'proz1',
         name: 'proz1',
-        align: 'left',
+        align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Unit Price',
         field: 'epreis',
         name: 'epreis',
+        align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Unit Cost',
         field: 'cost',
         name: 'cost',
+        align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Ratio',
@@ -117,6 +124,7 @@ export default defineComponent({
         name: 'margin',
         align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Sales',
@@ -124,6 +132,7 @@ export default defineComponent({
         name: 't-sales',
         align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Cost',
@@ -131,6 +140,7 @@ export default defineComponent({
         name: 't-cost',
         align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Ratio',
@@ -138,6 +148,7 @@ export default defineComponent({
         name: 't-margin',
         align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
       {
         label: 'Percentage',
@@ -145,6 +156,7 @@ export default defineComponent({
         name: 'proz2',
         align: 'right',
         sortable: false,
+        // format: (val) => (val == 0) ? '' : formatThousands(val),
       },
     ];
     onMounted(async () => {
@@ -273,7 +285,6 @@ export default defineComponent({
         ]);
         charts = dataOutletSoldMenuList[0].fbCostAnalyst['fb-cost-analyst'] || [];
         state.build = charts;
-        console.log('Data list table : ', state.build);
       }
       asyncCall();
     };

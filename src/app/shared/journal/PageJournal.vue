@@ -20,28 +20,43 @@
         @edit-journal="editTrans"
       ></TableGroupJournal>
     </div>
-    <JournalTransAdd
-      ref="addDialog"
-      :value="addDialog.status"
-      @dismit="tablePrep.refetch"
-      @hide="addDialog.hide"
-      @onOKClick="addDialog.hide"
-      @onCancelClick="addDialog.hide"
-    ></JournalTransAdd>
-    <JournalTransEdit
-      ref="editDialog"
-      :value="editDialog.status"
-      :jnr="selectTrans"
-      :is-fixed="true"
-      @dismit="tablePrep.refetch"
-      @hide="editDialog.hide"
-      @onOKClick="editDialog.hide"
-      @onCancelClick="editDialog.hide"
-    ></JournalTransEdit>
+    <template v-if="addDialog.status">
+      <JournalTransAdd
+        ref="addDialog"
+        :journaltype="2"
+        :columns="journalTransColumns"
+        :shape="colShape"
+        :value="addDialog.status"
+        @dismit="tablePrep.refetch"
+        @hide="addDialog.hide"
+        @onOKClick="addDialog.hide"
+        @onCancelClick="addDialog.hide"
+      ></JournalTransAdd>
+    </template>
+    <template v-if="editDialog.status === true">
+      <JournalTransEdit
+        ref="editDialog"
+        :journaltype="2"
+        :value="editDialog.status"
+        :jnr="selectTrans"
+        :is-fixed="true"
+        :columns="editColumns"
+        :shape="shpeEdit"
+        @dismit="tablePrep.refetch"
+        @hide="editDialog.hide"
+        @onOKClick="editDialog.hide"
+        @onCancelClick="editDialog.hide"
+      ></JournalTransEdit>
+    </template>
   </q-page>
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref } from '@vue/composition-api';
+import { journalTransColumns, colShape } from './table/journal-add.table';
+import {
+  journalTransColumns as editColumns,
+  colShape as shpeEdit,
+} from './table/journal-edit.table';
 import {
   ModuleJournalAbbr,
   journalType,
@@ -54,13 +69,28 @@ export default defineComponent({
   props: {
     module: { type: String as () => ModuleJournalAbbr, required: true },
   },
-  setup(props, { root: { $api } }) {
+  setup(props, { root: { $api, $q } }) {
     const debit = ref(0);
     const credit = ref(0);
+    const permission = ref(false);
     const moduleParams = journalType(props.module);
     const selectTrans = ref(0);
     const searchParams = ref();
     const sortType = ref();
+
+    const msgAccess = usePrepare(
+      true,
+      () =>
+        $api.common.checkPermission({
+          arrayNr: moduleParams.accessNr,
+          expectedNr: 1,
+        }),
+      (data) => {
+        // has a permission
+        permission.value = data.zugriff === 'true';
+      },
+      (tempData) => tempData.messStr
+    );
 
     const tablePrep = usePrepare(
       false,
@@ -91,8 +121,15 @@ export default defineComponent({
     }
 
     function editTrans(params: number) {
-      selectTrans.value = params;
-      editDialog.show();
+      if (permission.value === true) {
+        selectTrans.value = params;
+        editDialog.show();
+      } else {
+        $q.notify({
+          type: 'negative',
+          message: msgAccess.result.value,
+        });
+      }
     }
 
     function fetchTableData() {
@@ -115,7 +152,14 @@ export default defineComponent({
           tablePrep.refetch();
           break;
         case 'onAdd':
-          addDialog.show();
+          if (permission.value === true) {
+            addDialog.show();
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: msgAccess.result.value,
+            });
+          }
           break;
         default:
           break;
@@ -136,6 +180,10 @@ export default defineComponent({
       mapActions,
       editTrans,
       selectTrans,
+      journalTransColumns,
+      colShape,
+      editColumns,
+      shpeEdit,
     };
   },
   components: {

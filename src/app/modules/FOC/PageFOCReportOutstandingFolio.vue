@@ -47,14 +47,14 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" @click="onPrint"/>
         </q-btn>
       </div>
 
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -73,7 +73,8 @@ import {
   toRefs,
   onMounted,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportOutstandingFolio.table';
+import { ResTableHeaders } from './tables/Report/reportOutstandingFolio.table';
+import {PrintJs} from '~/app/helpers/PrintJs'
 
 export default defineComponent({
   setup(props, { root: { $api } }) {
@@ -174,11 +175,18 @@ export default defineComponent({
       }
     };
 
+    const onPrint = () => {
+      if (state.table.data.length !== 0) {
+        PrintJs(state.table.data, ResTableHeaders, 'Outstanding Folio')
+      }
+    }
+
     return {
-      tableHeaders,
+      ResTableHeaders,
       onSearch,
       onResets,
       displayChange,
+      onPrint,
       ...toRefs(state),
     };
   },

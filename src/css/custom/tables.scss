@@ -2,12 +2,26 @@
   thead tr th {
     color: #fff;
     background: $primary-grad;
-  
+
     &:not(:last-child) {
       border-right: 1px solid #e8e8e8;
     }
   }
-  
+
+  .table-expanded-row {
+    display: none;
+    &.expanded {
+      background: rgba(0, 0, 0, 0.03) !important;
+      display: table-row;
+    }
+    table tr {
+      background-color: inherit !important;
+    }
+    table td {
+      border: none !important;
+    }
+  }
+
   tr:not(.expanded):nth-of-type(even) {
     background-color: #dcebf6;
 
@@ -15,18 +29,19 @@
       background-color: #dcebf6 !important;
     }
   }
-  
-  thead th, tbody td {
+
+  thead th,
+  tbody td {
     &.fixed-col {
       background-color: #fff;
       position: sticky;
       z-index: 2;
-    
+
       &.left {
         left: 0;
         border-right-width: 1px;
       }
-    
+
       &.right {
         right: 0;
         border-left-width: 1px;
@@ -52,16 +67,37 @@ table.expandable {
 }
 
 // Style for selected row in table
-tbody tr.selected {
+.s-table table.q-table tbody tr.selected {
   td,
-  .fixed-col {
-    background: #2d00e2 !important;
+  &:not(.expanded):nth-of-type(even) .fixed-col.q-td {
+    background: #1485cb !important;
     color: #fff;
   }
 }
 
+// Style for STable Sticky Header
+.s-table.sticky-header {
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+
+    &.fixed-col {
+      z-index: 3 !important;
+    }
+  }
+
+  thead tr:first-child th {
+    top: 0;
+  }
+}
+
 // Style for virtual scroll table with sticky header
-.virtual-scroll-sticky-header {
+.virtual-scroll-sticky-header,
+.q-virtual-scroll {
+  // make table fit the screen
+  .fill &.q-table__middle {
+    height: calc(100vh - 250px);
+  }
   thead tr th {
     position: sticky;
     z-index: 1;
@@ -76,5 +112,33 @@ tbody tr.selected {
   }
   thead tr:first-child th {
     top: 0;
+  }
+}
+
+// table set fixed width need has fixed for work
+.s-table.fixed-width {
+  .q-table {
+    table-layout: fixed;
+  }
+}
+
+// hover on tr but not if selected
+.q-table tbody tr:not(.selected):not(.q-tr--no-hover):hover {
+  td {
+    color: white;
+    background: #5fa4ff;
+    &:before {
+      background: #5fa4ff;
+      /* create a new stacking context */
+      position: absolute;
+      z-index: -1; /* to be below the parent element */
+    }
+
+    &.fixed-col {
+      background: #5fa4ff !important;
+    }
+  }
+  &:not(.expanded):nth-of-type(even) .fixed-col.q-td {
+    background: #5fa4ff !important;
   }
 }

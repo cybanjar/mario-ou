@@ -2,7 +2,8 @@
   <section class="mt-7">
     <div id="input" class="q-pa-md">
       <q-form @submit="onSearch">
-        <SInput label-text="Suppier" v-model="inputan" unmasked-value />
+        <SInput v-if="group == '1'" label-text="Supplier" v-model="inputan" unmasked-value />
+        <SDateInput v-else label-text="Order Date" v-model="datadate" unmasked-value />
         <SInput label-text="Po-Number" v-model="poNumber" unmasked-value />
         <div id="radio">
           <q-option-group
@@ -10,6 +11,7 @@
             v-model="group"
             :options="options"
             color="primary"
+            @input="onGroup"
           />
         </div>
         <q-btn
@@ -41,9 +43,11 @@ export default defineComponent({
     orderDate: {type:String, required: true} as any
     },
   setup(props, { emit }) {
+    let datadatee = props.orderDate.orderDate
     const state = reactive({
       inputan: ref(''),
       poNumber: ref(''),
+      datadate: '',
       label: '',
       group: '1',
       options: [
@@ -58,24 +62,17 @@ export default defineComponent({
       ],
     });
 
-    watch(
-      () => state.group,
-      (val) => {
-        if (val == '1') {
-          state.label = 'Supplier';
-          state.inputan = '';
-        }
-        if (val == '2') {
-          state.label = 'Order Date';
-          state.inputan = date.formatDate(props.orderDate.orderDate,'DD/MM/YYYY')
-        }
-      }
-    );
+    const onGroup = () => {
+      if(state.group == '2'){
+        state.datadate = datadatee
+      } 
+    }
     const onSearch = () => {
       emit('onSearch', {...state});
     };
     return {
       onSearch,
+      onGroup,
       ...toRefs(state),
     };
   },

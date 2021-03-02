@@ -330,8 +330,10 @@ export const dataTableWakeupcall = (dataTable) => {
 }
 
 
-export const dataTable = (dataTable) => {
-    const data = dataTable.telopList['telop-list'].map((items) =>({
+export const dataTable = (dataTable) => {  
+  console.log('sukses12', dataTable.telopList['telop-list']);
+  
+    return dataTable.telopList['telop-list'].map((items) =>({
       'resli-wabkurz': items['resli-wabkurz'],
       'voucher-nr': items['voucher-nr'],
       grpflag: items.grpflag == true ? 'Yes' : 'No',
@@ -377,8 +379,7 @@ export const dataTable = (dataTable) => {
       groupname: items.groupname,
       'cancelled-id': items['cancelled-id'],
       'changed-id': items['changed-id'],
-      bemerk: items.bemerk.length < 53 ? 
-      items.bemerk : `${items.bemerk.substr(0,53)}...`,
+      bemerk: items.bemerk,
       bemarkToltip: items.bemerk,
       actions: '',
       reslinnr: items.reslinnr,
@@ -387,7 +388,5 @@ export const dataTable = (dataTable) => {
       selected: false,
       'active-flag' : items['active-flag'],
       pseudofix: items.pseudofix
-  }))
-
-  return data
+   }))
 }

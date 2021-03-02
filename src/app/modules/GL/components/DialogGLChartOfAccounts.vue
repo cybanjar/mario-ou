@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="dialogModel">
-    <q-card style="width: 500px;">
+    <q-card style="width: 500px">
       <q-toolbar>
         <q-toolbar-title class="text-white text-weight-medium">
           Account's

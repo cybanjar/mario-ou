@@ -18,10 +18,11 @@ export const DATA_RECIPE = (GET_DATA) => {
         cost: formatterMoney(data.cost),
         datumanlage: date.formatDate(data.datumanlage, 'DD/MM/YYYY'),
         datummod: date.formatDate(data.datummod, 'DD/MM/YYYY'),
-        kategorie: data.kategorie,
+        kategorie: data.kategorie == null ? 0 : data.kategorie,
         portion: data.portion,
         CostPortion: result2.toString().replace('.00','')+
-        result1.substring(result1.indexOf('.'))
+        result1.substring(result1.indexOf('.')),
+        selected: false
     }
 })}
 

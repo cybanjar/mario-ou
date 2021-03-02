@@ -39,21 +39,21 @@ export const tableHeaders: TableHeader[] = [
     label: 'Facimile',
     field: 'fax',
     name: 'fax',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
     label: 'Address',
     field: 'adresse1',
     name: 'adresse1',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
     label: 'City',
     field: 'wohnort',
     name: 'wohnort',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
@@ -67,14 +67,14 @@ export const tableHeaders: TableHeader[] = [
     label: 'Land',
     field: 'land',
     name: 'land',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
     label: 'Contact Person',
     field: 'vorname',
     name: 'vorname',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {
@@ -99,6 +99,5 @@ export const tableHeaders: TableHeader[] = [
     sortable: true,
   },
   { name: 'actions', field: 'actions' },
-
 ];
 

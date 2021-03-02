@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         @row-click="onRowClick"
         :rows-per-page-options="[10, 13, 16]"
@@ -48,6 +49,8 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -72,7 +75,7 @@ export default defineComponent({
             sortable: false,
             align: "left",
         },{
-            label: "RmNo", 
+            label: "Room Number", 
             field: "rmno",
             sortable: false,
             align: "left",
@@ -82,10 +85,10 @@ export default defineComponent({
             sortable: false,
             align: "left",
         }, {
-            label: "Bill No", 
+            label: "Bill Number", 
             field: "rechnr",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
             label: "Description", 
             field: "bezeich",
@@ -96,23 +99,25 @@ export default defineComponent({
             field: "saldo",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
-            label: "Foreign Art", 
+            label: "Foreign Amount", 
             field: "foreign",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
             label: "Time", 
             field: "zeit",
             sortable: false,
             align: "center",
         }, {
-            label: "ID", 
+            label: "Posting ID", 
             field: "id",
             sortable: false,
             align: "center",
         },  {
-            label: "TB", 
+            label: "Payment ID", 
             field: "tb",
             sortable: false,
             align: "center",
@@ -216,6 +221,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Join To Guest Folio');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -226,6 +237,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

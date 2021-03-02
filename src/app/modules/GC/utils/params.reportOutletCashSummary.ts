@@ -27,19 +27,19 @@ export const data_map = data => {
     const tKellner = data.tKellner['t-kellner']
     const xii = []
     for(const xi of tKellner){
-        if (xi['departement'] > 0) {
+        if (xi['departement'] == 1) {
             for(const i of tHotel){
                 if (xi['departement'] == i['num']) {
                     xii.push({
                         label: `${i['depart']} - ${xi['kellnername']}`,
                         value: xi['kellner-nr'],
                         data: {
-                            Name: xi['kellnername'],
-                            Depart: i['depart'],
-                            Dept: i['num'],
-                            Knr: i['num'],
+                            NAME: xi['kellnername'],
+                            depart: i['depart'],
+                            dept: i['num'],
+                            knr: xi['kellner-nr'],
                             'bl-recid': xi['rec-id'],
-                            Selected: false
+                            selected: true
                         }
                     })
                 }

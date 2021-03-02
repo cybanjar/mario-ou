@@ -11,7 +11,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
         </q-btn>
       </div>
@@ -24,39 +24,75 @@
         :hide-bottom="hide_bottom"
         class="table-accounting-date"
       >
-        <template #header-cell-fibukonto="props">
-          <q-th :props="props" class="fixed-col left">{{ props.col.label }}</q-th>
-        </template>
+        <!-- <template v-slot:header="props">
+          <q-tr style="height: 40px" :props="props">
+              <q-th
+              :props="props"
+              v-for="col in props.cols.filter(items => 
+              ![
+                'actions'
+              ].includes(items.name)
+              )"
+              :key="col.name"
+              >
+              {{col.label}}
+              </q-th>
+              <q-th style="z-index : 4" :props="props" key="actions" class="fixed-col right">{{ props.label }}</q-th>
+          </q-tr>
+        </template> -->
 
-        <template #body-cell-fibukonto="props">
-          <q-td :props="props" class="fixed-col left">{{ props.row.fibukonto }}</q-td>
-        </template>
-
-        <template #header-cell-actions="props">
-          <q-th style="z-index : 4" :props="props" class="fixed-col right">{{ props.col.label }}</q-th>
-        </template>
-
-        <template #body-cell-actions="props">
-          <q-td :props="props" class="fixed-col right">
-            <q-icon name="mdi-dots-vertical" size="16px">
-              <q-menu :props="props" auto-close anchor="bottom right" self="top right">
-                <q-list :props="props">
-                  <q-item :props="props" @click="onClickEdit(props.row)" clickable v-ripple>
-                    <q-item-section>edit</q-item-section>
-                  </q-item>
-                  <q-item @click="deleteDataRow(props.row)" clickable v-ripple>
-                    <q-item-section>delete</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-icon>
-          </q-td>
+        <template #body="props">
+          <q-tr
+            :props="props"
+            @click="onRowClick(props.row)"
+            :class="{
+              selected: props.row.selected,
+            }"
+          >
+            <q-td
+              :key="col.name"
+              :props="props"
+              v-for="col in props.cols.filter(
+                (items) => !['actions'].includes(items.name)
+              )"
+            >
+              {{ col.value }}
+            </q-td>
+            <q-td :props="props" key="actions" class="fixed-col right">
+              <q-icon name="mdi-dots-vertical" size="16px">
+                <q-menu
+                  :props="props"
+                  auto-close
+                  anchor="bottom right"
+                  self="top right"
+                >
+                  <q-list :props="props">
+                    <q-item
+                      :props="props"
+                      @click="onClickEdit(props.row)"
+                      clickable
+                      v-ripple
+                    >
+                      <q-item-section>edit</q-item-section>
+                    </q-item>
+                    <q-item
+                      @click="deleteDataRow(props.row)"
+                      clickable
+                      v-ripple
+                    >
+                      <q-item-section>delete</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-icon>
+            </q-td>
+          </q-tr>
         </template>
       </STable>
     </div>
     <DialogChartOfAccounts
-    :dialogRecipe="dialogRecipe"
-    @addRecipeSave="addRecipeSave"
+      :dialog-recipe="dialogRecipe"
+      @addRecipeSave="addRecipeSave"
     />
   </div>
 </template>
@@ -70,11 +106,13 @@ import {
   ref,
 } from '@vue/composition-api';
 import { tableHeaders, useInputModal } from './tables/recipe.table';
-import {Notify} from 'quasar'
-import {DATA_RECIPE} from './utils/params.recipe'
+import { Notify } from 'quasar';
+import { DATA_RECIPE } from './utils/params.recipe';
+import { PrintJs } from '~/app/helpers/PrintJs';
+
 export default defineComponent({
   setup(_, { root: { $api } }) {
-    let charts, dataRowDelete
+    let charts, dataRowDelete;
     const state = reactive({
       isFetching: false,
       hide_bottom: false,
@@ -83,249 +121,284 @@ export default defineComponent({
         openDialog: false,
         selectCatNo: [],
         dataChildRecipe: [],
-        dataEdit : [],
+        dataEdit: [],
         max_result: 0,
-        KEY_MODAL : 0
+        KEY_MODAL: 0,
       },
     });
 
-    // Helpers 
+    // Helpers
 
-    const NotifyCreate = (mess, col?, type?) => Notify
-      .create({
-          message: mess,
-          color: col,
-          type: type,
-    });
-    const NotifyCreate1 = (mess, col?, type?) => Notify
-      .create({
-          message: mess,
-          position: 'center',
-          type: type,
-          timeout: 0,
-          actions: [
-            { label: 'Cencel', color: 'white', handler: () => { 
-              state.dialogRecipe.openDialog = false} }
-          ],
-    });
-    const NotifyCreate2 = (mess, col?) => Notify
-      .create({
+    const NotifyCreate = (mess, col?, type?) =>
+      Notify.create({
+        message: mess,
+        color: col,
+        type: type,
+      });
+    const NotifyCreate1 = (mess, col?, type?) =>
+      Notify.create({
+        message: mess,
+        position: 'center',
+        type: type,
+        timeout: 0,
+        actions: [
+          {
+            label: 'Cencel',
+            color: 'white',
+            handler: () => {
+              state.dialogRecipe.openDialog = false;
+            },
+          },
+        ],
+      });
+    const NotifyCreate2 = (mess, col?) =>
+      Notify.create({
         message: mess,
         color: 'primary',
         timeout: 0,
         position: 'center',
         actions: [
-          { label: 'Cencel', color: 'white', handler: () => { /* ... */ } },
-          { label: 'Ok', color: 'white', handler: () => {
-            FETCH_API('recipeListDelete', {
-              tHRezeptArtnrrezept: dataRowDelete.artnrrezept
-            })
-          }}
-        ]
-    });
+          {
+            label: 'Cencel',
+            color: 'white',
+            handler: () => {
+              /* ... */
+            },
+          },
+          {
+            label: 'Ok',
+            color: 'white',
+            handler: () => {
+              FETCH_API('recipeListDelete', {
+                tHRezeptArtnrrezept: dataRowDelete.artnrrezept,
+              });
+            },
+          },
+        ],
+      });
     const sortData = (charts, params) => {
       if (params == 'bezeich1') {
         return charts.sort((a, b) => {
-          const ab = a[params].toLowerCase()
-          const bc = b[params].toLowerCase()
-          if(ab < bc){
-            return -1
+          const ab = a[params].toLowerCase();
+          const bc = b[params].toLowerCase();
+          if (ab < bc) {
+            return -1;
           }
-        })
+        });
       } else {
-        return charts
-        .sort((a, b) => a[params] - b[params])
-      } 
-      
-    }
+        return charts.sort((a, b) => a[params] - b[params]);
+      }
+    };
     const filterData = (charts, value, params) => {
-      return charts.filter(items => {
-        if (isNaN(value.inputan)) {            
-          return items.bezeich1.toLowerCase()
-          .includes(value.inputan.toLowerCase())
+      return charts.filter((items) => {
+        if (isNaN(value.inputan)) {
+          return items.bezeich1
+            .toLowerCase()
+            .includes(value.inputan.toLowerCase());
         } else {
-          return items[params].toString()
-          .includes(value.inputan)
-        }})
-    }
+          return items[params].toString().includes(value.inputan);
+        }
+      });
+    };
     const mapSelect = (GET_DATA) => {
-      const data = GET_DATA.recipe.recipe
-      return data.map(items => ({
-        label : `${items.katno} - ${items.bezeich}`,
-        value : items.katno
-      }))
-    }
+      const data = GET_DATA.recipe.recipe;
+      return data.map((items) => ({
+        label: `${items.katno} - ${items.bezeich}`,
+        value: items.katno,
+      }));
+    };
 
     // Fetch API
 
     const FETCH_API = async (api, body?) => {
       const [GET_DATA, GET_COMMON] = await Promise.all([
-        $api.inventory.FetchAPIINV(api, body), 
-        $api.inventory.FetchCommon(api, body)
-        ])
-        switch (api) {
-          case 'recipeListPrepare':
-            charts = DATA_RECIPE(GET_DATA)
-              state.data = charts
-              if (charts.length !== 0) {
-                state.hide_bottom = true
-              }
-              let x = []
-              for(const i in charts){
-                x.push(charts[i].artnrrezept)
-              }
-              state.dialogRecipe.max_result = Math.max(...x)
-              break;
-          case 'recipeSelect':
-            const data = mapSelect(GET_DATA)
-            state.dialogRecipe.selectCatNo = data
-            break;
-          case 'checkPermission':
-            if (GET_COMMON.zugriff) {
-              DELETE_DATA(true)
-            } else {
-              NotifyCreate('Access denied, can not delete', 'red')
-            }
-            break;
-          case 'recipeListDelCheck':
-            if (GET_DATA.msgStr == '') {
-              NotifyCreate2(`Do you really want to delete ${dataRowDelete.artnrrezept} ${dataRowDelete.bezeich1}`)
-            } else {
-              NotifyCreate(GET_DATA.msgStr, 'red')
-            }
+        $api.inventory.FetchAPIINV(api, body),
+        $api.inventory.FetchCommon(api, body),
+      ]);
+      switch (api) {
+        case 'recipeListPrepare':
+          charts = DATA_RECIPE(GET_DATA);
+          state.data = charts;
+          if (charts.length !== 0) {
+            state.hide_bottom = true;
+          }
+          let x = [];
+          for (const i in charts) {
+            x.push(charts[i].artnrrezept);
+          }
+          state.dialogRecipe.max_result = Math.max(...x);
           break;
-          case 'recipeListDelete':
-            DELETE_DATA(false)
-            break;
-          default:
-            if (GET_DATA.hBezeich !== '' && GET_DATA.katnr !== 0) {
-                state.dialogRecipe.dataEdit = GET_DATA
-            } else {
-              NotifyCreate1('this record is being modifed by oher user', 'white', 'negative')
-            }
-            break;
-        }
-    }
+        case 'recipeSelect':
+          const data = mapSelect(GET_DATA);
+          state.dialogRecipe.selectCatNo = data;
+          break;
+        case 'checkPermission':
+          if (GET_COMMON.zugriff) {
+            DELETE_DATA(true);
+          } else {
+            NotifyCreate('Access denied, can not delete', 'red');
+          }
+          break;
+        case 'recipeListDelCheck':
+          if (GET_DATA.msgStr == '') {
+            NotifyCreate2(
+              `Do you really want to delete ${dataRowDelete.artnrrezept} ${dataRowDelete.bezeich1}`
+            );
+          } else {
+            NotifyCreate(GET_DATA.msgStr, 'red');
+          }
+          break;
+        case 'recipeListDelete':
+          DELETE_DATA(false);
+          break;
+        case 'addRecipePrepare':
+          console.log('sukses123', GET_DATA);
+          break;
+        default:
+          if (GET_DATA.hBezeich !== '' && GET_DATA.katnr !== 0) {
+            state.dialogRecipe.dataEdit = GET_DATA;
+          } else {
+            NotifyCreate1(
+              'this record is being modifed by oher user',
+              'white',
+              'negative'
+            );
+          }
+          break;
+      }
+    };
 
     // Function
 
     onMounted(() => {
-        FETCH_API('recipeListPrepare')
-        FETCH_API('recipeSelect')
+      FETCH_API('recipeListPrepare');
+      FETCH_API('recipeSelect');
     });
 
     const DELETE_DATA = (val) => {
-      if (val) {        
+      if (val) {
         const data = {
           pvILanguage: 1,
-          tHRezeptArtnrrezept: dataRowDelete.artnrrezept
-        }
-        FETCH_API('recipeListDelCheck', data)
+          tHRezeptArtnrrezept: dataRowDelete.artnrrezept,
+        };
+        FETCH_API('recipeListDelCheck', data);
       } else {
-        FETCH_API('recipeListPrepare')
+        FETCH_API('recipeListPrepare');
       }
-    }
+    };
 
     const onSearch = (value) => {
+      FETCH_API('addRecipePrepare');
       if (value.group == '1') {
         if (value.inputan == null || value.inputan == '') {
-          state.data = sortData(charts, 'artnrrezept')
+          state.data = sortData(charts, 'artnrrezept');
         } else {
-          if (!isNaN(value.inputan)) {                    
-            const x = filterData(charts, value, 'artnrrezept')
+          if (!isNaN(value.inputan)) {
+            const x = filterData(charts, value, 'artnrrezept') as any;
             if (x.length !== 0) {
-              state.data = x
+              state.data = x;
             } else {
-              NotifyCreate('Data Not Found', 'red')
+              NotifyCreate('Data Not Found', 'red');
             }
           } else {
-            NotifyCreate('this is not a number', 'red')
+            NotifyCreate('this is not a number', 'red');
           }
         }
-      } else if(value.group == '2'){
+      } else if (value.group == '2') {
         if (value.inputan == null || value.inputan == '') {
-          state.data = sortData(charts, 'bezeich1')
+          state.data = sortData(charts, 'bezeich1');
         } else {
-          const x = filterData(charts, value, 'bezeich1')
-          if(x.length !== 0){
-            state.data = x
+          const x = filterData(charts, value, 'bezeich1') as any;
+          if (x.length !== 0) {
+            state.data = x;
           } else {
-            NotifyCreate('Data Not Found', 'red')
+            NotifyCreate('Data Not Found', 'red');
           }
         }
       } else {
         if (value.inputan == null || value.inputan == '') {
-          state.data = sortData(charts, 'kategorie')
+          state.data = sortData(charts, 'kategorie');
         } else {
           if (!isNaN(value.inputan)) {
-            const x = filterData(charts, value, 'kategorie')
-            if(x.length !== 0){
-              state.data = x
+            const x = filterData(charts, value, 'kategorie') as any;
+            console.log('sukses', x);
+            if (x.length !== 0) {
+              state.data = x;
             } else {
-              NotifyCreate('Data Not Found', 'red')
+              NotifyCreate('Data Not Found', 'red');
             }
           } else {
-            NotifyCreate('this is not a number', 'red')
+            NotifyCreate('this is not a number', 'red');
           }
         }
       }
     };
 
-    const x1 = useInputModal.filter(items => ['Category Number',
-    'Description', 'Category Name'].includes(items.label)
-    )
-    const x2 = useInputModal.filter(items => [
-    'Articel Number', 'Recipe Cost',
-    'Loss Factor', 'Quantity', 'content',
-    'Recipe Number'].includes(items.label)
-    )
+    const x1 = useInputModal.filter((items) =>
+      ['Category Number', 'Description', 'Category Name'].includes(items.label)
+    );
+    const x2 = useInputModal.filter((items) =>
+      [
+        'Articel Number',
+        'Recipe Cost',
+        'Loss Factor',
+        'Quantity',
+        'content',
+        'Recipe Number',
+      ].includes(items.label)
+    );
 
     const xii = () => {
-      for(const i in x1){
-        x1[i].disable = false
-        x1[i].value = ''
+      for (const i in x1) {
+        x1[i].disable = false;
+        x1[i].value = '';
       }
-      for(const i in x2){
-        x2[i].disable = true
-        x2[i].value = ''
+      for (const i in x2) {
+        x2[i].disable = true;
+        x2[i].value = '';
       }
-      useInputModal[4].value = '1'
-      useInputModal[4].disable = false
-    }
+      useInputModal[4].value = '1';
+      useInputModal[4].disable = false;
+    };
 
     const onClickDialog = () => {
-      state.dialogRecipe.openDialog = true
-      state.dialogRecipe.KEY_MODAL = 1
-      xii()
+      state.dialogRecipe.openDialog = true;
+      state.dialogRecipe.KEY_MODAL = 1;
+      xii();
+    };
+
+    function doPrint() {
+      if (state.data.length !== 0) {
+        PrintJs(state.data, tableHeaders, 'Recipe');
+      }
     }
 
     const onClickEdit = (onRowData) => {
-      state.dialogRecipe.openDialog = true
-      state.dialogRecipe.KEY_MODAL = 2
-      xii()
+      state.dialogRecipe.openDialog = true;
+      state.dialogRecipe.KEY_MODAL = 2;
+      xii();
       FETCH_API('chgRecipePrepare', {
-        "hArtnr" : onRowData.artnrrezept,
-        "DESCRIPTION" : onRowData.bezeich1.trim()
-      })
-    }
+        hArtnr: onRowData.artnrrezept,
+        DESCRIPTION: onRowData.bezeich1.trim(),
+      });
+    };
 
     const addRecipeSave = () => {
-      FETCH_API('recipeListPrepare')
+      FETCH_API('recipeListPrepare');
       setTimeout(() => {
-        state.dialogRecipe.openDialog = false
-      },2000)
-    }
+        state.dialogRecipe.openDialog = false;
+      }, 2000);
+    };
 
     const deleteDataRow = (dataRow) => {
       const data = {
-        "expectedNr": "2",
-		    "arrayNr": "53",
-		    "userInit": "01"
-      }
-      dataRowDelete = dataRow
-      FETCH_API('checkPermission', data)
-    }
-
+        expectedNr: '2',
+        arrayNr: '53',
+        userInit: '01',
+      };
+      dataRowDelete = dataRow;
+      FETCH_API('checkPermission', data);
+    };
 
     // const deleteData = async () => {
     //   await Promise.all([
@@ -336,14 +409,23 @@ export default defineComponent({
     //   ]);
     // };
 
+    const onRowClick = (datarow) => {
+      for (const i of state.data) {
+        i.selected = false;
+      }
+      datarow['selected'] = true;
+    };
+
     return {
       ...toRefs(state),
       onSearch,
+      doPrint,
       addRecipeSave,
       onClickDialog,
       deleteDataRow,
       onClickEdit,
       tableHeaders,
+      onRowClick,
       pagination: {
         rowsPerPage: 0,
       },

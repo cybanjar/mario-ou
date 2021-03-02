@@ -94,7 +94,7 @@
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -129,7 +129,7 @@ import {
   onMounted,
   watch,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportPaymentJournalByUser.table';
+import { ResTableHeaders } from './tables/Report/reportPaymentJournalByUser.table';
 import { setupCalendar, DatePicker } from 'v-calendar';
 
 setupCalendar({
@@ -373,7 +373,7 @@ export default defineComponent({
     };
 
     return {
-      tableHeaders,
+      ResTableHeaders,
       onSearch,
       onResets,
       onDeleteKeyword,
@@ -387,11 +387,11 @@ export default defineComponent({
     'v-date-picker': DatePicker,
     DialogReportPaymentJournalByUserClosedShift: () =>
       import(
-        './components/Dialog/DialogReportPaymentJournalByUserClosedShift.vue'
+        './components/Dialog/Report/DialogReportPaymentJournalByUserClosedShift.vue'
       ),
     DialogReportPaymentJournalByUserClosedShiftConfirm: () =>
       import(
-        './components/Dialog/DialogReportPaymentJournalByUserClosedShiftConfirm.vue'
+        './components/Dialog/Report/DialogReportPaymentJournalByUserClosedShiftConfirm.vue'
       ),
   },
 });

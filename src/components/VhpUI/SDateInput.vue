@@ -1,19 +1,25 @@
 <template>
   <SInput
-    v-bind="pAttrs"
+    v-bind="attrs"
     v-on="pListeners"
-    mask="##/##/####"
+    :mask="mask"
     :value="fValue"
+    @focus="() => $refs.qDateProxy.show()"
     @input="iInput"
   >
-    <template v-slot:append>
+    <template #append>
       <q-icon name="mdi-calendar" class="cursor-pointer">
         <q-popup-proxy
           ref="qDateProxy"
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date :value="fValue" @input="iInput" mask="DD/MM/YYYYYY">
+          <q-date
+            :value="fValue"
+            :options="options"
+            @input="iInput"
+            mask="DD/MM/YYYY"
+          >
             <div class="row items-center justify-end">
               <q-btn v-close-popup label="Close" color="primary" flat />
             </div>
@@ -24,21 +30,30 @@
   </SInput>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from '@vue/composition-api';
+import { defineComponent, computed, ref } from '@vue/composition-api';
 import { date } from 'quasar';
 export default defineComponent({
   inheritAttrs: true,
   props: {
-    value: { type: Date, required: true },
-    format: { type: String, required: false, default: 'DD/MM/YYYYYY' },
+    value: { type: [Date, String], required: true },
+    format: { type: String, required: false, default: 'DD/MM/YYYY' },
+    options: { type: [Array, Function], required: false },
   },
-  setup(props, { attrs, listeners }) {
-    const { value, ...pAttrs } = attrs;
+  computed: {
+    attrs() {
+      const { value, ...pAttrs } = (this as any).$attrs;
+      return pAttrs;
+    },
+  },
+  setup(props, { listeners }) {
     const { input, ...pListeners } = listeners;
+    const qDateProxy = ref();
 
     const fValue = computed(() => {
       return date.formatDate(props.value, props.format);
     });
+
+    const mask = props.format.replace(/\w/g, '#');
 
     function isValid(sDate: string): boolean {
       const [day, month, year] = sDate.split('/');
@@ -57,9 +72,10 @@ export default defineComponent({
     return {
       fValue,
       iInput,
-      pAttrs,
       pListeners,
+      qDateProxy,
       dateRule,
+      mask,
     };
   },
 });

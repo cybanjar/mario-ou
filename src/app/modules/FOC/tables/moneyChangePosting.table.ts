@@ -1,13 +1,6 @@
 import { TableHeader } from '~/components/VhpUI/typings';
 
-export const tableHeaders: TableHeader[] = [
-  {
-    label: 'Department',
-    field: 'dept',
-    name: 'dept',
-    align: 'right',
-    sortable: true,
-  },
+export const ResTableHeaders: TableHeader[] = [
   {
     label: 'Article Number',
     field: 'artnr',
@@ -17,24 +10,23 @@ export const tableHeaders: TableHeader[] = [
   },
   {
     label: 'Description',
-    field: 'desc',
-    name: 'desc',
+    field: 'bezeich',
+    name: 'bezeich',
     align: 'left',
     sortable: true,
   },
   {
     label: 'Foreign Amount',
-    field: 'fa',
-    name: 'fa',
+    field: 'preis',
+    name: 'preis',
     align: 'right',
     sortable: true,
   },
   {
     label: 'Local Amount',
-    field: 'la',
-    name: 'la',
+    field: 'betrag',
+    name: 'betrag',
     align: 'right',
     sortable: true,
   },
-  { name: 'actions', field: 'actions' },
 ];

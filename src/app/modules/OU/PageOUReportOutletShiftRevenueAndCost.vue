@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +32,7 @@
 import {defineComponent, onMounted, toRefs, reactive} from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -96,14 +98,14 @@ export default defineComponent({
             width: 150,
             divider: true
         },{
-            label: "WIG", 
+            label: "Pax of Outsider Guest", 
             field: "wig",
             sortable: false,
             align: "right",
             width: 150,
             divider: true
         }, {
-            label: "WIG Revenue", 
+            label: "Outsider Revenue", 
             field: "wrev",
             sortable: false,
             align: "right",
@@ -120,12 +122,12 @@ export default defineComponent({
             sortable: false,
             align: "right",
         },  {
-            label: "WIG Cost", 
+            label: "Outsider Guest Cost", 
             field: "wcost",
             sortable: false,
             align: "right",
         },  {
-            label: "TTL", 
+            label: "Total Pax", 
             field: "ttl",
             sortable: false,
             align: "right",
@@ -265,6 +267,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Outlet Shift Revenue And Cost');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -272,6 +280,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

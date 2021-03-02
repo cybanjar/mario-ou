@@ -1,311 +1,317 @@
 <template>
-  <q-dialog ref="dialogElRef" :value="show" @hide="hide">
-    <div class="dialog">
-      <div class="dialog__header">
-        <div class="dialog__title">Payment Record</div>
-      </div>
+  <SDialog v-bind="$attrs" v-on="$listeners">
+    <template #title>Payment Record </template>
+    <template #body>
       <div class="bg-white q-pa-md">
         <div class="row q-col-gutter-sm">
           <div class="col-4">
-            <q-form @submit="save">
-              <SInput
-                label-text="Payment Date"
-                hide-bottom-space
-                type="string"
-                v-model="formData.payDate"
-                :rules="['date']"
-              ></SInput>
-              <q-separator></q-separator>
-              <SelectFilter
-                label-text="Payment Article"
-                :options="articleOptions"
-                option-value="value"
-                option-label="label"
-                v-model="formData.article"
-                hide-bottom-space
-                lazy-rules
-                :rules="[(val) => val || 'Please select article']"
-              ></SelectFilter>
-              <SInput
-                label-text="In Percentage(%)"
-                v-model="formData.perc"
-                hide-bottom-space
-                type="number"
-              ></SInput>
-              <SInput
-                label-text="In Amount"
-                @focus="calculateAmount"
-                v-model="formData.amount"
-                hide-bottom-space
-                type="number"
-              ></SInput>
-              <SInput
-                label-text="Payment Remark"
-                hide-bottom-space
-                v-model="formData.remark"
-                type="string"
-              ></SInput>
-              <q-btn
-                class="full-width"
-                type="submit"
-                :label="submitLabel"
-                color="primary"
-                inline
-              />
-              <q-separator></q-separator>
+            <AddPaymentForm
+              v-model="form"
+              :total-balance="totalBalance"
+              :label="submitLabel"
+              :bill-date="billDate"
+              :transfer-date="transferDate"
+              :articles="articles"
+              :loading="formPrep.data.isLoading"
+              @on-save="addToRecord"
+            >
               <div class="q-my-md">
-                <SRemarkLeftDrawer label="Total" :value="paymentTotal" />
-                <SRemarkLeftDrawer label="Balance" :value="totalBalance" />
+                <SRemarkLeftDrawer
+                  label="Total"
+                  :value="paymentTotal | money"
+                />
+                <SRemarkLeftDrawer
+                  label="Balance"
+                  :value="totalBalance | money"
+                />
               </div>
-            </q-form>
+            </AddPaymentForm>
           </div>
           <div class="col">
-            <STable
-              row-key="key"
-              selection="single"
-              :columns="paymentRecordListColumns"
-              :data="paymentList"
-              :selected.sync="selected"
-            ></STable>
+            <AddPaymentTable
+              :data="record"
+              @row-click="setForm"
+              @delete="delRecord"
+            />
           </div>
         </div>
       </div>
-      <div class="dialog__footer q-pa-md q-gutter-sm">
-        <q-btn
-          label="Cancel"
-          color="white"
-          text-color="gray"
-          outline
-          v-close-popup
-        />
-        <q-btn label="Ok" color="primary" @click="insertPaymentDebt" />
-      </div>
-    </div>
-  </q-dialog>
+    </template>
+    <template #action-cancel>
+      <q-btn
+        label="Cancel"
+        color="white"
+        class="q-mr-md"
+        text-color="gray"
+        outline
+        v-close-popup
+      />
+    </template>
+    <template #action-ok>
+      <q-btn label="Ok" color="primary" @click="savePayment" />
+    </template>
+  </SDialog>
 </template>
 <script lang="ts">
-import { date, QDialog } from 'quasar';
-import {
-  defineComponent,
-  reactive,
-  toRaw,
-  ref,
-  toRefs,
-  computed,
-  watch,
-} from '@vue/composition-api';
+import { defineComponent, ref, computed } from '@vue/composition-api';
+import { date } from 'quasar';
+import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
+import { ResPaymentDebtPayList } from '../models/payment.model';
 import { paymentRecordListColumns } from '../tables/payment-record.table';
-import { loadArticleList } from '../shared/article-list.comp';
-import { loadPayDate } from '../shared/pay-date.comp';
-import {
-  PaymentRecord,
-  ResPaymentDebtPayList,
-  ReqSettlePaymentDebt,
-} from '../../AR/models/payment.model';
-
-type FormType = 'edit' | 'add';
-type PayRow = PaymentRecord & { key: number };
+import { reformArticle, reformWarung } from '../utils/reformData';
+import { FormState, initState } from './AddPaymentForm.vue';
 
 export default defineComponent({
+  inheritAttrs: true,
   props: {
-    show: { type: Boolean, required: true },
-    selectDepts: {
-      type: Array as () => Array<ResPaymentDebtPayList>,
+    dataSelected: {
+      type: Array as () => ResPaymentDebtPayList[],
       required: true,
     },
+    debitArticle: { type: Number, required: false },
+    totalBalance: { type: Number, required: false, default: 0 },
   },
-  setup(props, { root: { $api, $q }, emit }) {
-    const selected = ref([]);
-    const { payDate, isPrefetch } = loadPayDate($api);
-    const paymentList = ref<Array<PayRow>>([]);
-    const formData = {
-      payDate: '',
-      article: 0,
-      perc: 0,
-      amount: 0,
-      remark: '',
-    };
-
-    const state = reactive({
-      formData,
-      formType: 'add' as FormType,
-      formTargetKey: -1,
+  setup(props, { root: { $api, $q }, refs, listeners }) {
+    const record = ref<FormState[]>([]);
+    const articles = ref([]);
+    const form = ref<FormState>({
+      ...initState,
     });
 
     const submitLabel = computed(() =>
-      state.formType === 'edit' ? 'Edit Payment' : 'Add Payment'
-    );
-
-    watch(isPrefetch, (prefetch) => {
-      prefetch
-        ? (state.formData.payDate = date.formatDate(
-            toRaw(payDate).value,
-            'DD/MM/YYYY'
-          ))
-        : undefined;
-    });
-
-    const { articleOptions } = loadArticleList($api, '23');
-    const totalBalance = computed<number>(() =>
-      props.selectDepts.reduce<number>((a, b: any) => a + b['tot-debt'], 0)
+      form.value.isEdit ? 'Edit Payment' : 'Add Payment'
     );
 
     const paymentTotal = computed<number>(() =>
-      paymentList.value.reduce((total, payment) => total + payment.betrag, 0)
+      record.value.reduce((total, payment) => total + payment.amount, 0)
     );
 
-    const dialogElRef = ref<QDialog>();
-    const hide = () => emit('hide');
-
-    function calculateAmount() {
-      state.formData.amount = -totalBalance.value * (state.formData.perc / 100);
-    }
-
-    function addPayment() {
-      const article = articleOptions.value.find(
-        (option) => option.value === state.formData.article
-      );
-
-      const paymentData: PayRow = {
-        key: paymentList.value.length,
-        artnr: state.formData.article,
-        bezeich: article?.label.split(' - ')[1] || '',
-        proz: state.formData.perc,
-        betrag: state.formData.amount,
-        'f-amt': 0,
-        currency: 0,
-        'curr-str': 'Rp',
-        bemerk: state.formData.remark,
-        'remain-amt': totalBalance.value - state.formData.amount,
-        'fremain-amt': 0,
+    function setForm(_, payment: any) {
+      form.value = {
+        ...payment,
+        isEdit: true,
       };
-      paymentList.value = [...paymentList.value, paymentData];
-      state.formData = formData; // reset
+      formPrep.refetch();
     }
 
-    function applyEditPayment() {
-      const article = articleOptions.value.find(
-        (option) => option.value === state.formData.article
-      );
+    const billDate = ref();
+    const transferDate = ref();
 
-      paymentList.value = paymentList.value.map((a) => {
-        if (a.key === state.formTargetKey) {
-          return {
-            key: a.key,
-            artnr: state.formData.article,
-            bezeich: article?.label.split(' - ')[1] || '',
-            proz: state.formData.perc,
-            betrag: state.formData.amount,
-            'f-amt': 0,
-            currency: 0,
-            'curr-str': 'Rp',
-            bemerk: state.formData.remark,
-            'remain-amt': totalBalance.value - state.formData.amount,
-            'fremain-amt': 0,
-          };
+    const formPrep = usePrepare(
+      true,
+      () =>
+        Promise.all([
+          $api.accountReceivable.getARClosePayDate(),
+          $api.accountReceivable.getReadArticleList({
+            caseType: '23',
+            dept: 0,
+            actFlag: true,
+          }),
+          $api.common.getGeneralParam(2, 1014),
+        ]),
+      ([closeDate, accList, lastTransfer]) => {
+        const billFromDate = date.extractDate(closeDate.billDate, 'YYYY-MM-DD');
+
+        transferDate.value = date.extractDate(lastTransfer.fdate, 'YYYY-MM-DD');
+        billDate.value = billFromDate;
+        form.value.payDate = billFromDate;
+        articles.value = reformArticle(accList, '23');
+        console.log(lastTransfer);
+      }
+    );
+
+    const savePrep = usePrepare(
+      false,
+      (param) => $api.accountReceivable.arPaymentSettlePaymentDebtPay(param),
+      (responseSavePayment) => {
+        if (
+          responseSavePayment.fFlag === 0 &&
+          responseSavePayment.msgStr === ''
+        ) {
+          record.value = [];
+          doReset();
+          $q.notify({
+            type: 'positive',
+            message: 'Successfully added',
+          });
+          listeners.hide && listeners.hide();
         } else {
-          return a;
+          $q.notify({
+            type: 'negative',
+            message: responseSavePayment.message,
+          });
         }
-      });
-    }
-
-    watch(selected, (val) => {
-      if (val.length === 1) {
-        const target: PayRow = val[0];
-        state.formType = 'edit';
-        state.formTargetKey = target.key;
-        state.formData = {
-          ...state.formData,
-          article: target.artnr,
-          perc: target.proz,
-          remark: target.bemerk,
-          amount: target.betrag,
-        };
-      } else {
-        state.formType = 'add';
       }
-    });
+    );
 
-    function save() {
-      if (state.formType === 'edit') {
-        applyEditPayment();
-        state.formType = 'add';
-        state.formTargetKey = -1;
-        selected.value = [];
-      } else {
-        addPayment();
+    const warungPrep = usePrepare(
+      true,
+      () =>
+        $api.accountReceivable.arPaymentReadWaehrung({
+          caseType: 1,
+          currencyNo: 1,
+          currBez: ' ',
+        }),
+      undefined,
+      reformWarung
+    );
+
+    async function savePayment() {
+      let ageList = [];
+      console.log('x', props.dataSelected);
+      const stateWarung = warungPrep.result.value;
+      for (var i = 0; i < props.dataSelected.length; i++) {
+        let ageListArr = props.dataSelected[i];
+        // let al_selected = ageListArr.selected ? 'Yes' : 'No';
+        let cidate = ageListArr.cidate ? ageListArr.cidate : ' ';
+        let codate = ageListArr.codate ? ageListArr.codate : ' ';
+        let prevdate = ageListArr.prevdate ? ageListArr.prevdate : ' ';
+
+        ageList.push({
+          selected: 'Yes',
+          'ar-recid': ageListArr.recid,
+          rechnr: ageListArr.billNumber,
+          refno: ageListArr.referenceNumber,
+          counter: ageListArr.counter,
+          gastnr: ageListArr.gastnr,
+          billname: ageListArr.billName,
+          gastnrmember: ageListArr.gastnrmember,
+          gastname: ageListArr.guestName,
+          zinr: ageListArr.roomNumber,
+          rgdatum: ageListArr.billDateOri,
+          'user-init': ageListArr.id,
+          debt: ageListArr.debt,
+          'debt-foreign': ageListArr.foreignDebt,
+          currency: ageListArr.currency,
+          credit: ageListArr.creditOri,
+          'tot-debt': ageListArr.balanceOri,
+          'vouc-nr': ageListArr.voucherNumber,
+          prevdate: prevdate,
+          remarks: ageListArr.remark,
+          'b-resname': ageListArr.bresname,
+          'ci-date': cidate,
+          'co-date': codate,
+        });
       }
-      state.formData = formData;
-    }
 
-    async function insertPaymentDebt() {
-      const [day, mounth, year] = formData.payDate.split('/');
+      let currency_str = stateWarung ? stateWarung[0].currency_short_code : '';
+      let paymentList = [];
+      let total_paid_amount = 0;
 
-      const body: ReqSettlePaymentDebt = {
-        balance: paymentTotal.value,
-        currArt: 1,
-        fbalance: 0,
-        foutstand: 0,
-        foutstand1: 0,
-        outstand: totalBalance.value + paymentTotal.value,
-        outstand1: totalBalance.value,
-        payDate: [mounth, day, year].join('/'),
+      for (var i = 0; i < record.value.length; i++) {
+        let dataPayment = record.value[i];
+        let currency = dataPayment.fAmt; //currency
+        let paid_amount = dataPayment.amount;
+        total_paid_amount += paid_amount;
+
+        paymentList.push({
+          artnr: dataPayment.article,
+          bezeich: dataPayment.description,
+          proz: dataPayment.perc,
+          betrag: paid_amount, // paid amount yg dimasukan user
+          'f-amt': 0,
+          currency: currency,
+          'curr-str': currency_str,
+          bemerk: dataPayment.remark,
+          'remain-amt': paid_amount,
+          'fremain-amt': 0,
+          //"payDate": dateToServer(dataPayment.payment_date), // "01/09/19"
+          //"fbalance": dataPayment.foreign_amount, // Nilai yg sudah dibayar dalam foreign
+        });
+      }
+
+      let initialApiSavePaymentParams = {
         pvILanguage: '1',
+        outstand1: props.totalBalance, // Total yg diselect
+        foutstand1: 0,
+        outstand: props.totalBalance + total_paid_amount, // sama kayak balance
+        currArt: props.debitArticle,
         rundung: 0,
+        foutstand: 0, // Total yg diselect dalam foreign
+        payDate: date.formatDate(formPrep.data.raw[0].billDate, 'MM/DD/YY'),
+        balance: total_paid_amount, //total_balance + total_paid_amount,
+        fbalance: 0,
         userInit: '01',
-        payList: {
-          'pay-list': [...paymentList.value],
-        },
         ageList: {
-          'age-list': [...props.selectDepts],
+          'age-list': ageList,
+        },
+        payList: {
+          'pay-list': paymentList,
         },
       };
 
-      const response = await $api.accountReceivable.getSettlePaymentDebtPay(
-        body
-      );
-
-      if (response.fFlag === 0) {
-        // close dialog and toast toast
-        dialogElRef.value?.hide();
+      if (total_paid_amount == 0 && record.value.length == 0) {
         $q.notify({
           type: 'warning',
-          message: 'Payment has been submited',
-          timeout: 2000,
+          message: 'Submit Without Payment',
+        });
+      } else if (total_paid_amount * -1 > props.totalBalance) {
+        $q.notify({
+          type: 'warning',
+          message: 'Over Balance',
         });
       } else {
-        // keep modal show error toast
-        $q.notify({
-          type: 'negative',
-          message: `Something goes wrong (${response.msgStr}), try again`,
-          timeout: 2000,
-        });
+        savePrep.refetch(initialApiSavePaymentParams);
       }
+    }
+
+    function doReset() {
+      form.value = { ...initState };
+      formPrep.refetch();
+    }
+
+    function delRecord({ key }) {
+      record.value = record.value.filter((it) => it.key !== key);
+      if (form.value.key === key) {
+        doReset();
+      }
+    }
+
+    function addToRecord(mForm: FormState) {
+      const index = record.value.findIndex((it) => it.key === mForm.key);
+      // console.log(mForm.key, index, record);
+      if (!~index === false) {
+        // has not record
+        const data = [...record.value];
+        const payment = {
+          ...record.value[index],
+          ...mForm,
+        };
+        record.value = [
+          ...data.slice(0, index),
+          payment,
+          ...data.slice(index + 1),
+        ];
+      } else {
+        const payment = {
+          key: record.value.length,
+          ...mForm,
+        };
+        record.value = [...record.value, payment];
+      }
+
+      doReset();
     }
 
     return {
-      ...toRefs(state),
-      insertPaymentDebt,
-      hide,
-      save,
-      paymentList,
-      calculateAmount,
-      articleOptions,
-      totalBalance,
+      form,
+      savePayment,
+      record,
+      delRecord,
       paymentTotal,
-      selected,
-      dialogElRef,
       submitLabel,
+      formPrep,
       paymentRecordListColumns,
+      setForm,
+      addToRecord,
+      articles,
+      billDate,
+      transferDate,
     };
   },
   components: {
-    SelectFilter: () => import('../../AP/components/SelectFilter.vue'),
+    AddPaymentForm: () => import('./AddPaymentForm.vue'),
+    AddPaymentTable: () => import('./AddPaymentTable.vue'),
   },
 });
 </script>
-<style lang="scss" scoped>
-.dialog {
-  max-width: 800px !important;
-}
-</style>

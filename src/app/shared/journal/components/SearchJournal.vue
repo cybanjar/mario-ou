@@ -27,7 +27,7 @@
             />
           </div>
           <q-separator spaced="xl" />
-          <SDateRange label-text="Date" v-model="date" />
+          <SDateRange :range.sync="dateRange" />
           <SInput label-text="Vouncer No." v-model="voucerNo" />
           <q-separator spaced="xl" />
           <q-btn
@@ -46,9 +46,11 @@
   </section>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRef, toRefs } from '@vue/composition-api';
 import { usePrepare } from '../../compositions/use-prepare.composition';
-import { formatToBL } from '~/app/helpers/formatterDate.helper';
+import { dateFormatOB, formatToBL } from '~/app/helpers/formatterDate.helper';
+import { useDateRange } from '../../compositions/use-date-range.composition';
+import { date } from 'quasar';
 export default defineComponent({
   props: {
     debit: { type: Number, required: false, default: 0 },
@@ -57,10 +59,8 @@ export default defineComponent({
   setup(_, { emit, root: { $api, $q } }) {
     const filter = reactive({
       display: 0,
-      date: {
-        before: new Date(),
-        after: new Date(),
-      },
+      fromDate: '14/01/19',
+      toDate: date.formatDate('01/01/19', 'DD/MM/YY'),
       voucerNo: '',
     });
     usePrepare<any[]>(
@@ -81,18 +81,20 @@ export default defineComponent({
       false,
       () => $api.common.getGeneralParam(2, 558),
       (tempData) => {
-        const date = new Date(tempData?.fdate);
-        date.setDate(date.getDate() + 1); // add 1 day
-        filter.date.after = date;
+        const fromDate = new Date(tempData?.fdate);
+        fromDate.setDate(fromDate.getDate() + 1); // add 1 day
+        filter.fromDate = date.formatDate(fromDate, 'DD/MM/YY');
         onSubmit(); // show result on first load
       }
     );
     function onSubmit() {
+      const toDate = date.extractDate(filter.toDate, 'DD/MM/YY');
+      const fromDate = date.extractDate(filter.fromDate, 'DD/MM/YY');
       const params = {
         sorttype: filter.display,
         fromRefno: filter.voucerNo || ' ',
-        fromDate: formatToBL(filter.date.after),
-        toDate: formatToBL(filter.date.before),
+        fromDate: date.formatDate(fromDate, dateFormatOB),
+        toDate: date.formatDate(toDate, dateFormatOB),
       };
 
       emit('search', params);
@@ -100,6 +102,7 @@ export default defineComponent({
 
     return {
       ...toRefs(filter),
+      ...useDateRange(toRef(filter, 'fromDate'), toRef(filter, 'toDate')),
       initPrep,
       onSubmit,
     };

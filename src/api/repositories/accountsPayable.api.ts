@@ -57,6 +57,8 @@ export interface AccountsPayableEndpoints {
 
   getPaymentList: (body: ReqPaymentList) => Promise<ResPaymentList[]>;
   getPaymentArticle: (body: ReqPaymentArticle) => Promise<ResPaymentArticle[]>;
+
+  readParameter: any;
 }
 
 const defaultBodies = {
@@ -65,6 +67,13 @@ const defaultBodies = {
     pvILanguage: '1',
     currDate: '2019-01-14',
     progName: 'hk-roomlist',
+  },
+  readParameter: {
+    caseType: 4,
+    char1: 'costcenter',
+    char2: 'name',
+    char3: ' ',
+    'int1 ': ' ',
   },
 };
 
@@ -134,5 +143,10 @@ export default (doFetch: DoRequest): AccountsPayableEndpoints => ({
   getPaymentArticle: (body) =>
     doFetch({ url: `${AP_URL}/apPaymentPrepareSettle`, body }).then(
       ([, res]) => res?.artikelList?.['artikel-list']
+    ),
+
+  readParameter: (body = defaultBodies.readParameter) =>
+    doFetch({ url: `${AP_URL}/readParameter`, body }).then(
+      ([, res]) => res?.tParameters?.['t-parameters']
     ),
 });

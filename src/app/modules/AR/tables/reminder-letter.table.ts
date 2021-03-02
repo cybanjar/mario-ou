@@ -10,6 +10,8 @@ export const reminderLetterListColumns: TableHeader<ReminderLetterList>[] = [
     name: 'description',
     align: 'left',
     sortable: true,
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
   },
   {
     label: 'Bill Date',
@@ -17,13 +19,17 @@ export const reminderLetterListColumns: TableHeader<ReminderLetterList>[] = [
     name: 'bill_date',
     align: 'left',
     sortable: true,
+    style: 'width: 80px',
+    headerStyle: 'width: 80px',
   },
   {
     label: 'Bill Number',
     field: 'bill_number',
     name: 'bill_number',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 90px',
+    headerStyle: 'width: 90px',
   },
 
   {
@@ -32,38 +38,48 @@ export const reminderLetterListColumns: TableHeader<ReminderLetterList>[] = [
     name: 'bill_receiver',
     align: 'left',
     sortable: true,
+    style: 'width: 200px',
+    headerStyle: 'width: 200px',
   },
 
   {
     label: 'Ar Amount',
     field: 'ar_amount',
     name: 'ar_amount',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
   },
 
   {
     label: 'Payment Amount',
     field: 'payment_amount',
     name: 'payment_amount',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
   },
 
   {
     label: 'Outstanding',
     field: 'outstanding',
     name: 'outstanding',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 150px',
+    headerStyle: 'width: 150px',
   },
 
   {
     label: 'Days',
     field: 'days',
     name: 'days',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 70px',
+    headerStyle: 'width: 70px',
   },
 
   {
@@ -72,13 +88,17 @@ export const reminderLetterListColumns: TableHeader<ReminderLetterList>[] = [
     name: 'last_print',
     align: 'left',
     sortable: true,
+    style: 'width: 100px',
+    headerStyle: 'width: 100px',
   },
 
   {
     label: 'Level',
     field: 'level',
     name: 'level',
-    align: 'left',
+    align: 'right',
     sortable: true,
+    style: 'width: 70px',
+    headerStyle: 'width: 70px',
   },
 ];

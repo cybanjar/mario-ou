@@ -14,6 +14,10 @@ import OutletEndpoints from '../repositories/outlet.api';
 import TelephoneOperatorEndpoints from '../repositories/telephoneOperator.api';
 import InventoryEndpoints from '../repositories/inventory.api';
 import GeneralCashierEndpoints from '../repositories/generalCashier.api';
+import FrontOfficeReception from '../repositories/frontOfficeReception.api';
+import IncomeAudit from '../repositories/incomeaudit.api';
+import SystemSetting from '../repositories/systemSetting.api';
+import SettingsApi from '../repositories/settings.api';
 
 const http: ApiEndpoints = {
   auth: AuthApi(repository),
@@ -28,6 +32,10 @@ const http: ApiEndpoints = {
   telephoneOperator: TelephoneOperatorEndpoints(repository),
   inventory: InventoryEndpoints(repository),
   generalCashier: GeneralCashierEndpoints(repository),
+  frontOfficeReception: FrontOfficeReception(repository),
+  incomeaudit: IncomeAudit(repository),
+  systemsetting: SystemSetting(repository),
+  settings: SettingsApi(repository),
 };
 
 export default http;

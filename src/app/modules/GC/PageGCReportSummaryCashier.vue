@@ -9,7 +9,7 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="25" @click="doPrint"/>
         </q-btn>
       </div>
       <STable
@@ -19,6 +19,7 @@
         :hide-bottom="hide_bottom"
         class="table-accounting-date"
         flat bordered
+        id="printMe"
       >
         <template #header-cell-fibukonto="props">
             <q-th :props="props" class="fixed-col left">{{ props.col.label }}</q-th>
@@ -60,6 +61,7 @@ import {
 import {tableHeaders}  from './tables/ReportSummaryCashier.table'
 import {data_table} from './utils/params.summaryCashier'
 import {date} from 'quasar'
+import {PrintJs} from '~/app/helpers/PrintJs'
 
 export default defineComponent({
     setup(_, {root: {$api}}){
@@ -90,6 +92,7 @@ export default defineComponent({
 
       const onSearch = (val) => {
         const _date = date.formatDate(val, 'YYYY-MM-DD')
+        
         FETCH_DATA('summCashier', {
           "pvILanguage" : 1,
           "toDate" : _date,
@@ -111,11 +114,18 @@ export default defineComponent({
             "inpParam" : 110
           })
       })
+
+    function doPrint() {
+      if (state.data.length !== 0) {   
+        PrintJs(state.data, tableHeaders, 'Summary Cashier')     
+      }
+    }
       return {
           ...toRefs(state),
           tableHeaders,
           onSearch,
-          onRowClick
+          onRowClick,
+          doPrint
       }
     },
     components: {

@@ -3,7 +3,7 @@
     class="column items-center justify-center full-height cursor-pointer"
     @mouseenter="isHover = true"
     @mouseleave="isHover = false"
-    @click="$router.push(item.path)"
+    @click="onClick(item)"
   >
     <img
       :src="
@@ -25,9 +25,17 @@ export default defineComponent({
   props: {
     item: { type: Object, required: true },
   },
-  setup() {
+  setup(_, {root: {$router}}) {
+    const onClick = (item) => {
+      if (item.name == 'Night Audit') {
+        sessionStorage.removeItem('key')
+        sessionStorage.removeItem('value')
+      }
+      $router.push(item.path)
+    }
     return {
       isHover: ref(false),
+      onClick
     };
   },
 });

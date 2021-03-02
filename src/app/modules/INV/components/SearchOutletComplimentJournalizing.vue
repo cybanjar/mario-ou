@@ -1,26 +1,8 @@
 <template>
   <section class="mt-7">
     <div id="input" class="q-pa-md">
-      <v-date-picker v-model="searches.fromDate"  :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="From Date"
-          slot-scope="{ inputProps }"
-          readonly
-          v-bind="inputProps"
-          clearable
-          disable
-        />
-      </v-date-picker>
-      <v-date-picker v-model="searches.toDate"  :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="To Date"
-          slot-scope="{ inputProps }"
-          readonly
-          v-bind="inputProps"
-          clearable
-          :disable="searches.disableButton"
-        />
-      </v-date-picker>
+      <SDateInput disable label-text="From Date" v-model="searches.fromDate"/>
+      <SDateInput :disable="searches.disableButton" label-text="To Date" v-model="searches.toDate"/>
       <SInput 
       label-text="Refrence Number" 
       v-model="searches.refNum" 
@@ -42,6 +24,7 @@
         :label="searches.search"
         class="q-mt-md full-width"
         @click="onSearch"
+        unelevated
       />
 
       <q-separator style="border-width: 1px;" class="q-my-md" />

@@ -1,8 +1,18 @@
 <template>
   <SDialog v-bind="$attrs" v-on="$listeners" @show="refetch">
-    <template #title> G/L Journal - RefNo {{ transaction.refno }} </template>
+    <template #title> G/L Journal - RefNo {{ refno }} </template>
     <template #body>
-      <DialogJournalTable :data="dataRef" :is-fixed="true"></DialogJournalTable>
+      <STable
+        :data="data"
+        virtual-scroll
+        :pagination.sync="pagination"
+        :rows-per-page-options="[0]"
+        fixed-header
+        height="280px"
+        :columns="viewTransColumns"
+        :is-fixed="true"
+        row-key="key"
+      ></STable>
     </template>
     <template #action-ok>
       <q-btn label="Close" color="primary" v-close-popup />
@@ -10,35 +20,34 @@
   </SDialog>
 </template>
 <script lang="ts">
-import { defineComponent, toRefs, ref, onMounted } from '@vue/composition-api';
+import { defineComponent, ref, onMounted } from '@vue/composition-api';
 import { usePrepare } from '../../compositions/use-prepare.composition';
-import { LedgerData } from '../helpers/reformData.helper';
-import { reformTransaction } from '../../helpers/reformData.helper';
+import { reformTransaction } from '../utils/reformData';
+import { viewTransColumns } from '../tables/journal-view.tables';
 export default defineComponent({
   props: {
-    transaction: { type: Object as () => LedgerData, required: true },
+    jnr: { type: Number, required: true },
+    refno: { type: String, required: true },
+    recordId: { type: Number, required: true },
   },
   setup(props, { root: { $api } }) {
-    const dataRef = ref([]);
-    const { data, refetch } = usePrepare(
+    const pagination = ref();
+    const { result: data, refetch } = usePrepare(
       true,
       () =>
         $api.common.getGLViewTransaction({
-          jnr: props.transaction.jnr,
-          refno: props.transaction.refno,
-          srecid: props.transaction.recordId,
+          jnr: props.jnr,
+          refno: props.refno,
+          srecid: props.recordId,
         }),
-      (data) => {
-        dataRef.value = reformTransaction(data, []);
-      }
+      undefined,
+      (data) => reformTransaction(data),
+      []
     );
 
     onMounted(() => refetch());
 
-    return { ...toRefs(data), dataRef, refetch };
-  },
-  components: {
-    DialogJournalTable: () => import('../../components/DialogJournalTable.vue'),
+    return { data, refetch, viewTransColumns, pagination };
   },
 });
 </script>

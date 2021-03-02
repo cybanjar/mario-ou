@@ -53,70 +53,83 @@
           </q-menu>
         </q-btn>
 
-        <q-btn v-if="currentModule" flat round icon="mdi-apps">
-          <q-menu v-if="currentModule.reports[0].keyword !== 'Inventory'" 
-          content-class="menu-submodule" :offset="[0, 5]" auto-close>
-            <ul class="q-pa-md">
-              <li
-                v-for="menuItem in currentModule.subModules"
-                :key="menuItem.name"
-              >
-                <router-link
-                  :to="menuItem.path"
-                  class="column items-center justify-center text-center full-height"
+        <template v-if="currentModule">
+          <q-btn
+            v-if="
+              currentModule.reports[0].keyword !== 'Income Audit' &&
+              currentModule.reports[0].keyword !== 'Night Audit'
+            "
+            flat
+            round
+            icon="mdi-apps"
+          >
+            <q-menu
+              v-if="currentModule.reports[0].keyword !== 'Inventory'"
+              content-class="menu-submodule"
+              :offset="[0, 5]"
+              auto-close
+            >
+              <ul class="q-pa-md">
+                <li
+                  v-for="menuItem in currentModule.subModules"
+                  :key="menuItem.name"
                 >
-                  <img
-                    :src="require(`~/app/icons/${menuItem.icon}.svg`)"
-                    width="50"
-                    height="50"
-                  />
-
-                  {{ menuItem.name }}
-                </router-link>
-              </li>
-            </ul>
-          </q-menu>
-          <q-menu v-else
-          content-class="menu-submodule" :offset="[0, 5]">
-            <q-list style="min-width: 150px">
-              <q-item v-for="menu in item(currentModule)" clickable>
-                <div
-                style="marginLeft: 10px; fontSize: 15px; fontWeight: 'bold">
-                {{menu.name}}
-                </div>
-                <q-menu
-                  auto-close
-                  anchor="top right"
-                  self="top left"
-                  content-class="menu-submodule" 
-                  :offset="[0, 5]"
-                  fit
+                  <router-link
+                    :to="menuItem.path"
+                    class="column items-center justify-center text-center"
                   >
-                  <ul class="q-pa-md">
-                    <li
-                    v-for="xi in menu.item"
-                    :key="xi.name"
-                    >
-                      <router-link
-                        :to="xi.path"
-                        class="column items-center 
-                        justify-center text-center 
-                        full-height"
-                      >
-                        <img
-                          :src="require(`~/app/icons/${xi.icon}.svg`)"
-                          width="50"
-                          height="50"
-                        />
-                        {{ xi.name }}
-                      </router-link>
-                    </li>
-                  </ul>
-                </q-menu>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+                    <img
+                      :src="require(`~/app/icons/${menuItem.icon}.svg`)"
+                      width="50"
+                      height="50"
+                    />
+
+                    {{ menuItem.name }}
+                  </router-link>
+                </li>
+              </ul>
+            </q-menu>
+            <q-menu v-else content-class="menu-submodule" :offset="[0, 5]">
+              <q-list style="min-width: 150px">
+                <q-item
+                  v-for="menu in item(currentModule)"
+                  clickable
+                  :key="menu.name"
+                >
+                  <div
+                    style="marginLeft: 10px; fontSize: 15px; fontWeight: 'bold"
+                  >
+                    {{ menu.name }}
+                  </div>
+                  <q-menu
+                    auto-close
+                    anchor="top right"
+                    self="top left"
+                    content-class="menu-submodule"
+                    :offset="[0, 5]"
+                    fit
+                  >
+                    <ul class="q-pa-md">
+                      <li v-for="xi in menu.item" :key="xi.name">
+                        <router-link
+                          :to="xi.path"
+                          class="column items-center justify-center text-center full-height"
+                        >
+                          <img
+                            :src="require(`~/app/icons/${xi.icon}.svg`)"
+                            width="50"
+                            height="50"
+                          />
+                          {{ xi.name }}
+                        </router-link>
+                      </li>
+                    </ul>
+                  </q-menu>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+        </template>
       </div>
     </q-toolbar>
   </q-header>
@@ -125,7 +138,7 @@
 <script lang="ts">
 import { defineComponent, computed } from '@vue/composition-api';
 import { store } from '~/store';
-import {item} from '~/app/modules/INV/LayoutMainHeader'
+import { item } from '~/app/modules/INV/LayoutMainHeader';
 
 export default defineComponent({
   setup() {
@@ -135,7 +148,7 @@ export default defineComponent({
       user,
       doLogout: store.dispatch.auth.doLogout,
       currentModule,
-      item
+      item,
     };
   },
 });
@@ -181,5 +194,4 @@ export default defineComponent({
     padding: 10px;
   }
 }
-
 </style>

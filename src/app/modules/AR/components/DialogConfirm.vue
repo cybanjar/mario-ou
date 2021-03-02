@@ -12,7 +12,7 @@
           v-if="icon"
           :icon="icon"
           text-color="warning"
-          style="font-size: 4rem;"
+          style="font-size: 4rem"
         />
         <div class="col">
           <div class="text-h6">{{ title }}</div>

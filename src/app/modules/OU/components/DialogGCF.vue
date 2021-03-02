@@ -158,7 +158,7 @@ export default defineComponent({
               charts[i]["zeit"] = displayTime(charts[i]["zeit"]);
             } 
             state.dataGuest = charts;
-            // console.log('response : ', tempdata);
+            console.log('response : ', tempdata);
           } else {
             Notify.create({
               message: 'Please check your internet connection',
@@ -184,7 +184,7 @@ export default defineComponent({
         ]);
 
         if (data) {
-          // console.log("data: ", data);
+          console.log("data: ", data);
 
           const tempdata = data || [];
           const okFlag = tempdata['outputOkFlag'];

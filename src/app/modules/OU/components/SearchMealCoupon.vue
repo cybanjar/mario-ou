@@ -1,36 +1,28 @@
 <template>
   <section class="mt-7">
     <div class="q-pa-md">
-      <v-date-picker mode="range" v-model="date" :columns="2" :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="Date"
-          slot-scope="{ inputProps }"
-          placeholder="From - Until"
-          readonly
-          v-bind="inputProps"
-          @clear="date = null"
-        />
-      </v-date-picker>
-
+      <DateRangeInput
+        label-text="Date"
+        :position-fixed="true"
+        v-model="inputDate"
+      />
       <q-btn dense color="primary" icon="mdi-magnify" label="Search" class="q-mt-md full-width" @click="onSearch"/>
     </div>
   </section>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs } from '@vue/composition-api';
-import { setupCalendar, DatePicker } from 'v-calendar';
-import { watch } from 'fs';
-import { date } from 'quasar';
-
-setupCalendar({
-  firstDayOfWeek: 2,
-});
+import { defineComponent, reactive, toRefs, } from '@vue/composition-api';
+import DateRangeInput from '~/app/modules/FR/components/common/DateRangeInput.vue';
 
 export default defineComponent({
+  components: {
+    DateRangeInput,
+  },
+
   setup(_, { emit }) {
     const state = reactive({
-      date: {start: ref(new Date()), end: ref(new Date())},
+      inputDate: {start: new Date(), end: new Date()},
     });
 
     const onSearch = () => {
@@ -42,9 +34,6 @@ export default defineComponent({
       onSearch,
     };
   },
-  components: {
-    'v-date-picker': DatePicker,
-  }
 });
 </script>
 

@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
     </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :visible-columns="visibleColumns"
@@ -32,7 +33,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
-import { date, Notify } from 'quasar';
+import { Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -59,47 +61,47 @@ export default defineComponent({
 
     const tableHeaders = [
         {
-            label: "Bill No",
+            label: "Bill Number",
             name: "rechnr",
             field: "rechnr",
             sortable: false,
-            align: "right",
+            align: "left",
         },{
             label: "Pax", 
             name: "belegung",
             field: "belegung",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
             label: "", 
             name: "bezeich0",
             field: "bezeich0",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
             label: "", 
             name: "bezeich1",
             field: "bezeich1",
             sortable: false,
-            align: "right",
+            align: "left",
         },{
             label: "", 
             name: "bezeich2",
             field: "bezeich2",
             sortable: false,
-            align: "right",
+            align: "left",
         },  {
             label: "", 
             name: "bezeich3",
             field: "bezeich3",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
             label: "", 
             name: "bezeich4",
             field: "bezeich4",
             sortable: false,
-            align: "right",
+            align: "left",
         },{
             label: "Service", 
             name: "t-service",
@@ -143,11 +145,11 @@ export default defineComponent({
             sortable: false,
             align: "right",
         },{
-            label: "CC/CL", 
+            label: "Card / City Ledger", 
             name: "c-ledger",
             field: "c-ledger",
             sortable: false,
-            align: "left",
+            align: "right",
         },{
             label: "Info", 
             name: "info",
@@ -264,6 +266,12 @@ export default defineComponent({
       state.build = dataTurnover;
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Daily Sales By User');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -271,6 +279,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint,
     };
   },
   components: {

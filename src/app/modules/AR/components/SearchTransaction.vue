@@ -12,7 +12,11 @@
           map-options
           label-text="Debt Article"
           :rules="[(val) => !!val || 'Please Input Debt Article']"
-        />
+        >
+          <template v-if="!debtArticle" #selected>
+            <div class="text-grey-6">- Please select -</div>
+          </template>
+        </SSelect>
         <q-separator spaced />
         <div class="row justify-center items-center">
           <div class="col">
@@ -23,16 +27,16 @@
             name="mdi-help-circle"
             color="blue"
             class="q-mx-sm"
-            style="font-size: 32px;"
+            style="font-size: 32px"
           />
         </div>
-        <SDateRange v-model="dateRange" label-text="Date" />
+        <SDateRange :range.sync="dateRange" />
         <q-checkbox v-model="showDetail" label="Show Detail" />
         <q-checkbox v-model="inclBalance" label="Include Balance Dept" />
-        <SInput
+        <SDateInput
+          v-if="inclBalance"
           label-text="Since"
           v-model="billDate"
-          type="date"
           :rules="[(val) => !!val || 'Please Input Since Date']"
         />
         <div class="q-px-sm q-py-md">
@@ -63,11 +67,22 @@
   </section>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from '@vue/composition-api';
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  ref,
+  toRef,
+} from '@vue/composition-api';
 import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
 import { mapWithBezeich } from '~/app/helpers/mapSelectItems.helpers';
-import { formatterDate } from '~/app/helpers/formatterDate.helper';
-export default defineComponent({
+import {
+  dateFormatOB,
+  formatterDate,
+} from '~/app/helpers/formatterDate.helper';
+import { useDateRange } from '~/app/shared/compositions/use-date-range.composition';
+import { date } from 'quasar';
+export default defineComponent<any>({
   props: {
     selectRemarks: {
       type: Array,
@@ -82,13 +97,11 @@ export default defineComponent({
     const filter = reactive({
       debtArticle: null,
       billName: '',
-      dateRange: {
-        before: new Date(),
-        after: new Date(),
-      },
+      fromDate: '14/01/19',
+      toDate: date.formatDate('01/01/19', 'DD/MM/YY'),
       showDetail: true,
       inclBalance: true,
-      billDate: new Date(),
+      billDate: null,
     });
     const showDialog = ref(false);
     const articlePrep = usePrepare<any[]>(
@@ -100,6 +113,8 @@ export default defineComponent({
     );
 
     function onSubmit() {
+      const toDate = date.extractDate(filter.toDate, 'DD/MM/YY');
+      const fromDate = date.extractDate(filter.fromDate, 'DD/MM/YY');
       const article = articlePrep.data.raw.find(
         (it) => it.artnr === filter.debtArticle
       );
@@ -109,8 +124,8 @@ export default defineComponent({
         fromName: article.billName || ' ',
         detail: filter.showDetail,
         incl: filter.inclBalance,
-        frDate: formatterDate(filter.dateRange.after, false),
-        toDate: formatterDate(filter.dateRange.before, false),
+        frDate: date.formatDate(fromDate, dateFormatOB),
+        toDate: date.formatDate(toDate, dateFormatOB),
         Bdate: formatterDate(filter.billDate, false),
         tDept: article.bezeich,
         toName: 'zz',
@@ -128,6 +143,7 @@ export default defineComponent({
 
     return {
       ...toRefs(filter),
+      ...useDateRange(toRef(filter, 'fromDate'), toRef(filter, 'toDate')),
       showDialog,
       toggleDialog,
       articlePrep,

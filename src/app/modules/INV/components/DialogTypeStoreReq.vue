@@ -6,7 +6,6 @@
           <q-toolbar-title class="text-white text-weight-medium">Type Of Store Requisition</q-toolbar-title>
         </q-toolbar>
         <q-card-section>
-          <div class="actualQuantity">Actual Quantity</div>
           <div class="q-pa-md">
             <q-option-group
               size="xs"
@@ -48,18 +47,18 @@
             dialog: {} as any ,
         },
         setup(props,{emit}){
-            const state = reactive({
-                options: [
-                  { label: 'Transfer To Other Storage', value: '1' },
-                  { label: 'Outgoing / Consumed', value: '2', color: 'bat' },
-                ],
-                group: '1',
-                child_dialog : {
-                    dialog : false,
-                    actual : ['From Store', 'To Store'], 
-                    actual1 : ['Total Amount']
-                }
-            })
+          const state = reactive({
+            options: [
+              { label: 'Transfer To Other Storage', value: '1' },
+              { label: 'Outgoing / Consumed', value: '2', color: 'bat' },
+            ],
+            group: '1',
+            child_dialog : {
+              dialog : false,
+              actual : ['From Store', 'To Store'], 
+              actual1 : ['Total Amount']
+            }
+          })
 
             const onClick = () => {
               state.child_dialog.dialog = true
@@ -78,6 +77,11 @@
                 state.child_dialog.actual1 = ['Account', 'Total Amount']
               }
             }
+
+            watch(() => props.dialog.dialog_child1,
+            () => {
+              state.child_dialog.dialog = false
+            })
 
             return {
                 ...toRefs(state),

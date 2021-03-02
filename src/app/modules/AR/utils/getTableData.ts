@@ -18,14 +18,15 @@ export function getTableData(
     key: index,
     description: data.STR.substring(0, 15),
     bill_date: data.STR.substring(16, 24),
-    bill_number: parseInt(data.STR.substring(28, 33).trim()),
+    bill_number: data.STR.substring(28, 33),
     bill_receiver: data.STR.substring(33, 59),
-    ar_amount: parseFloat(data.STR.substring(59, 81).trim()),
-    payment_amount: parseFloat(data.STR.substring(81, 86).trim()),
-    outstanding: parseFloat(data.STR.substring(86, 99).trim()),
-    days: parseInt(data.STR.substring(99, 109).trim()),
+    ar_amount: data.STR.substring(59, 81),
+    payment_amount: data.STR.substring(81, 86),
+    outstanding: data.STR.substring(86, 99),
+    days: data.STR.substring(99, 109),
     last_print: ' ',
-    level: parseInt(data.STR.substring(111, 113).trim()),
+    level: data.STR.substring(111, 113),
   }));
+  // debugger;
   return data;
 }

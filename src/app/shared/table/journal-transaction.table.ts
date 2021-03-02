@@ -38,6 +38,7 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
   },
   {
     label: 'Id',
+    group: 'Before',
     field: 'id',
     name: 'id',
     align: 'left',
@@ -46,6 +47,7 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
 
   {
     label: 'Date',
+    group: 'Before',
     field: 'created',
     name: 'created',
     format: (v) => (v == null ? '' : formatFromBL(v)),
@@ -55,6 +57,7 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
 
   {
     label: 'Time',
+    group: 'Before',
     field: 'time',
     name: 'time',
     format: (v) => (v == null ? '' : formatTime(v)),
@@ -64,6 +67,7 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
 
   {
     label: 'Change By',
+    group: 'After',
     field: 'changeBy',
     name: 'changeBy',
     align: 'left',
@@ -72,6 +76,7 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
 
   {
     label: 'Date',
+    group: 'After',
     field: 'changedDate',
     name: 'changedDate',
     format: (v) => (v == null ? '' : formatFromBL(v)),
@@ -86,4 +91,26 @@ export const journalTransColumns: TableHeader<TransTable>[] = [
     align: 'left',
     sortable: true,
   },
+];
+
+export const colShape = [
+  [
+    ...journalTransColumns
+      .slice(0, 4)
+      .map((value) => ({ ...value, height: 2 })),
+    {
+      name: 'Before',
+      width: 3,
+    },
+    {
+      name: 'After',
+      width: 2,
+    },
+    ...journalTransColumns.slice(9).map((value) => ({ ...value, height: 2 })),
+  ],
+  [
+    ...journalTransColumns
+      .slice(4, 9)
+      .map((value) => ({ ...value, height: 2 })),
+  ],
 ];

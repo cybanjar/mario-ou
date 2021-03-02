@@ -44,8 +44,9 @@
                             <q-input
                               v-else 
                               style="width: 70px" 
-                              @blur="blurQTY(props.row)"
-                              @keyup.enter="blurQTY(props.row)"
+                              @blur="blurQTY(props.row, qty)"
+                              @keyup.enter="blurQTY(props.row, qty)"
+                              @input="blurQTYY(props.row, qty)"
                               autofocus
                               dense 
                               borderless 
@@ -101,90 +102,104 @@ import {
   ref,
 } from '@vue/composition-api';
 import {use_input, tableHeaders} from './tables/Issuing.table'
-import {dataTable} from './utils/Params.InterStoreTf'
+import {dataTable} from './utils/params.issuing'
 import {Notify} from 'quasar'
 export default defineComponent({
-    setup(_, { root: { $api } }) {
-         const state = reactive({
-            searches : {
-                use_input,
-                totalPrice: '0'
-            },
-            data: [],
-            hide_bottom: false,
-            qtyModify: null,
-            qty: '',
-         })
-          const NotifyCreate = (mess, col?, position?,) => Notify.create({
-              message: mess,
-              color: col,
-              position
-            });
-
-        const ADD = (value) => {
-            const x = value.searches.use_input
-            if(x[2].value !== '' && x[3].value !== ''){
-                if (Number(x[3].value) <= x[2].value.qty && 
-                    Number(x[3].value) !== 0) {                    
-                    state.data.push(dataTable(
-                        Object.assign(x[2].value, x[3]))
-                    )
-                    let xi = 0
-                    for(const i of state.data){
-                        xi += Number(i.price)
-                    }
-                    state.searches.totalPrice = xi.toString()+'.000'
-                    x[2].value = ''
-                    x[3].value = ''
-                    if(state.data.length !== 0){
-                        state.hide_bottom = true
-                    }
-                } else {
-                     NotifyCreate('Wrong quantity', 'red', 'top')
-                }
-            } else {
-                NotifyCreate('please fill in Articel Number / Quantiy', 'red', 'top')
-            }
+  setup(_, { root: { $api } }) {
+    const state = reactive({
+       searches : {
+        use_input,
+        totalPrice: '0'
+       },
+       data: [],
+       hide_bottom: false,
+       qtyModify: null,
+       qty: '',
+    })
+    const NotifyCreate = (mess, col?, position?,) => Notify.create({
+        message: mess,
+        color: col,
+        position
+    });
+    const ADD = (value) => {
+      const x = value.searches.use_input
+      if(x[1].value !== '' && x[2].value !== '' && x[3].value !== ''){
+        const data =  dataTable(Object.assign(x[2].value, x[3]))
+        if (Number(x[3].value) <= x[2].value.qty && 
+          Number(x[3].value) !== 0) {                    
+          state.data.push(dataTable(
+              Object.assign(x[2].value, x[3]))
+          )
+          let xi = 0
+          for(const i of state.data){
+              xi += Number(i.price)
+          }
+          x[2].value = ''
+          x[3].value = ''
+          if(state.data.length !== 0){
+            state.hide_bottom = true
+          }
+        } else {
+             NotifyCreate('Wrong quantity', 'red', 'top')
         }
+      } else {
+          NotifyCreate('please fill in Articel Number / Quantiy', 'red', 'top')
+      }
+    }
 
-        const blurQTY = (val) => {
+    const blurQTY = (val, qty) => {
+      console.log('sukses1', Number(val.qty), qty)
+      if (!isNaN(qty)) 
+        if (Number(qty) <= Number(val.qty)) {
           state.qtyModify = null
           val.qty = state.qty
+        } else {
+          NotifyCreate('Wrong quantity', 'red', 'top')
         }
-        const onClickEdit = (dataRow) => {
-          state.qtyModify = dataRow.pageIndex
-          state.qty = dataRow.row.qty
-        }
-        const deleteDataRow = (dataRow) => {
-          state.data = state.data.filter((x, i) => {
-             return x.artNumber !== dataRow.artNumber
-          })
-          if(state.data.length == 0){
-              state.hide_bottom = false
-          }
-        }
+      else
+        NotifyCreate('Wrong quantity', 'red', 'top')
+      
+    }
 
-        const saveReturn = () => {
-            if(use_input[1].value !== ''){
-                NotifyCreate('Sorry, no access righ', 'red', 'top')
-            } else {
-                NotifyCreate('please fill in From Store', 'red', 'top')
-            }
-         
+    const blurQTYY = (val, qty) => {
+      if (Number(qty) > Number(val.qty))     
+        NotifyCreate('Wrong quantity', 'red', 'top') 
+    }
+    
+    const onClickEdit = (dataRow) => {
+      state.qtyModify = dataRow.pageIndex
+      state.qty = dataRow.row.qty
+    }
+    const deleteDataRow = (dataRow) => {
+      state.data = state.data.filter((x, i) => {
+        return x.artNumber !== dataRow.artNumber
+      })
+      if(state.data.length == 0){
+        state.hide_bottom = false
+      }
+    }
+    const saveReturn = () => {
+        if(use_input[1].value !== ''){
+            NotifyCreate('Sorry, no access righ', 'red', 'top')
+        } else {
+            NotifyCreate('please fill in From Store', 'red', 'top')
         }
-        return {
-            ...toRefs(state),
-            tableHeaders,
-            ADD,
-            onClickEdit,
-            blurQTY,
-            deleteDataRow,
-            saveReturn,
-            pagination: {
-              rowsPerPage: 0,
-            },
-        }
-    },
+     
+    }
+    return {
+        ...toRefs(state),
+        tableHeaders,
+        ADD,
+        onClickEdit,
+        blurQTY,
+        deleteDataRow,
+        saveReturn,
+        blurQTYY,
+        pagination: {
+          rowsPerPage: 0,
+        },
+    }
+  },
     components: {
         SearchInterStore: () => import('./components/SearchIssuing.vue')
     },

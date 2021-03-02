@@ -14,14 +14,11 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
         </q-btn>
-        <q-btn @click="alarmClock" flat round>
-          <img :src="require('~/app/icons/TO/Icon-alarmclock.svg')" height="25" />
-        </q-btn>
       </div>
       <STable
         :loading="isFetching"
         :columns="tableHeaders"
-        :data="data"
+        :data="dataTO"
         :rows-per-page-options="[0]"
         :pagination.sync="pagination"
         class="table-accounting-date"
@@ -84,7 +81,16 @@
             {{ props.colsMap.guestNote.label }}
           </q-th>
           <q-th
-            v-for="col in getDefaultColumns(props.cols)"
+            v-for="col in props.cols.filter(x => 
+            ![
+              'icons',
+              'roomNumber',
+              'floor',
+              'roomType',
+              'roomStatus', 
+              'guestNote',
+              'actions'
+            ].includes(x.name))"
             :key="col.name"
             :props="props"
           >
@@ -211,25 +217,33 @@
 
           <q-td
             :props="props"
-            v-for="col in getDefaultColumns(props.cols)"
+            v-for="col in props.cols.filter(x => 
+              ![
+                'icons',
+                'roomNumber',
+                'floor',
+                'roomType',
+                'roomStatus', 
+                'guestNote',
+                'actions'
+              ].includes(x.name))"
             :key="col.name"
             :class="[col.name === 'Remark']"
           >
-            <template v-if="col.name === 'Remark'">
+            <div v-if="col.name === 'Remark'">
               {{ props.row.bemerk }}
-
-              <q-tooltip
+              <!-- <q-tooltip
                 v-if="props.row.bemarkToltip.length > 52"
                 anchor="bottom middle"
                 self="top middle"
                 :offset="[0, 0]"
               >
                 {{ props.row.bemarkToltip }}
-              </q-tooltip>
-            </template>
-            <template v-else>
+              </q-tooltip> -->
+            </div>
+            <!-- <template v-else>
               {{ props.row[col.field] }}
-            </template>
+            </template> -->
           </q-td>
 
           <q-td
@@ -329,6 +343,7 @@ import { formatDates } from '../../helpers/dateFormat.helpers'
 import { Notify, date } from 'quasar';
 import { paramsOnSearch, paramsPrepare, saveDataMessage } from './utils/paramsTelephoneOperator'
 import { store } from '~/store';
+import { useExtraMenu } from '~/app/shared/compositions/use-extra-menu';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -343,7 +358,7 @@ export default defineComponent({
     const state = reactive({
       isFetching: true,
       ciDate: '',
-      data: [] as any,
+      dataTO: [] as any,
       hide_bottom: false,
       paramsIncognitoGuest: '' as any,
       messDelete: [] as any,
@@ -399,16 +414,34 @@ export default defineComponent({
     }
 
     // FETCH_API
-    const FETCH_API = async (data, body?, params?) => {
-      switch (data) {
+    const FETCH_API = async (api, body?, params?) => {
+      const [GET_DATA, GET_COMMON] = await Promise.all([
+        $api.telephoneOperator.fetchApiTelephoneOperator(api, body),
+        $api.telephoneOperator.fetchApiCommon(api, body)
+      ])
+      
+      switch (api) {
+        case 'telopPrepare':
+          onPrepare(GET_DATA)
+          break;
+        case 'telopList':
+          state.dataTO = dataTable(GET_DATA)
+          state.isFetching = false
+          if (state.dataTO.length !== 0) {
+            state.hide_bottom = true
+          }
+          break;
+
+
         case 'prepare':          
           const [telopPrepare, telopList] = await Promise.all([
           $api.telephoneOperator.fetchApiTelephoneOperator('telopPrepare'),
           $api.telephoneOperator.fetchApiTelephoneOperator('telopList', body)
           ])
+
+          
           state.ciDate = telopPrepare.ciDate
           state.searches.data = telopList
-          state.data = dataTable(telopList)
           if (telopList.telopList['telop-list'].length !== 0) {
             state.isFetching = false
             state.hide_bottom = true
@@ -564,6 +597,13 @@ export default defineComponent({
       
     }
 
+    useExtraMenu([
+      {
+        handler: () => alarmClock(),
+        icon: 'TO/Icon-alarmclock',
+      },
+    ]);
+
     watch(() => state.paramsIncognitoGuest,
           (paramsIncognitoGuest, prev) => {
             if(valueOnSearch == undefined) {
@@ -576,15 +616,20 @@ export default defineComponent({
 
     onMounted(() => {
         FETCH_API('prepare')
+        FETCH_API('telopPrepare')
     })
 
-    watch(() => state.ciDate,
-          (ciDate, prev) => {
-            if (ciDate && ciDate !== prev) {
-            FETCH_API('prepare',paramsPrepare(ciDate))
-            }
-          }
-    )
+    const onPrepare = (cidate) => {
+      FETCH_API('telopList',paramsPrepare(cidate['ciDate']))
+    }
+
+    // watch(() => state.ciDate,
+    //       (ciDate, prev) => {
+    //         if (ciDate && ciDate !== prev) {
+    //         FETCH_API('prepare',paramsPrepare(ciDate))
+    //         }
+    //       }
+    // )
 
     watch(() => state.messDelete,
           (messDelete, prev) => {
@@ -620,8 +665,8 @@ export default defineComponent({
     }
 
     const onRowClick = (datarow) => {
-      for(const i in state.data){
-        state.data[i]['selected'] = false
+      for(const i in state.dataTO){
+        state.dataTO[i]['selected'] = false
       }
       datarow['selected'] = true;
       state.searches.bemark = datarow

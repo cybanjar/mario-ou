@@ -8,7 +8,7 @@ export const moduleList: HomeModule[] = [
   {
     path: '/fr/reservation',
     name: 'Front Office Reception',
-    logo: 'FOR',
+    logo: 'FR',
   },
   {
     path: '/foc/guest-folio',
@@ -56,7 +56,7 @@ export const moduleList: HomeModule[] = [
     logo: 'Purchasing',
   },
   {
-    path: '/inv/incoming-journalizing',
+    path: '/inv/report/stock-on-hand',
     name: 'Inventory',
     logo: 'Inventory',
   },
@@ -91,18 +91,23 @@ export const moduleList: HomeModule[] = [
     logo: 'SettingTools',
   },
   {
-    path: '/setting',
+    path: '/st/banquet',
     name: 'Setting',
     logo: 'Setting',
   },
   {
-    path: '/night-audit',
+    path: '/na/report/night-audit',
     name: 'Night Audit',
     logo: 'NightAudit',
   },
   {
-    path: '/income-audit',
+    path: '/ia/report/outstanding-folio',
     name: 'Income Audit',
     logo: 'IncomeAudit',
+  },
+  {
+    path: '/sc/master-plan',
+    name: 'Sales & Catering',
+    logo: 'Sales&Catering',
   },
 ];

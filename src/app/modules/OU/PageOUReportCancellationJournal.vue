@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         @row-click="onRowClick"
         :rows-per-page-options="[10, 13, 16]"
@@ -48,6 +49,8 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -77,17 +80,17 @@ export default defineComponent({
             sortable: false,
             align: "left",
         },{
-            label: "TbNo", 
+            label: "Table Number", 
             field: "tbno",
             sortable: false,
             align: "right",
         }, {
-            label: "Bill-No", 
+            label: "Bill Number", 
             field: "rechnr",
             sortable: false,
             align: "right",
         }, {
-            label: "ArtNo", 
+            label: "Article Number", 
             field: "artno",
             sortable: false,
             align: "right",
@@ -102,17 +105,19 @@ export default defineComponent({
             sortable: false,
             align: "left",
         }, {
-            label: "Qty", 
+            label: "Quantity", 
             field: "qty",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
             label: "Amount", 
             field: "amount",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
-            label: "Department", 
+            label: "Outlet", 
             field: "depart",
             sortable: false,
             align: "left",
@@ -122,7 +127,7 @@ export default defineComponent({
             sortable: false,
             align: "center",
         }, {
-            label: "Name", 
+            label: "Guest Name", 
             field: "cname",
             sortable: false,
             align: "left",
@@ -272,6 +277,12 @@ export default defineComponent({
         asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Cancellation Journal');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -282,6 +293,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

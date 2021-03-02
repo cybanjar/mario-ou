@@ -1,4 +1,5 @@
 import {date} from 'quasar'
+import {formatterMoney} from '~/app/helpers/formatterMoney.helper'
 export const fromStore = [
     {
         label: '01 - GENERAL STORE F&B',
@@ -29,8 +30,8 @@ export const fromStore = [
 
 export const articelNumber = [
     {
-        label: 'Creamer Stick - 0.00',
-        price: '12.000',
+        label: '00 - Creamer Stick',
+        price: '12000',
         st: '07',
         artNumber: '1157653',
         des: 'Creamer Stick',
@@ -38,8 +39,8 @@ export const articelNumber = [
         qty: 0
     },
     {
-        label: 'Nescafe Sachet @gr - 640.0',
-        price: '10.000',
+        label: '640.0 - Nescafe Sachet @gr',
+        price: '10000',
         st: '03',
         des: 'Nescafe Sachet @gr',
         qty: 640,
@@ -47,26 +48,26 @@ export const articelNumber = [
         artNumber: '7666354'
     },
     {
-        label: 'Sosro Black Tea 25 Bag/pack - 2.00',
+        label: '2.00 - Sosro Black Tea 25 Bag/pack',
         qty: 2,
-        price: '20.000',
+        price: '20000',
         st: '05',
         des: 'Sosro Black Tea 25 Bag/pack',
         creattedBy: 'SINDATA',
         artNumber: '3323454'
     },
     {
-        label: 'Sugar Brown Stick- 680.00',
+        label: '680.00 - Sugar Brown Stick',
         qty: 680,
-        price: '1.000',
+        price: '1000',
         st: '09',
         des: 'Sugar Brown Stick',
         creattedBy: 'SINDATA',
         artNumber: '3332456'
     },
     {
-        label: 'Sugar Stick @250 Pcs/pack - 680.00',
-        price: '101.000',
+        label: '680.00 - Sugar Stick @250 Pcs/pack',
+        price: '101000',
         qty: 680,
         st: '02',
         des: 'Sugar Stick @250 Pcs/pack',
@@ -76,15 +77,19 @@ export const articelNumber = [
 ]
 
 export const dataTable = (item) => {
-    return {
-      st : item.st,
-      artNumber: item.artNumber,
+    const x = {
+      fs : item.label.substring(item.label.indexOf('-')+2),
+      ts : item.value.label.substring(item.value.label.indexOf('-')+2),
+      artNumbers: item.artNumber,
       des : item.des,
-      price: item.price,
-      qty: item.value+'.000',
+      price: formatterMoney(item.price),
+      qty: item.dataqty,
       date: date.formatDate(new Date(), 'DD/MM/YYYY'),
       creattedBy: item.creattedBy,
       time: date.formatDate(new Date(), 'hh:mm:ss'),
+      stock: item.qty
     }
+    return [x]
   }
+
   

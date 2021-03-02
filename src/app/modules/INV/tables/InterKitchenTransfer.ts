@@ -2,7 +2,7 @@ import { TableHeader } from '~/components/VhpUI/typings';
 import {departement, dataToDepartement} from '../utils/params.interkitchen'
 export const tableHeaders: TableHeader[] = [
     {
-        label: 'Articel Number',
+        label: 'Articles Number',
         field: 'art',
         name: 'art',
         align: 'left',
@@ -24,8 +24,8 @@ export const tableHeaders: TableHeader[] = [
     },
     {
         label: 'Unit Price',
-        field: 'price',
-        name: 'price',
+        field: 'price1',
+        name: 'price1',
         align: 'left',
         sortable: false,
     },
@@ -73,24 +73,28 @@ export const use_input = [
         width: '160px',
         right: '20px',
         value: '',
+        disable: false,
         option: departement
     },
     {
         name: 'To Departement',
         width: '160px',
         right: '20px',
+        disable: true,
         option: departement,
         value: ''
     },
     {
-        name: 'Articel Name',
+        name: 'Articel Number',
         width: '160px',
         right: '20px',
+        disable: true,
         value: '',
         option: dataToDepartement
     },
     {
         name: 'Quantity',
+        disable: true,
         width: '160px',
         right: '20px',
         value: ''

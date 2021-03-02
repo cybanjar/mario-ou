@@ -8,7 +8,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
         </q-btn>
-        <q-btn flat round class="q-mr-lg">
+        <q-btn flat round class="q-mr-lg" @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
         </q-btn>
         <q-btn @click="onClickPostCallToBill" flat round class="q-mr-lg">
@@ -22,6 +22,7 @@
         :rows-per-page-options="[0]"
         :pagination.sync="pagination"
         class="table-accounting-date"
+        :hide-bottom="hide_bottom"
       >
       <template v-slot:body="props">
         <q-tr :props="props">
@@ -79,12 +80,12 @@ import {
   onMounted,
   toRefs,
   reactive,
-  watch,
-  
 } from '@vue/composition-api';
 import {Notify, date} from 'quasar'
 import {tableHeaders} from './tables/callAdministration.table'
 import { paramsCallsListGoBtn, paramsTable} from './utils/paramsCallAdministrations'
+import {PrintJs} from '~/app/helpers/PrintJs'
+
 export default defineComponent({
   setup(_, { root: { $api } }) {
     let callsListPrepare
@@ -94,14 +95,15 @@ export default defineComponent({
       keyRow: '',
       inputDes: '',
       radioGroup: 1,
-      dataCallToBill: {}
+      dataCallToBill: {},
+      hide_bottom : false
     });
 
     // HELPER 
     const NotifyCreate = (mess, col?, type?) => Notify.create({
-              message: mess,
-              color: col,
-              type: type
+      message: mess,
+      color: col,
+      type: type
     });
 
     // FETCH API
@@ -110,11 +112,16 @@ export default defineComponent({
       if (GET_DATA.logicFlag) {        
         callsListPrepare = GET_DATA.logicFlag
       } 
-      else if (GET_DATA.strList['str-list']){
+      
+      if (GET_DATA.strList['str-list']){
         const data = paramsTable(GET_DATA)
-        state.data = GET_DATA.strList['str-list'].concat(data)
+        state.data = GET_DATA.strList['str-list'].concat(data)  
         if (GET_DATA.strList['str-list'].length !== 0) {
           state.isFetching = false
+          state.hide_bottom = true
+        } else {
+          state.isFetching = false
+          NotifyCreate('Data not found', 'red')
         }
       }
     }
@@ -125,9 +132,7 @@ export default defineComponent({
     const onSearch =  (val) => {
       state.radioGroup = val.groupRadio
       state.isFetching = true
-      if (true){
-        FETCH_API('callsListGoBtn', paramsCallsListGoBtn(val))}
-      else{ NotifyCreate('not found', 'red')}
+      FETCH_API('callsListGoBtn', paramsCallsListGoBtn(val))
     }
 
     const onClickDestination = (row, e) => {
@@ -139,6 +144,12 @@ export default defineComponent({
           state.keyRow = ''
           FETCH_API('callsListUpdate')
         }
+      }
+    }
+
+    function doPrint() {
+      if (state.data.length !== 0) {
+        PrintJs(state.data, tableHeaders, 'Call Administration')
       }
     }
 
@@ -154,6 +165,7 @@ export default defineComponent({
       tableHeaders,
       onClickPostCallToBill,
       onSearch,
+      doPrint,
       pagination: { page: 1, rowsPerPage: 0 }
     };
   },

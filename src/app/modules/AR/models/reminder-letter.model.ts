@@ -1,14 +1,14 @@
 export interface ReminderLetterList {
   description: string;
   bill_date: string;
-  bill_number: number;
+  bill_number: string;
   bill_receiver: string;
-  ar_amount: number;
-  payment_amount: number;
-  outstanding: number;
-  days: number;
+  ar_amount: string;
+  payment_amount: string;
+  outstanding: string;
+  days: string;
   last_print: string;
-  level: number;
+  level: string;
 }
 
 export interface ResReminderLetterList {

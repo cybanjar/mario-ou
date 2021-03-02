@@ -4,17 +4,10 @@
       <SearchReminderLetter @search="search"></SearchReminderLetter>
     </q-drawer>
     <div class="q-pa-lg">
-      <div class="q-mb-md">
-        <q-btn flat round class="q-mr-lg" @click="getData">
-          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round class="q-mr-lg">
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
-        </q-btn>
-      </div>
+      <SharedModuleActions @onActions="mapActions" />
       <TableReminderLetter
-        :reminder-letter-list="reminderLetterList"
-        :is-fetching="isFetching"
+        :data="tablePrep.result"
+        :loading="tablePrep.data.isLoading"
       ></TableReminderLetter>
     </div>
   </q-page>
@@ -24,45 +17,60 @@
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { getTableData } from './utils/getTableData';
 import { ReminderLetterList } from './models/reminder-letter.model';
+import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
     const state = reactive({
       searchParam: {
-        fromArt: -1,
-        toArt: -1,
+        fromArt: 1,
+        toArt: 26,
       },
       isFetching: false,
       reminderLetterList: [] as ReminderLetterList[],
     });
 
-    async function getData() {
-      if (state.searchParam.toArt >= 0 && state.searchParam.fromArt >= 0) {
-        state.isFetching = true;
-        state.reminderLetterList = [];
-        const responseData = await $api.accountReceivable.getRemainList({
+    const tablePrep = usePrepare(
+      false,
+      () =>
+        $api.accountReceivable.getRemainList({
           fromArt: state.searchParam.fromArt,
           toArt: state.searchParam.toArt,
-        });
-        state.reminderLetterList = getTableData(responseData);
-        state.isFetching = false;
-      }
-    }
+        }),
+      undefined,
+      (tempData) => getTableData(tempData),
+      []
+    );
 
     function search(fromArt, toArt) {
       state.searchParam = { fromArt, toArt };
-      getData();
+      tablePrep.refetch();
+    }
+
+    function mapActions(name) {
+      switch (name) {
+        case 'onRefresh':
+          tablePrep.refetch();
+          break;
+          break;
+        default:
+          break;
+      }
     }
 
     return {
       ...toRefs(state),
+      mapActions,
       search,
-      getData,
+      tablePrep,
     };
   },
   components: {
     SearchReminderLetter: () => import('./components/SearchReminderLetter.vue'),
     TableReminderLetter: () => import('./components/TableReminderLetter.vue'),
+        SharedModuleActions: () =>
+      import('../../shared/components/SharedModuleActions.vue'),
+
   },
 });
 </script>

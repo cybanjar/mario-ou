@@ -1,8 +1,8 @@
 import { TableHeader } from '~/components/VhpUI/typings';
-import {fromStore, articelNumber} from '../utils/Params.InterStoreTf'
+import {fromStore, articelNumber} from '../utils/params.issuing'
 export const tableHeaders: TableHeader[] = [
     {
-      label: 'St',
+      label: 'Store',
       field: 'st',
       name: 'st',
       align: 'left',
@@ -85,9 +85,8 @@ export const use_input = [
       onClikc: '1'
   },
   {
-      name: 'Articel Name',
-      width: '145px',
-      right: '20px',
+      name: 'Article Name',
+      width: '310px',
       value: '',
       option: articelNumber,
       onClikc: '2'

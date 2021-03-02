@@ -1,44 +1,68 @@
 <template>
-  <q-dialog v-model="dialogModel">
-    <q-card style="width: 500px;">
+  <q-dialog v-model="modal.dialog" persistent>
+    <q-card style="width: 400px;">
       <q-toolbar>
         <q-toolbar-title class="text-white text-weight-medium">Create Phone Book</q-toolbar-title>
       </q-toolbar>
 
       <q-card-section>
-        <!-- {{ dataSelected }} -->
-        <SInput label-text="Department" v-model="department" />
-        <SInput label-text="Name" v-model="name" />
-        <SInput label-text="Address" v-model="address" />
+        <SInput 
+          :label-text="sinput.label"
+          :key="sinput.label"
+          :style="{'marginTop': sinput.top}"
+          v-for="sinput in SInputAddPhoneBook.filter(x => 
+          ['Departement', 'Name', 'Address'].includes(x.label)
+          )" 
+          v-model="sinput.value" />
         <div class="row q-gutter-xs">
-          <div class="col">
-            <SInput label-text="Country" v-model="country" />
-          </div>
-          <div class="col">
-            <SInput label-text="City" v-model="city" />
-          </div>
-          <div class="col">
-            <SInput label-text="Zip" v-model="zip" />
+          <div 
+            :key="sinput.label"
+            :style="{'marginTop': sinput.top}"
+            v-for="sinput in SInputAddPhoneBook.filter(x => 
+            ['Country', 'City', 'Zip'].includes(x.label)
+            )"  
+            class="col">
+            <SInput :label-text="sinput.label" v-model="sinput.value" />
           </div>
         </div>
-        <SInput label-text="Email" v-model="email" />
+        <SInput 
+          v-for="sinput in SInputAddPhoneBook.filter(x =>
+            ['Email'].includes(x.label)
+          )" 
+          :style="{'marginTop': sinput.top}"
+          :key="sinput.label"
+          :label-text="sinput.label" 
+          v-model="sinput.value" />
         <div class="row q-gutter-xs">
-          <div class="col">
-            <SInput label-text="Phone number" v-model="phonenumber" />
-          </div>
-          <div class="col">
-            <SInput label-text="Extention" v-model="extention" />
+          <div 
+            :key="sinput.label"
+            :style="{'marginTop': sinput.top}"
+            v-for="sinput in SInputAddPhoneBook.filter(x => 
+            ['Phone Number', 'Extention'].includes(x.label)
+            )"  
+            class="col">
+            <SInput :label-text="sinput.label" v-model="sinput.value" />
           </div>
         </div>
         <div class="row q-gutter-xs">
-          <div class="col">
-            <SInput label-text="Mobile number" v-model="mobilenumber" />
-          </div>
-          <div class="col">
-            <SInput label-text="Contact Name" v-model="contactname" />
+          <div 
+            :key="sinput.label"
+            :style="{'marginTop': sinput.top}"
+            v-for="sinput in SInputAddPhoneBook.filter(x => 
+            ['Mobile Number', 'Contact Name'].includes(x.label)
+            )"  
+            class="col">
+            <SInput :label-text="sinput.label" v-model="sinput.value" />
           </div>
         </div>
-        <SInput label-text="Remark" v-model="remark" />
+        <SInput 
+          v-for="sinput in SInputAddPhoneBook.filter(x =>
+            ['Remark'].includes(x.label)
+          )" 
+          :style="{'marginTop': sinput.top}"
+          :key="sinput.label"
+          :label-text="sinput.label" 
+          v-model="sinput.value" />
       </q-card-section>
 
       <q-separator />
@@ -48,15 +72,17 @@
           outline
           color="primary"
           label="Cancel"
-          @click="$emit('onModal', false)"
           size="sm"
+          v-close-popup 
         />
 
         <q-btn
+          :loading="modal.loading"
+          unelevated
           size="sm"
           color="primary"
           label="Save"
-          @click="$emit('onModal', false)"
+          @click="onSave" 
         />
       </q-card-actions>
     </q-card>
@@ -64,26 +90,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive } from '@vue/composition-api';
-
+import { defineComponent, computed, reactive, toRefs } from '@vue/composition-api';
+import { SInputAddPhoneBook } from '../utils/paramsPhoneBook'
 export default defineComponent({
   props: {
-    modal: { type: Boolean, required: true },
+    modal: {} as any,
   },
-  setup(props, { emit, root: { $api } }) {
+  setup(_, { emit, root: { $api } }) {
     const data = reactive({
-      title: '',
+      SInputAddPhoneBook: SInputAddPhoneBook
     });
-
-    const dialogModel = computed({
-      get: () => props.modal,
-      set: (val) => {
-        emit('onModal', val);
-      },
-    });
+    
+    const onSave = () => {
+      emit('onSave', data.SInputAddPhoneBook)
+    }
 
     return {
-      dialogModel,
+      ...toRefs(data),
+      onSave
     };
   },
 });

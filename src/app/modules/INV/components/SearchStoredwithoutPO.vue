@@ -1,16 +1,7 @@
 <template>
   <section class="mt-7">
     <div id="input" class="q-pa-md">
-      <v-date-picker v-model="date" 
-      :popover="{ visibility: group == '1'? null: 'click' }">
-        <SInput
-          label-text="From Date"
-          slot-scope="{ inputProps }"
-          readonly
-          v-bind="inputProps"
-          clearable
-        />
-      </v-date-picker>
+      <SDateInput label-text="From Date" v-model="date"  />
       <SInput label-text="Delivery Note"/>
       <div id="radio">
         <q-option-group

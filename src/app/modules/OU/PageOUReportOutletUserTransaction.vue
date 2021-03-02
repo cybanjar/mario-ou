@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,8 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
+        row-key="name"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -36,7 +38,7 @@ import {
 } from '@vue/composition-api';
 import { mapOU4Label } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
-import SearchOutletUserTransactionVue from './components/SearchOutletUserTransaction.vue';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -58,58 +60,69 @@ export default defineComponent({
         {
             label: "Date",
             field: "datum",
+            name: "datum",
             sortable: false,
             align: "left"
         },{
-            label: "TbNo", 
-            field: "tb",
+            label: "Table Number", 
+            field: "tabelno",
+            name: "tabelno",
             sortable: false,
-            align: "right"
+            align: "left"
         }, {
-            label: "Bill-No", 
+            label: "Bill Number", 
             field: "billno",
+            name: "billno",
             sortable: false,
-            align: "right"
+            align: "left"
         }, {
-            label: "ArtNo", 
+            label: "Article Number", 
             field: "artno",
+            name: "artno",
             sortable: false,
-            align: "right"
+            align: "left"
         }, {
             label: "Description", 
             field: "descr",
+            name: "descr",
             sortable: false,
             align: "left"
             },{
-            label: "Qty", 
+            label: "Quantity", 
             field: "qty",
+            name: "qty",
             sortable: false,
             align: "right"
         }, {
             label: "Amount", 
             field: "amount",
+            name: "amount",
             sortable: false,
             align: "right"
         },  {
             label: "Department", 
             field: "depart",
+            name: "depart",
             sortable: false,
             align: "left"
         }, {
             label: "Time", 
             field: "zeit",
+            name: "zeit",
             sortable: false,
-            align: "center"
+            align: "left"
         },  {
-            label: "ID", 
+            label: "Posting ID", 
             field: "id",
+            name: "id",
             sortable: false,
-            align: "center"
+            align: "left"
         }, {
-            label: "TB", 
+            label: "Payment ID", 
             field: "tb",
+            name: "tb",
             sortable: false,
-            align: "right"
+            align: "left"
         } 
     ];
     
@@ -219,7 +232,7 @@ export default defineComponent({
           }
           state.build = [];
           charts = data.restJourList['rest-jour-list'];
-
+          
           for (let i = 0; i<charts.length; i++) {
             charts[i]["datum"] = charts[i]["datum"] == null ? "" : date.formatDate(charts[i]["datum"], "DD/MM/YYYY");
             charts[i]["billno"] = charts[i]["datum"] == "" ? "" : charts[i]["billno"]
@@ -241,6 +254,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Outlet User Transaction');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -248,6 +267,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

@@ -1,16 +1,17 @@
 import { dateFormatBL, formatToDate } from '~/app/helpers/formatterDate.helper';
 import { formatterAccountNumber } from '../../ledger/helpers/formmaterAccountNumber';
+import { TransRecord } from '../../models/journal.model';
 
-export function reformDetailData(tempData: any[], GL_PARAM) {
+export function reformDetailData(tempData: TransRecord[], GL_PARAM: string[]) {
   return tempData.map((temp, index) => ({
     key: index,
     recid: temp['rec-gl-journ'],
-    accountNo: formatterAccountNumber(temp.fibukonto, GL_PARAM),
+    accNo: formatterAccountNumber(temp.fibukonto, GL_PARAM),
     debit: temp.debit,
     credit: temp.credit,
     remark: temp.bemerk,
     id: temp.userinit,
-    created: formatToDate(temp.sysdate, dateFormatBL),
+    created: new Date(temp.sysdate),
     time: temp.zeit,
     changeBy: temp.chginit,
     changedDate: temp.chgdate && formatToDate(temp.chgdate, dateFormatBL),

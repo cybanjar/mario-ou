@@ -1,4 +1,5 @@
 .dialog {
+  position: relative;
   width: 100%; // If need to custom dialog width, custom it on scoped component style
 
   &__header {
@@ -10,6 +11,7 @@
 
   &__title {
     font-size: 16px;
+    font-weight: 700;
   }
 
   &__footer {

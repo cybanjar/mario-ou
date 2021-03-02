@@ -1,7 +1,11 @@
 <template>
   <section class="mt-7">
     <div class="q-pa-md">
-      <q-input filled v-model="searches.total" label="Total" disabled="true" />
+      <SInputMoney
+        label-text="Total"
+        v-model="searches.total"
+        :disable="true"
+      ></SInputMoney>
       <q-btn
         dense
         color="primary"

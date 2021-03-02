@@ -18,7 +18,7 @@ export const tableHeaders: TableHeader[] = [
         label: 'Amount',
         field: 'betrag',
         name: 'betrag',
-        align: 'left',
+        align: 'right',
         sortable: false,
     },
 ]

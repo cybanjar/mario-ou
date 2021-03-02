@@ -8,13 +8,16 @@
         <div class="col-5">
           <div class="row justify-between">
             <DialogJournalForm
+              ref="cForm"
               :param="form"
+              :journaltype="journaltype"
               :fixeds="disableInputs"
               :label="label"
               :debits="debits"
               :credits="credits"
               :remaining="remaining"
               :disable="disabled"
+              @stage="onStage"
               @commit="onCommit"
             ></DialogJournalForm>
           </div>
@@ -22,43 +25,48 @@
         <div class="col-7">
           <slot />
           <DialogJournalTable
-            :is-fixed="false"
             :data="transactions"
+            :columns="columns"
+            :shape="shape"
+            height="350px"
             @delete="delRecord"
             @row-click="editRecord"
           ></DialogJournalTable>
         </div>
       </div>
     </template>
-    <template #action-cancel="props">
+    <template #action-cancel>
       <q-btn
-        @click="() => onCancelClick(props.handler)"
+        @click="onCancelClick"
         label="Cancel"
         color="primary"
         flat
         class="q-mr-sm"
       />
     </template>
-    <template #action-ok="props">
-      <q-btn
-        ref="okBtn"
-        @click="() => onOKClick(props.handler)"
-        label="Save"
-        color="primary"
-      />
+    <template #action-ok>
+      <q-btn ref="okBtn" @click="onOKClick" label="Save" color="primary" />
     </template>
   </SDialog>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, unref } from '@vue/composition-api';
+import {
+  defineComponent,
+  ref,
+  computed,
+  unref,
+  watch,
+} from '@vue/composition-api';
 import { TransTable, Journal } from '../models/journal.model';
-import { date } from 'quasar';
 
 type JournalTrans = Journal & TransTable;
-
-const initForm: JournalTrans = {
-  key: -1,
-  date: date.formatDate(new Date(), 'YYYY-MM-DD'),
+const INIT_POINTER = -1;
+const SET_RECORD = 'setRecord';
+const DEL_RECORD = 'delRecord';
+const CHG_RECORD = 'chgRecord';
+export const initForm: JournalTrans = {
+  key: INIT_POINTER,
+  date: new Date(),
   referenceNo: '',
   description: '',
   debits: 0,
@@ -72,37 +80,56 @@ const initForm: JournalTrans = {
   remark: '',
 };
 
-export default defineComponent({
+export default defineComponent<any>({
   inheritAttrs: true,
   props: {
     title: { type: String, required: true },
+    journaltype: { type: Number, required: true },
+    showSaveNotif: { type: Boolean, required: false },
+    columns: { type: Array, required: false, default: () => [] },
+    shape: { type: Array, required: false, default: () => [] },
     label: { type: String, required: true },
     disabled: { type: Boolean, required: false, default: false },
     disableInputs: {
-      type: Array as () => string[],
+      type: Array,
       required: false,
       default: () => [],
     },
     initForm: {
-      type: Object as () => JournalTrans,
+      type: Object,
       required: false,
       default: () => initForm,
     },
     transactions: {
-      type: Array as () => TransTable[],
+      type: Array,
       required: false,
       default: () => [],
     },
   },
   setup(props, { root: { $q }, emit, listeners }) {
     const { hide, ...restListener } = listeners;
+    const printForm = ref(false);
+    const cForm = ref();
+    const formPointer = ref<number>(INIT_POINTER);
+    const records = ref<Map<number, JournalTrans>>(
+      new Map([[INIT_POINTER, props.initForm]])
+    );
 
-    const formPointer = ref<number | 'init'>('init');
-    const records = ref<Map<number, JournalTrans>>(new Map());
+    watch(
+      () => props.initForm,
+      (val) => {
+        // we need some way to trigger formPointer
+        // to activate the form computed
+        formPointer.value = Number.MAX_VALUE;
+        records.value.set(INIT_POINTER, val);
+        formPointer.value = INIT_POINTER;
+      }
+    );
+
     const debits = computed(() => {
       let start = 0;
       props.transactions.forEach((it) => {
-        start += it.debit;
+        start += Number.isInteger(it.debit) ? it.debit : parseInt(it.debit);
       });
 
       return start;
@@ -110,7 +137,7 @@ export default defineComponent({
     const credits = computed(() => {
       let start = 0;
       props.transactions.forEach((it) => {
-        start += it.credit;
+        start += Number.isInteger(it.credit) ? it.credit : parseInt(it.credit);
       });
 
       return start;
@@ -120,88 +147,133 @@ export default defineComponent({
     });
 
     const form = computed(() => {
-      const vFormPointer = unref(formPointer);
       const vRecord = unref(records);
-
-      if (vFormPointer === 'init') {
-        return props.initForm;
-      } else {
-        return vRecord.get(vFormPointer);
+      if (vRecord.size > 0) {
+        const { credits, debits, remaining, ...item } = vRecord.get(
+          formPointer.value
+        );
+        return {
+          print: printForm.value,
+          ...item,
+        };
       }
     });
 
+    function resetForm() {
+      formPointer.value = Number.MAX_VALUE;
+      records.value.set(INIT_POINTER, { key: INIT_POINTER, ...props.initForm });
+      formPointer.value = INIT_POINTER;
+    }
+
     function resetHide() {
-      formPointer.value = 'init';
-      records.value.clear();
+      resetForm(); // make form into init state
+      records.value.clear(); // clear all record
+      emit('clearRecord', resetField);
       hide();
+    }
+
+    function onStage(pos, data) {
+      emit(CHG_RECORD, pos, data);
     }
 
     async function delRecord(trans: TransTable) {
       $q.dialog({
-        title: 'Confirm delete',
-        message: `Do you want to delete this transaction?`,
-        ok: 'Delete',
-        cancel: 'Cancel',
+        message: `Do You Want to Delete This Transaction?`,
+        cancel: true,
+        persistent: true,
       }).onOk(async () => {
-        emit('delrecord', trans);
+        records.value.delete(trans.key);
+        emit(DEL_RECORD, trans, resetField);
       });
+    }
+
+    function resetField(...keys) {
+      const baseGroup = { ...form.value };
+
+      keys.forEach((key) => {
+        baseGroup[key] = props.initForm[key];
+      });
+      records.value.set(INIT_POINTER, { ...baseGroup, key: INIT_POINTER });
+      formPointer.value = INIT_POINTER;
     }
 
     // add or replace in table
     async function onCommit(trans: JournalTrans) {
+      let nKey, nVal;
       const vRecords = unref(records);
-      vRecords.set(trans.key, trans);
-      formPointer.value = 'init';
-      $q.notify({
-        message: 'Click Save to apply change',
-        onDismiss: () => {
-          const exists = vRecords.has(-1);
-          emit('setRecord', trans, exists);
-          vRecords.delete(-1);
-          emit('clearForm');
-        },
-      });
+      const recordExist = vRecords.has(trans.key) && trans.key !== INIT_POINTER;
+      // in edit mode
+      if (recordExist) {
+        nKey = trans.key;
+        nVal = { ...trans };
+      } else {
+        // FIXED THIS KEY SYSTEM
+        nKey = Math.abs(trans.key) + props.transactions.length;
+        nVal = { ...trans, key: nKey };
+      }
+
+      vRecords.set(nKey, nVal);
+      formPointer.value = nKey;
+      if (props.showSaveNotif) {
+        $q.notify({
+          message: 'Click Save to apply change',
+          onDismiss: () => {
+            emit(SET_RECORD, nVal, recordExist, resetField);
+          },
+        });
+      } else {
+        emit(SET_RECORD, nVal, recordExist, resetField);
+      }
     }
 
+    // user click transaction on table
     async function editRecord(_, trans: TransTable) {
       let record;
-      const vRecord = unref(records);
+      const vRecord = new Map(unref(records));
       const vInitForm = props.initForm;
-
-      formPointer.value = 'init';
+      // edit record
       if (vRecord.has(trans.key)) {
         record = vRecord.get(trans.key);
-        vRecord.set(-1, record);
       } else {
+        // add new one record
         record = {
           ...vInitForm,
           ...trans,
         };
-        vRecord.set(-1, record);
       }
-      formPointer.value = -1;
+      // update record
+      records.value.set(trans.key, record);
+      // set pointer
+      formPointer.value = trans.key;
       emit('editRecord', record);
     }
 
     function onOKClick() {
-      $q.dialog({
-        title: 'Confirm save',
-        message: `Do you want to save entries this journal?`,
-        ok: 'Save',
-        cancel: 'Cancel',
-      }).onOk(async () => {
-        const vRecords = unref(records);
-        if (vRecords.has(-1)) {
-          vRecords.delete(-1);
-        }
-        const transRaw: JournalTrans[] = Array.of(...vRecords.values());
-        emit('onOKClick', transRaw);
-      });
+      if (remaining.value !== 0) {
+        $q.dialog({
+          title: 'Journal Transacation not yet balance',
+        });
+      } else {
+        $q.dialog({
+          title: 'Confirm save',
+          message: `Do you want to save entries this journal?`,
+          ok: 'Save',
+          cancel: 'Cancel',
+        }).onOk(async () => {
+          // FIXME: Transaksi tidak terkirim ke emiiter
+          // FIXME: add new not terclean up after close dialog
+          const vRecords = new Map(unref(records));
+          const form = vRecords.get(INIT_POINTER);
+          vRecords.delete(INIT_POINTER); //doest include the form just records
+
+          emit('onOKClick', form, Array.of(...vRecords.values()));
+        });
+      }
     }
 
     function onCancelClick() {
-      const total = props.transactions.length;
-      if (total > 2) {
+      const total = records.value.size;
+      if (total > 1) {
         $q.dialog({
           title: 'Unsafe Change',
           message: `there are ${total}`,
@@ -214,6 +286,7 @@ export default defineComponent({
     }
 
     return {
+      cForm,
       form,
       onCommit,
       delRecord,
@@ -221,10 +294,15 @@ export default defineComponent({
       editRecord,
       onCancelClick,
       restListener,
+      onStage,
+      formPointer,
       resetHide,
       debits,
       credits,
       remaining,
+      records,
+      resetForm,
+      printForm,
     };
   },
   components: {

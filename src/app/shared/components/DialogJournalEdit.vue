@@ -1,115 +1,200 @@
 <template>
   <DialogJournalAdd
+    ref="journalAddEl"
     v-bind="$attrs"
     v-on="restListener"
     :title="title"
-    :label="title"
-    :disabled="inDisable"
+    :label="label"
+    :disable-inputs="inFixeds"
     :init-form="form"
     :transactions="transactions"
+    :acc-num="inFillAdd || !inAdd"
+    :show-save-notif="inFillAdd || !inAdd"
     @show="refetch"
-    @setRecord="reloadTable"
-    @onOKClick="isBalance"
-    @onCancelClick="isBalance"
-    @editRecord="setDisable(false)"
-    @clearForm="setDisable(true)"
+    @chgRecord="onChange"
+    @setRecord="updateTable"
+    @onOKClick="collectRecord"
+    @delRecord="removeOnTable"
+    @editRecord="doEdit"
+    @clearRecord="clearAll"
   >
     <div class="q-mb-md">
-      <q-btn flat round @click="addDialog.show" class="q-mr-lg">
+      <q-btn v-if="!inAdd" flat round @click="setInAdd(true)" class="q-mr-lg">
         <img :src="require('~/app/icons/Icon-Add.svg')" height="30" />
+        <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
+          Add
+        </q-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        flat
+        round
+        @click="setInAdd(false)"
+        class="q-mr-lg bg-blue inline text-white bold"
+      >
+        X
+        <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 5]">
+          Delete
+        </q-tooltip>
       </q-btn>
     </div>
-    <DialogJournalAdd
-      v-bind="$attrs"
-      v-on="restListener"
-      title="Add"
-      :value="addDialog.status"
-      label="Add"
-      :disabled="false"
-      :init-form="form"
-      :transactions="transAdd"
-      @setRecord="reloadTable"
-      @onOkClick="isBalance"
-      @onCancelClick="isBalance"
-      @hide="addDialog.hide"
-    />
   </DialogJournalAdd>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from '@vue/composition-api';
+import { computed, defineComponent, ref } from '@vue/composition-api';
 import { usePrepare } from '../compositions/use-prepare.composition';
 import { reformChgGLJournal } from '../helpers/reformData.helper';
-import { useDialog } from '../compositions/use-dialog.composition';
-import { TransTable, JournalTrans } from '../models/journal.model';
+import { TransTable, JournalTrans, Journal } from '../models/journal.model';
+import { initForm } from './DialogJournal.vue';
 
 export default defineComponent({
   inheritAttrs: true,
   props: {
     jnr: { type: Number, required: true },
-    fixedInputs: { type: Array, required: false, default: () => ['date'] },
-    label: { type: String, required: false, default: 'Edit' },
     title: { type: String, required: false, default: 'Edit' },
   },
-  setup(props, { root: { $api, $children, $q }, listeners }) {
-    const el = $children[0] as any; // this
+  setup(props, { root: { $api, $q }, listeners }) {
     const form = ref<JournalTrans>();
+    const delTrans = ref<any[]>([]);
     const transactions = ref<TransTable[]>([]);
     const transAdd = ref<TransTable[]>([]);
-    const addDialog = useDialog();
-    const inDisable = ref(true);
+    const inAdd = ref(false);
+    const journalAddEl = ref();
+    const inFillAdd = ref(false);
+    const label = computed(() => (inAdd.value ? 'Add' : 'Edit'));
 
-    const { onOKClick, onCancelClick, setRecord, ...restListener } = listeners;
+    const { onOKClick, setRecord, delRecord, ...restListener } = listeners;
 
     const { refetch } = usePrepare(
       true,
       () => $api.common.prepareChgGLJournal(props.jnr),
       (content) => {
-        const { trans, form: initForm } = reformChgGLJournal(content, []);
-
-        // parent el
-        form.value = { ...initForm, ...el.form };
+        const { trans, form: preForm } = reformChgGLJournal(content, [
+          '0',
+          '0',
+          '.',
+          '0',
+          '0',
+          '.',
+          '0',
+          '0',
+          '0',
+          '0',
+        ]);
+        form.value = { ...initForm, ...preForm };
         transactions.value = trans;
+        journalAddEl?.value.chgTouchEdit(true);
       },
       undefined,
       []
     );
 
-    function isBalance(params: JournalTrans[]) {
-      const credits = params.reduce((p, j) => p + j.credit, 0);
-      const debits = params.reduce((p, j) => p + j.debit, 0);
-      if (credits !== debits) {
-        console.log(credits, debits);
-        $q.notify({
-          type: 'negative',
-          message: 'Journal transaction not yet balance',
-        });
-        return false;
-      } else {
-        onOKClick(params);
-        addDialog.hide();
+    const allFixed = [
+      'date',
+      'referenceNo',
+      'description',
+      'accNo',
+      'remark',
+      'accName',
+      'debit',
+      'credit',
+    ];
+
+    const inFixeds = ref(allFixed);
+
+    function onChange(params: JournalTrans) {
+      if (inAdd.value === true) {
+        if (
+          params.date &&
+          params.referenceNo !== '' &&
+          params.description !== ''
+        ) {
+          inFixeds.value = ['date', 'referenceNo'];
+          inFillAdd.value = true;
+        } else {
+          $q.notify({
+            type: 'negative',
+            message: 'Fill date, referenceNo, and description',
+          });
+        }
       }
     }
 
-    function reloadTable(params: JournalTrans) {
-      setRecord(params);
-      refetch();
+    function removeOnTable(params: JournalTrans) {
+      transactions.value = transactions.value.filter(
+        (t) => t.key !== params.key
+      );
+
+      if (params.recid) {
+        delTrans.value = [...delTrans.value, params];
+      }
+
+      setDisable(true);
+      journalAddEl?.value.$children[0].resetForm();
     }
 
-    function setDisable(params: boolean) {
-      inDisable.value = params;
+    function updateTable(params: JournalTrans, recordExist) {
+      if (recordExist) {
+        transactions.value = transactions.value.map((val) => {
+          if (val.key === params.key) {
+            return { ...params };
+          }
+          return val;
+        });
+      } else {
+        transactions.value = [...transactions.value, params];
+      }
+      setInAdd(false);
+      setRecord && setRecord(params, recordExist);
+    }
+
+    function setDisable(disable: boolean) {
+      inFixeds.value = disable ? allFixed : ['date'];
+      journalAddEl?.value.chgTouchEdit(disable);
+    }
+
+    const setInAdd = (add: boolean) => {
+      inAdd.value = add;
+      setDisable(!add); // enable
+      journalAddEl?.value.chgTouchEdit(!add);
+      journalAddEl?.value.$children[0].resetForm();
+    };
+
+    function doEdit() {
+      inAdd.value = false;
+      setDisable(false);
+      journalAddEl?.value.chgTouchEdit(true);
+    }
+
+    function clearAll(resetField) {
+      setDisable(true);
+      resetField(allFixed);
+    }
+
+    async function collectRecord(journal: Journal, tranList: JournalTrans[]) {
+      delTrans.value.forEach((trans) => delRecord && delRecord(trans));
+      onOKClick && onOKClick(journal, tranList);
     }
 
     return {
       form,
-      addDialog,
+      journalAddEl,
+      inAdd,
+      removeOnTable,
+      inFillAdd,
+      doEdit,
+      clearAll,
+      setInAdd,
       refetch,
       transactions,
-      isBalance,
-      reloadTable,
+      collectRecord,
+      label,
+      onChange,
+      updateTable,
       transAdd,
       restListener,
-      inDisable,
+      inFixeds,
       setDisable,
     };
   },

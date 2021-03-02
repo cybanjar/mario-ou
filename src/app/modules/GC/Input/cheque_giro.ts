@@ -2,22 +2,18 @@ export const input_giro = [
     {
         name : 'Bank Name',
         right: '20px',
-        value: ''
-    },
-    {
-        name : 'To Name',
-        value: ''
+        value: '',
+        disable: false
     },
     {
         name : 'Account Number',
-        right: '20px',
-        left: '20px',
         value: '',
-        options: []
+        options: [],
+        disable: false
     },
     {
         name : 'Giro Number',
         value: '',
-        right: '20px'
+        disable: false
     },
 ]

@@ -1,6 +1,6 @@
 import { TableHeader } from '~/components/VhpUI/typings';
 
-export const tableHeaders: TableHeader[] = [
+export const ResTableHeaders: TableHeader[] = [
   {
     label: 'Article',
     field: 'artnr',

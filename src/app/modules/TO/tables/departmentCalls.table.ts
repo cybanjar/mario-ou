@@ -93,8 +93,8 @@ export const tableHeaders: TableHeader[] = [
   },
   {
     label: 'User Name',
-    field: 'username ',
-    name: 'username ',
+    field: 'username',
+    name: 'username',
     align: 'left',
     sortable: false,
   },

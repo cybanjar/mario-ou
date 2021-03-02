@@ -8,7 +8,7 @@
     transition-next="jump-up"
   >
     <q-tab-panel style="height: 351px" name="ApplicationForm">
-      <v-date-picker v-model="date"  :popover="{ visibility: 'click' }">
+      <!-- <v-date-picker v-model="date"  :popover="{ visibility: 'click' }">
         <SInput
           label-text="From Date"
           slot-scope="{ inputProps }"
@@ -16,7 +16,8 @@
           style="width: 160px"
           v-bind="inputProps"
         />
-      </v-date-picker>
+      </v-date-picker> -->
+      <SDateInput label-text="From Date" v-model="date" style="width: 160px"/>
       <div class="row">
           <SSelect
             v-for="x in use_inputchild.appForm.filter(x => [
@@ -58,15 +59,7 @@
       </div>
     </q-tab-panel>
     <q-tab-panel style="height: 422px" name="Payment">
-      <v-date-picker v-model="date"  :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="From Date"
-          slot-scope="{ inputProps }"
-          readonly
-          style="width: 160px"
-          v-bind="inputProps"
-        />
-      </v-date-picker>
+      <SDateInput label-text="From Date" v-model="date" style="width: 160px"/>
       <div class="row">
           <div style="marginRight: 107px"> 
             Type        
@@ -89,20 +82,15 @@
             v-model="x.value"
             :style="{width: x.width, marginRight: x.right}"/>
             <div class="row">
-              <v-date-picker 
+              <SDateInput 
               v-for="x in use_inputchild.Payment.filter(x => ![
               '1', '2', '3'].includes(x.key))" 
               :key="x.name" 
-              v-model="x.value"  
-              :popover="{ visibility: group == 'op2'? 'click': null }">
-                <SInput 
-                :label-text="x.name" 
-                placeholder="From"
-                slot-scope="{ inputProps }"
-                :disable="x.disable"
-                v-bind="inputProps"
-                :style="{width: x.width, marginRight: x.right, marginTop: x.top}"/>
-              </v-date-picker>
+              v-model="x.value"
+              :disable="x.disable"
+              :label-text="x.name" 
+              :style="{width: x.width, marginRight: x.right, marginTop: x.top}"
+              />
             </div>
         </div>
         <SInput 
@@ -124,15 +112,7 @@
     </q-tab-panel>
     <q-tab-panel style="height: 420px" name="Settlement">
       <div>
-        <v-date-picker v-model="date"  :popover="{ visibility: 'click' }">
-          <SInput
-            label-text="From Date"
-            slot-scope="{ inputProps }"
-            readonly
-            style="width: 160px"
-            v-bind="inputProps"
-          />
-        </v-date-picker>
+        <SDateInput label-text="From Date" v-model="date" style="width: 160px"/>
         <div class="row">
           <SSelect
             :label-text="x.name" 

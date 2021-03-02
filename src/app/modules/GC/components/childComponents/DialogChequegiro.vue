@@ -4,20 +4,28 @@
         <q-toolbar>
            <q-toolbar-title 
             class="text-white text-weight-medium">
-              New
+              {{dialogcheck_giro.header}}
            </q-toolbar-title>
         </q-toolbar>
 
-        <q-card-section style="marginTop: 20px" class="q-pt-none">
-            <div class="row justify-center">
+        <q-card-section style="marginTop: 20px; width: 432px" class="q-pt-none">
+          <div class="row">
+            <SInput 
+              v-for="x in use_input.filter(x => 
+              ['Bank Name'].includes(x.name))"
+              :label-text="x.name"
+              :key="x.name"
+              :style="{marginRight: x.right, width: '190px'}"
+              v-model="x.value"
+              />
             <SInput 
               v-for="x in use_input.filter(x => [
-                'Bank Name', 'To Name'
+                'Giro Number'
               ].includes(x.name))"
               :label-text="x.name"
               :key="x.name"
-              :style="{marginRight: x.right, marginLeft: x.left}"
               v-model="x.value"
+              :style="{marginRight: x.right, width: '190px' }"
               />
             <SSelect 
               v-for="x in use_input.filter(x => [
@@ -27,16 +35,8 @@
               :key="x.name"
               :options="x.options"
               v-model="x.value"
-              :style="{marginRight: x.right, marginLeft: x.left, width: '180px'}"
-              />
-            <SInput 
-              v-for="x in use_input.filter(x => [
-                'Giro Number'
-              ].includes(x.name))"
-              :label-text="x.name"
-              :key="x.name"
-              v-model="x.value"
-              :style="{marginRight: x.right, marginLeft: x.left}"
+              :disable="x.disable"
+              :style="{width: '400px'}"
               />
             </div>
         </q-card-section>

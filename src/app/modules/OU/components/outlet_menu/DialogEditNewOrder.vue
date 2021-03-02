@@ -43,16 +43,16 @@
 
 <script lang="ts">
 import {defineComponent, computed, watch, reactive, toRefs, ref, onMounted} from '@vue/composition-api';
-import { date, Notify } from 'quasar';
+// import { date, Notify } from 'quasar';
 import VueTouchKeyboard from "vue-touch-keyboard";
-import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
+// import style from 'vue-touch-keyboard/dist/vue-touch-keyboard.css';
 import Vue from 'vue';
 
 // import numkeyboard from 'vue-numkeyboard';
 // import 'vue-numkeyboard/style.css';
 
 Vue.use(VueTouchKeyboard);
-Vue.use(style);
+// Vue.use(style);
 Vue.component('vue-touch-keyboard', VueTouchKeyboard.components);
 
 // Vue.use(numkeyboard);

@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
       </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         :rows-per-page-options="[10, 13, 16]"
         :pagination.sync="pagination"
@@ -31,6 +32,8 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -48,12 +51,12 @@ export default defineComponent({
 
     const tableHeaders = [
         {
-          label: "RmNo",
+          label: "Room Number",
           field: "zinr",
           sortable: false,
-          align: "right"
+          align: "left"
           }, {
-          label: "Payment / Gname", 
+          label: "Payment / Guest Name", 
           field: "gname",
           sortable: false,
           align: "left"
@@ -61,74 +64,88 @@ export default defineComponent({
           label: "", 
           field: "laundry_genttlement",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty1",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
           label: "", 
           field: "dry_clean_genttlement",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty2",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           },  {
           label: "", 
           field: "pressing_genttlement",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty3",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           },  {
           label: "", 
           field: "laundry_ladies",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty4",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           },  {
           label: "", 
           field: "dry_clean_ladies",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty5",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
           label: "", 
           field: "pressing_laddies",
           sortable: false,
           align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty6",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           },  {
           label: "Total Amount", 
           field: "totamount",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "Qty", 
+          label: "Quantity", 
           field: "qty7",
           sortable: false,
-          align: "right"
+          align: "right",
+          format: (val) => (val == 0) ? '' : formatThousands(val),
           }, {
-          label: "ID", 
+          label: "Posting ID", 
           field: "id",
           sortable: false,
           align: "left"
@@ -151,7 +168,13 @@ export default defineComponent({
           return false;
         }
         state.dataPrepare = responsePrepare;
-        state.searches.userList = mapOU(state.dataPrepare['userList']['user-list'], 'usrnr', 'usrname');
+        console.log(state.dataPrepare,'test');
+        
+        state.searches.userList = mapOU(
+          state.dataPrepare['userList']['user-list'],
+          'usrnr',
+          'depart'
+        );
 
         tableHeaders[2]['label'] = state.dataPrepare['bezeich1'];
         tableHeaders[4]['label'] = state.dataPrepare['bezeich2'];
@@ -252,6 +275,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Drug Store');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -259,6 +288,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

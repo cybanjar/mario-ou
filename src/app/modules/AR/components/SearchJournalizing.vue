@@ -5,17 +5,16 @@
     </div>
     <template v-else>
       <q-form @submit="onSubmit" class="q-gutter-md">
-        <SInput
+        <SDateInput
           v-model="fromDate"
-          type="date"
           label-text="From Date"
           disabled
           readonly
         />
-        <SInput
+        <SDateInput
           label-text="To Date"
           v-model="toDate"
-          type="date"
+          :options="options"
           :rules="[(val) => !!val || 'Please Input Since Date']"
         />
         <SInput
@@ -32,7 +31,7 @@
         <div class="q-px-sm q-py-md">
           <q-btn
             icon="mdi-magnify"
-            label="Search"
+            label="Display"
             type="submit"
             class="full-width"
             color="primary"
@@ -45,21 +44,45 @@
           <q-btn
             icon="mdi-content-save"
             label="Save"
-            color="white"
-            text-color="gray"
+            color="primary"
+            unelevated
             class="full-width"
             :disabled="noSave"
-            outline
           >
-            <q-popup-proxy :offset="[0, -100]">
-              <q-banner inline-actions rounded class="bg-orange text-white">
+            <q-popup-proxy :offset="[0, 10]">
+              <q-banner
+                inline-actions
+                rounded
+                class="banner-alert bg-white text-black"
+              >
                 <template v-slot:avatar>
-                  <q-icon name="mdi-gavel" />
+                  <q-icon
+                    name="mdi-information"
+                    size="sm"
+                    class="text-yellow"
+                  />
                 </template>
-                Do you really want to transfer A/R Payments to GL Journals?
+                <div>
+                  {{ confirmTransfer }}
+                </div>
                 <template v-slot:action>
-                  <q-btn flat v-close-popup label="Cancel" />
-                  <q-btn flat v-close-popup @click="onSave" label="Ok" />
+                  <div class="row q-gutter-sm">
+                    <q-btn
+                      outline
+                      color="gray"
+                      v-close-popup
+                      size="sm"
+                      label="No"
+                    />
+                    <q-btn
+                      color="primary"
+                      unelevated
+                      v-close-popup
+                      size="sm"
+                      @click="onSave"
+                      label="Yes"
+                    />
+                  </div>
                 </template>
               </q-banner>
             </q-popup-proxy>
@@ -70,9 +93,18 @@
   </section>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
+import { date } from 'quasar';
 import { formatToOB } from '~/app/helpers/formatterDate.helper';
 import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
+
+type State = {
+  toDate: Date | string; // this is hardcode
+  fromDate: Date | string;
+  refNum: string;
+  description: string;
+  confirmTransfer: string;
+};
 
 export default defineComponent({
   props: {
@@ -81,19 +113,52 @@ export default defineComponent({
     noSave: { type: Boolean, required: false, default: true },
   },
   setup(props, { emit, root: { $api } }) {
-    const filter = reactive({
+    const filter = reactive<State>({
       toDate: '2019-01-14', // this is hardcode
       fromDate: '2019-01-14',
       refNum: '',
       description: '',
+      confirmTransfer: '',
     });
-
+    const options = ref([]);
     const initPrep = usePrepare(
       true,
-      () => $api.common.getGeneralParam(2, 110),
-      (tempData) => {
-        filter.fromDate = tempData?.fdate;
-        filter.toDate = tempData?.fdate;
+      () =>
+        Promise.all([
+          $api.common.getGeneralParam(2, 1014), // fdate
+          $api.accountReceivable.transferGLCheckBL({
+            pvILanguage: 1,
+            userInit: '01',
+            arrayNr: 30,
+            expectedNr: 2,
+          }),
+          $api.accountReceivable.transferGLPrepare({}),
+        ]),
+      ([stateBillDate, stateCheck, statePrepare]) => {
+        let today = new Date();
+        // ( Date according to Pramater number 1014 + 1 Day)
+        let billDate = stateBillDate.fdate
+          ? date.addToDate(stateBillDate.fdate, { days: 1 })
+          : '';
+        let confirmTransfer = stateCheck.msgStr
+          ? stateCheck.msgStr
+          : `confirm_transfer_msg`;
+        // debugger;
+        let fromDate = statePrepare.fromDate ? statePrepare.fromDate : '';
+        let toDate = statePrepare.acctDate ? statePrepare.acctDate : '';
+
+        let terkecil: string | Date = null;
+        terkecil =
+          new Date(toDate) > today
+            ? date.formatDate(today, 'YYYY-MM-DD')
+            : toDate;
+        terkecil = new Date(terkecil) > billDate ? billDate : terkecil;
+
+        filter.fromDate = terkecil;
+        filter.toDate = fromDate; // to date
+        filter.confirmTransfer = confirmTransfer;
+        options.value = [date.formatDate(fromDate, 'YYYY/MM/DD')];
+        // debugger;
       }
     );
 
@@ -116,6 +181,7 @@ export default defineComponent({
       onSubmit,
       onSave,
       initPrep,
+      options,
     };
   },
   components: {
@@ -123,3 +189,18 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+.banner-alert {
+  max-width: 240px;
+  .q-banner {
+    &__avatar,
+    &__actions,
+    &__content {
+      font-size: 10px;
+    }
+    &__actions {
+      width: 100%;
+    }
+  }
+}
+</style>

@@ -29,7 +29,7 @@ export function reformChgGLJournal(transRes, accParams: string[]) {
   const trans = reformTransaction(tempModify, accParams);
 
   const [form] = tempForm.map<Journal>((temp) => ({
-    date: temp.datum === null ? '' : temp.datum,
+    date: new Date(temp.datum),
     referenceNo: temp.refno,
     description: temp.bezeich,
     debits: temp.debit,

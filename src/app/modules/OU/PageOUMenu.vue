@@ -9,39 +9,16 @@
           <div class="row">
             <div class="col-md-8" style="margin-top: -34px">
               <h5 class="q-ml-lg text-weight-bolder">{{ restaurant }}
-                <span @click="onDialogTablePlan(true)" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
-                  <q-icon color="white" name="mdi-table-furniture" >
+                <q-btn flat round class="q-mr-lg float-right">
+                  <img @click="zuggriff(19, 2, 'getPrepare')" :src="require('~/app/icons/Icon-Refresh.svg')" height="30">
                     <q-tooltip>
-                      Select Table
+                      Refresh
                     </q-tooltip>
-                  </q-icon>
-                </span>
-                <span @click="onClickCashierTransfer" class="q-mx-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
-                  <q-icon color="white" name="mdi-account-switch" >
-                    <q-tooltip>
-                      Cashier Transfer
-                    </q-tooltip>
-                  </q-icon>
-                </span>
-
-                <span @click="zuggriff(49, 1, 'closebill')" class="float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
-                  <q-icon color="white" name="mdi-account-cash" >
-                    <q-tooltip>
-                      Close Bill
-                    </q-tooltip>
-                  </q-icon>
-                </span>
-                <span @click="onClickChangeOutlet()" class="q-mr-sm float-right bg-primary rounded-borders q-py-sm q-px-md cursor-pointer"> 
-                  <q-icon color="white" name="mdi-account-convert" >
-                    <q-tooltip>
-                      Change Outlet
-                    </q-tooltip>
-                  </q-icon>
-                </span>
-
+                  </img>
+                </q-btn>
               </h5>
               <div class="q-gutter-y-md">                
-                <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 250px">
+                <div class="row q-ml-xs items-start q-gutter-md q-mb-md scroll overflow" style="height: 220px">
                   <template v-for="datarow in dataFilteredSubGroup">
                     <q-card flat bordered class="my-card" 
                       style="width:240px" 
@@ -87,7 +64,7 @@
                     </div>
                   </div>
                 </q-card>
-                <div class="q-pa-md row items-start scroll overflow" style="height: 250px">
+                <div class="q-pa-md row items-start scroll overflow" style="height: 220px">
                   <template v-for="datarow in dataFilteredArticle">
                     <q-card flat bordered
                       class="my-card q-mr-md q-mb-md" 
@@ -104,9 +81,69 @@
             </div>
 
             <div class="col-md-4">
-              <!-- <h5 style="visibility: hidden;">Bill Number</h5> -->
-              <div class="q-ml-lg q-gutter-y-md">
-                <q-tabs
+              <div class="q-ml-lg q-gutter-y-md row justify-between">
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/TableTransfer.svg"
+                    >
+                      <q-tooltip>
+                        Table Transfer
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/SelectOrderTakers.svg"
+                    >
+                      <q-tooltip>
+                        Select Order Taker
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/Discount.svg"
+                    >
+                      <q-tooltip>
+                        Discount
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/PrintOrderChecker.svg"
+                    >
+                      <q-tooltip>
+                        Print Order Checker
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/rePrintBill1.svg"
+                    >
+                      <q-tooltip>
+                        RePrint Bill
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+                  <q-btn class="col" flat >
+                    <q-img
+                      class="img-collage"
+                      src="../../icons/OU/collage/BillPrint.svg"
+                    >
+                      <q-tooltip>
+                        Bill Print
+                      </q-tooltip>
+                    </q-img>
+                  </q-btn>
+
+                <!-- <q-tabs
                   v-model="tabbill"
                   class="text-blue"
                   align="left"
@@ -122,7 +159,7 @@
 
                 <q-tab-panels v-model="tabbill" animated>
                   <q-tab-panel class="q-pa-none" name="calc">
-                    <SInput v-model="qty" label-text="QTY" data-layout="numeric" ref="qtyRoomBox" @focus="showKeyboardQty"/>
+                    <SInput autofocus v-model="qty" label-text="QTY" data-layout="numeric" ref="qtyRoomBox" @focus="showKeyboardQty"/>
 
                     <div class="row items-start">
                       <q-card flat class="numpad">
@@ -238,23 +275,23 @@
                       </q-card>
                     </div>
                   </q-tab-panel>
-                </q-tab-panels>
+                </q-tab-panels> -->
               </div>
 
               <!-- Bill Number -->
               <q-card class="bg-dark q-pa-md q-ml-lg q-mt-sm">
                 <div class="row text-white"> 
                   <div class="col-6">
-                    <p class="text-subtitle1 text-grey-7">Bill Number : <span class="q-ml-sm text-white text-weight-bold">{{dataTable.rechnr}}</span></p>
-                    <p class="text-subtitle1 text-grey-7">Pax : <span class="q-ml-sm text-white text-weight-bold">{{dataTable.belegung}}</span></p>
+                    <p class="text-subtitle1 text-grey-7">Bill Number : <span class="q-ml-sm text-white text-weight-bold">{{dataTable['rechnr']}}</span></p>
+                    <p class="text-subtitle1 text-grey-7">Pax : <span class="q-ml-sm text-white text-weight-bold">{{dataTable['belegung']}}</span></p>
                   </div>
                   <div class="col-6">
                     <!-- <p class="q-ml-sm">
                       <span class="text-weight-bolder">{{dataTable.bezeich}}</span> <br />
                       {{dataTable.bilname}}
                     </p> -->
-                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable.bezeich}}</span></p>
-                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable.bilname}}</span></p>
+                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable['bezeich']}}</span></p>
+                    <p class="text-subtitle1 text-grey-7"><span class="text-white text-weight-bold">{{dataTable['bilname']}}</span></p>
                   </div>
                 </div>
                 <q-separator />
@@ -272,10 +309,10 @@
 
                 <q-separator />
 
-                <q-tab-panels v-model="tabbillnumber" animated>
+                <q-tab-panels v-model="tabbillnumber">
                   <q-tab-panel class="q-pa-none" name="neworder">
                     <div class="bg-grey-10 text-white">
-                      <q-list dark class="scroll overflow" style="height: 200px">
+                      <q-list dark class="scroll overflow" style="min-height: 350px; max-height: 350px">
                         <template v-for="datarow in dataNewOrder">
                           <q-item clickable v-ripple :key="datarow['position']" @click="onClickNewOrder(datarow)" >
                             <q-item-section avatar top>
@@ -305,7 +342,6 @@
                           <q-btn
                             :disable="dataNewOrder.length === 0"
                             color="primary"
-                            rounded
                             class="full-width"
                             label="CONFIRM"
                             @click="showDialogConfirmMenu = true"
@@ -317,7 +353,7 @@
 
                   <q-tab-panel class="q-pa-none" name="ordered">
                     <div class="bg-grey-10 text-white">
-                      <q-list dark class="scroll overflow" style="height: 200px">
+                      <q-list dark class="scroll overflow" style="min-height: 200px; max-height: 200px">
                         <template v-for="datarow in dataOrdered">
                           <q-item clickable v-ripple :key="datarow['position']">
                            <q-item-section avatar top>
@@ -367,7 +403,7 @@
                           </q-item-section>
                         </q-item> -->
 
-                        <q-item>
+                        <!-- <q-item>
                           <q-item-section class="text-white"
                             >Total</q-item-section
                           >
@@ -376,11 +412,58 @@
                               {{dataTable['saldo']}}
                             </q-item-label>
                           </q-item-section>
-                        </q-item>
-                      </q-list>
+                        </q-item> -->
+                      </q-list> 
 
                       <div class="row q-gutter-sm">
                         <div class="col">
+                          <q-list>
+                            <q-item>
+                              <q-item-section class="text-white"
+                                >Sub Total</q-item-section
+                              >
+                              <q-item-section avatar>
+                                <q-item-label class="text-white">
+                                  {{dataTable['saldo']}}
+                                </q-item-label>
+                              </q-item-section>
+                            </q-item>
+                            <q-item>
+                              <q-item-section class="text-white"
+                                >Service</q-item-section
+                              >
+                              <q-item-section avatar>
+                                <q-item-label class="text-white">
+                                  {{dataTable['saldo']}}
+                                </q-item-label>
+                              </q-item-section>
+                            </q-item>
+                            <q-item>
+                              <q-item-section class="text-white"
+                                >Tax</q-item-section
+                              >
+                              <q-item-section avatar>
+                                <q-item-label class="text-white">
+                                  {{dataTable['saldo']}}
+                                </q-item-label>
+                              </q-item-section>
+                            </q-item>
+                            <q-item>
+                              <q-item-section class="text-white text-weight-bold"
+                                >Total</q-item-section
+                              >
+                              <q-item-section avatar>
+                                <q-item-label class="text-white">
+                                  {{dataTable['saldo']}}
+                                </q-item-label>
+                              </q-item-section>
+                            </q-item>
+                          </q-list>
+                        </div>
+                      </div>
+
+                      <div class="row q-gutter-sm">                        
+                        <div class="col">                          
                           <q-btn
                             outline
                             color="primary"
@@ -686,6 +769,7 @@ import { defineComponent, reactive, toRefs, onMounted, } from '@vue/composition-
 import { date, Notify } from 'quasar';
 import Vue from 'vue';
 import { store } from '~/store';
+import { useExtraMenu } from '~/app/shared/compositions/use-extra-menu';
 
 interface State {
   isLoading: boolean;
@@ -752,6 +836,8 @@ interface State {
   tabbillnumber: string,
   billDate: '',
   flagPrintOrderCheckerEnable: boolean,
+  tempDataPayment: {},
+  isCancel: boolean,
 }
 
 export default defineComponent({
@@ -826,6 +912,8 @@ export default defineComponent({
       tabbillnumber: 'neworder',
       billDate: '',
       flagPrintOrderCheckerEnable: false,
+      tempDataPayment: {},
+      isCancel : false,
     });
 
     onMounted(async () => { 
@@ -973,7 +1061,11 @@ export default defineComponent({
       state.showDialogKpr = false;
 
       if (isOKButton) {
-        getAddKitchpr();
+        if (state.flagPostingMenu) {
+          getAddKitchpr();
+        } else {
+          getPrintBill();
+        }
       } else {
         if (state.flagPostingMenu) {
           checkBill(); 
@@ -1173,11 +1265,11 @@ export default defineComponent({
                 "request": " "
               }]},
             }
-            console.log('request : ', state.objRequestInvUpdateBill);
+            // console.log('request : ', state.objRequestInvUpdateBill);
             restInvUpdateBill1('cash');
           }
         } else if (payType == 2) {
-          console.log('should refresh , Card / dataTable : ', state.dataTable);
+          // console.log('should refresh , Card / dataTable : ', state.dataTable);
           
           state.objRequestInvUpdateBill = {
             pvILanguage : 1,
@@ -1237,10 +1329,10 @@ export default defineComponent({
               "request": " "
             }]},
           }
-          console.log('request : ', state.objRequestInvUpdateBill);
+          // console.log('request : ', state.objRequestInvUpdateBill);
           restInvUpdateBill1('card');
         } else if (payType == 3) {
-          console.log('should refresh , City Legder : ', state.dataTable)
+          // console.log('should refresh , City Legder : ', state.dataTable)
           state.objRequestInvUpdateBill = {
             pvILanguage : 1,
             recId: state.dataTable['dataThBill'][0]['rec-id'],
@@ -1299,11 +1391,11 @@ export default defineComponent({
               "request": " "
             }]},
           }
-          console.log('request : ', state.objRequestInvUpdateBill);
+          // console.log('request : ', state.objRequestInvUpdateBill);
 
           restInvUpdateBill1('cityledger');
         } else if (payType == 4) {
-          console.log('should refresh , Transfer to Guest Folio : ', state.dataTable)
+          // console.log('should refresh , Transfer to Guest Folio : ', state.dataTable)
           const flag = state.dataTable['dataPayment']['tHBill']['t-h-bill'][0]['flag'];
           if (flag == 1) {
             state.dataTable['saldo'] = 0;
@@ -1321,7 +1413,7 @@ export default defineComponent({
         } else if (payType == 6) {
           console.log('should refresh , Transfer to Master Folio : ', state.dataTable)
         } else if (payType == 7) {
-          console.log('should refresh , Compliment : ', state.dataTable)
+          // console.log('should refresh , Compliment : ', state.dataTable)
 
           state.objRequestInvUpdateBill = {
             pvILanguage : 1,
@@ -1381,11 +1473,11 @@ export default defineComponent({
               "request": " "
             }]},
           }
-          console.log('request : ', state.objRequestInvUpdateBill);
+          // console.log('request : ', state.objRequestInvUpdateBill);
 
           restInvUpdateBill1('compliment');
         } else if (payType == 8) {
-          console.log('should refresh , Meal Coupon : ', state.dataTable)
+          // console.log('should refresh , Meal Coupon : ', state.dataTable)
 
           state.objRequestInvUpdateBill = {
             pvILanguage : 1,
@@ -1445,9 +1537,14 @@ export default defineComponent({
               "request": " "
             }]},
           }
-          console.log('request : ', state.objRequestInvUpdateBill);
+          // console.log('request : ', state.objRequestInvUpdateBill);
 
           restInvUpdateBill1('mealcoupon');
+        } else if (payType == 9) {
+          console.log('should refresh , Close Bill : ', state.dataTable)
+          console.log('state : ', state);
+
+          getRestInvPayCash2();
         }
         // checkBill();
       } 
@@ -1638,15 +1735,67 @@ export default defineComponent({
       asyncCall();
     }
 
+    const getRestInvPayCash2 = () => {
+      state.isLoading = true;
+
+      async function asyncCall() {
+        const [dataPrepare] = await Promise.all([
+          $api.outlet.getOUPrepare('restInvPayCash2', {
+            recId : state.dataTable['dataThBill'][0]['rec-id'],
+            transdate: date.formatDate((new Date(state.billDate)), 'MM/DD/YY'),
+            currDept : state.currDept,
+            discArt1: state.dataPrepare['discArt1'],
+            discArt2: state.dataPrepare['discArt1'],
+            discArt3: state.dataPrepare['discArt1'],
+            kelnerNr: state.dataPrepare['tKellner']['t-kellner'][0]['kellner-nr'],
+          })
+        ]);
+        
+        if (dataPrepare) {
+          const responsePrepare = dataPrepare || [];
+          const okFlag = responsePrepare['outputOkFlag'];
+
+          // console.log('restInvPayCash2 : ', responsePrepare);
+
+          if (!okFlag) {
+            Notify.create({
+              message: 'Failed when retrive data, please try again',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+          } 
+
+          if (responsePrepare['flCode'] == 0) {
+            state.dataTable = {};
+            
+            state.dataTable['saldo'] = 0;
+            state.dataOrdered = [];
+            state.dataNewOrder = [];
+            state.dataTable['belegung'] = 0;
+            state.dataTable['bezeich'] = '';
+            state.dataTable['bilname'] = '';
+            state.qty = 1;
+            state.objRequestInvUpdateBill = {};
+            state.flagRefreshAfterAction = false;
+            onDialogTablePlan(true);
+          }
+
+         
+          state.isLoading = false;
+        } else {
+          Notify.create({
+              message: 'Please check your internet connection',
+              color: 'red',
+            });
+            state.isLoading = false;
+            return false;
+        }
+      }
+      asyncCall();
+    }
+
     const getAddKitchpr = () => {
-      // console.log('Request add kitchen printer : ', {
-      //       pvlLanguage : '1',
-      //       sessionParameter: '',
-      //       dept : state.currDept,
-      //       rechnr: state.dataTable['dataThBill'][0]['rechnr'],
-      //       billdate: date.formatDate((new Date(state.billDate)), 'MM/DD/YY'),
-      //       userInit: '01',
-      //     })
       state.isLoading = true;
 
       async function asyncCall() {
@@ -1686,25 +1835,7 @@ export default defineComponent({
           } else {
             if (state.flagPostingMenu) {
               checkBill(); 
-            } else {
-              if (state.paytype == 2) {
-                onDialogTablePlan(true);          
-              } else if (state.paytype == 1) {
-                getBillLine();
-              } else if (state.paytype == 11) {
-                onDialogTablePlan(true);          
-              } else if (state.paytype == 3) {
-                if (state.tempFlCodePayment == 1) {
-                  onDialogTablePlan(true);
-                } else if (state.tempFlCodePayment == 0) {
-                  getBillLine();
-                }
-              } else if (state.paytype == 7) {
-                onDialogTablePlan(true);
-              } else if (state.paytype == 8) {
-                onDialogTablePlan(true);          
-              }
-            }
+            } 
           }
           state.isLoading = false;
         } else {
@@ -1717,6 +1848,28 @@ export default defineComponent({
         }
       }
       asyncCall();
+    }
+
+    const getPrintBill = () => {
+      console.log("print bill");
+      
+      if (state.paytype == 2) {
+        onDialogTablePlan(true);          
+      } else if (state.paytype == 1) {
+        getBillLine();
+      } else if (state.paytype == 11) {
+        onDialogTablePlan(true);          
+      } else if (state.paytype == 3) {
+        if (state.tempFlCodePayment == 1) {
+          onDialogTablePlan(true);
+        } else if (state.tempFlCodePayment == 0) {
+          getBillLine();
+        }
+      } else if (state.paytype == 7) {
+        onDialogTablePlan(true);
+      } else if (state.paytype == 8) {
+        onDialogTablePlan(true);          
+      }
     }
 
     const getSubgroup = () => {
@@ -2035,7 +2188,7 @@ export default defineComponent({
           const responseGetBillLine = dataBillLine || [];
           const okFlag = responseGetBillLine['outputOkFlag'];
 
-          // console.log('responseGetBillLine : ', responseGetBillLine);
+          console.log('responseGetBillLine : ', responseGetBillLine);
 
           state.dataOrdered = responseGetBillLine['tHBillLine']['t-h-bill-line'];
 
@@ -2050,7 +2203,13 @@ export default defineComponent({
 
           if (state.flagFirstLoad == 0) {
             if (!state.flagRefreshAfterAction) {
-              onDialogMenuOrderTaker(true, null);
+              if (!state.isCancel) {
+                if (state.dataOrdered.length == 0) {
+                  onDialogMenuOrderTaker(true, null);
+                }
+              } else {
+                state.isCancel = false;
+              }
             }
           } else {
             if (state.dataOrdered.length == 0) {
@@ -2463,6 +2622,7 @@ export default defineComponent({
           const okFlag = response['outputOkFlag'];
 
           console.log('response restInvUpdateBill1 : ', response);
+          console.log('data Table : ', state.dataTable);
 
           if (!okFlag) {
             Notify.create({
@@ -2481,6 +2641,8 @@ export default defineComponent({
   
             if (flag == 'card') {
               if (flagCode == 1) {
+                state.dataTable = {};
+
                 state.dataTable['saldo'] = saldo;
                 state.dataOrdered = [];
                 state.dataNewOrder = [];
@@ -2510,6 +2672,8 @@ export default defineComponent({
               }
             } else if (flag == 'cityledger') {
               if (flagCode == 1) {
+                state.dataTable = {};
+
                 state.dataTable['saldo'] = saldo;
                 state.dataOrdered = [];
                 state.dataNewOrder = [];
@@ -2537,6 +2701,8 @@ export default defineComponent({
               }
             } else if (flag == 'compliment') {
               if (flagCode == 1) {
+                state.dataTable = {};
+
                 state.dataTable['saldo'] = saldo;
                 state.dataOrdered = [];
                 state.dataNewOrder = [];
@@ -2555,6 +2721,8 @@ export default defineComponent({
               }
             } else if (flag == 'mealcoupon') {
                if (flagCode == 1) {
+                state.dataTable = {};
+
                 state.dataTable['saldo'] = saldo;
                 state.dataOrdered = [];
                 state.dataNewOrder = [];
@@ -2572,7 +2740,13 @@ export default defineComponent({
                 }
               }
             } else if (flag == 'cancel') {
-
+              state.dataTable['saldo'] = saldo;
+              state.dataNewOrder = [];
+              state.objRequestInvUpdateBill = {};
+              state.flagRefreshAfterAction = false;
+              state.isCancel = true;
+              
+              getBillLine();
             }
           }
 
@@ -2661,11 +2835,6 @@ export default defineComponent({
             return false;
           }
 
-          const flCode1 = response['flCode1'];
-          if (flCode1 == 1) {
-            
-          }
-
           state.dataSelected['recIdHArt'] = response['recIdHArt'];
           state.dataSelected['cancelFlag'] = response['cancelFlag'];
           state.dataSelected['pricePrepare'] = response['price'];
@@ -2674,8 +2843,17 @@ export default defineComponent({
           state.dataSelected['anz'] = response['anz'];
           state.dataSelected['prepareArticle'] = response['tHArtikel']['t-h-artikel'][0];
 
+          // const flCode1 = response['flCode1'];
+          // const flCode2 = response['flCode2'];
+          // if (flCode1 == 1 || flCode2 == 1) {
+          //     onDialogVoidItem(true, '', null);            
+          // }
+
+
           if (response['tHArtikel']['t-h-artikel'].length > 0) {
             if (response['tHArtikel']['t-h-artikel'][0]['artart'] == 0) {
+              state.tempDataPayment = response;
+
               onDialogVoidItem(true, '', null);
             }
           }
@@ -3241,10 +3419,13 @@ export default defineComponent({
     }
 
     const onClickVoidItem = (datarow) => {
-      // console.log('datarow to void : ', datarow);
+      console.log('data article selected : ', datarow);
       state.dataSelected = datarow;
+
+      if (state.dataSelected['anzahl'] > 0 && state.dataSelected['artnr'] != 0) {
+        zuggriff(52, 2, 'voiditem');
+      }
       // console.log(state.dataSelected);
-      zuggriff(52, 2, 'voiditem');
     }
 
     const onDialogVoidItem = (val, flag, data) => {
@@ -3252,7 +3433,8 @@ export default defineComponent({
 
       if (flag == 'ok') {
         state.dataTable['dataPayment'] = data;
-        console.log('onResultVoid : ', state.dataTable);
+        console.log('onResultVoid : ', state);
+        console.log('data : ', data)
 
         state.objRequestInvUpdateBill = {
             pvILanguage : 1,
@@ -3265,12 +3447,12 @@ export default defineComponent({
             // hArtart :state.dataTable['dataPayment']['artart'],
             hArtart :1,
             cancelOrder :'false',
-            hArtikelServiceCode :state.dataTable['dataPayment']['service-code'],
-            amount: -state.dataTable['dataPayment']['betrag'],
-            amountForeign: -state.dataTable['dataPayment']['betrag'],
-            price: -state.dataTable['dataPayment']['epreis1'],
+            hArtikelServiceCode :state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['service-code'],
+            amount: -(state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['betrag'] * state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['qty']),
+            amountForeign: -(state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['betrag'] * state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['qty']),
+            price: state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['epreis1'],
             doubleCurrency: state.dataPrepare['doubleCurrency'],
-            qty: -state.dataTable['dataPayment']['qty'],
+            qty: -state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['qty'],
             exchgRate:state.dataPrepare['exchgRate'],
             priceDecimal:state.dataPrepare['priceDecimal'],
             orderTaker:state.dataPrepare['dataSelectedOrderTaker'] == null ? '1' : state.dataPrepare['dataSelectedOrderTaker'],
@@ -3281,17 +3463,17 @@ export default defineComponent({
             pax:state.dataTable['belegung'],
             kreditlimit: state.dataTable['klimit'],
             addZeit: 1,
-            billart: state.dataTable['dataPayment']['artnr'],
-            description:  state.dataTable['dataPayment']['bezeich'],
+            billart: state.tempDataPayment['billart'],
+            description:  state.tempDataPayment['description'],
             changeStr:' ',
             ccComment:' ',
-            cancelStr: state.dataTable['dataPayment']['cancelStr'],
+            cancelStr: state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['cancelStr'],
             reqStr:' ',
             voucherStr:' ',
             hogaCard:' ',
             printToKitchen:'true',
             fromAcct:'false',
-            hArtnrfront: state.dataTable['dataPayment']['artnrfront'],
+            hArtnrfront: state.tempDataPayment['tHArtikel']['t-h-artikel'][0]['artnrfront'],
             payType:0,
             guestnr:0,
             transferZinr:' ',
@@ -3320,6 +3502,33 @@ export default defineComponent({
         restInvUpdateBill1('cancel');
       }
     }
+
+    useExtraMenu([
+      {
+        handler: () => onDialogTablePlan(true),
+        icon: 'OU/Icon-SelectTable',
+      },
+      {
+        handler: () => onClickCashierTransfer(),
+        icon: 'OU/Icon-CashierTransfer',
+      },
+      {
+        handler: () => zuggriff(49, 1, 'closebill'),
+        icon: 'OU/Icon-ClosedBill',
+      },
+      {
+        handler: () => onClickChangeOutlet(),
+        icon: 'OU/Icon-ChangeOutlet',
+      },
+      {
+        handler: () => onClickChangeOutlet(),
+        icon: 'OU/collage/ChangeUser',
+      },
+      {
+        handler: () => onClickChangeOutlet(),
+        icon: 'OU/collage/StandingMode',
+      },
+    ]);
 
     return {
       dataStoreLogin,

@@ -46,10 +46,11 @@
                 style="width: 70px" 
                 @blur="blurQTY(props.row)"
                 @keyup.enter="blurQTY(props.row)"
+                @input="blurQTYY(props.row)"
                 autofocus
                 dense 
                 borderless 
-                v-model="qty" />
+                v-model="props.row.qty" />
             </q-td>
             <q-td :props="props" 
               v-for="col in props.cols.filter((x, i) => [
@@ -98,7 +99,7 @@ linkstock_check_refnobl
 } from './utils/params.inv'
 import {fromStore, articelNumber} from './utils/params.stockItemTransform'
 import { store } from '~/store';
-
+import {formatterMoney} from '~/app/helpers/formatterMoney.helper'
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -109,16 +110,17 @@ export default defineComponent({
       hide_bottom: false,
       data: [] as any,
       qtyModify: null,
-      qty: '',
       searches: {
-          date: new Date(),
-          fromStore: fromStore,
-          store: '',
-          articelNumber: articelNumber,
-          art1: '',
-          art2: '',
-          qty: '',
-          amount: '0'
+        disableTransform: true,
+        date: new Date(),
+        fromStore: fromStore,
+        store: '',
+        articelNumber: articelNumber,
+        art1: '',
+        art2: '',
+        qty: '',
+        amount: '0',
+        price: '0'
       }
     });
     // FETCH DATA
@@ -133,10 +135,10 @@ export default defineComponent({
     }
         // HELPER 
     const NotifyCreate = (mess, col?, position?, key?) => Notify.create({
-              message: mess,
-              color: col,
-              position,
-            });
+        message: mess,
+        color: col,
+        position,
+      });
 
     onMounted(() => {
       FETCH_DATA('checkPermission', 
@@ -144,32 +146,46 @@ export default defineComponent({
     })
 
     const ADD = (val) => {
-    if (val.searches.art1 !== '' && val.searches.qty !== '') {
-      if (!isNaN(val.searches.qty)){
-        if(Number(val.searches.qty) == 0){
-          NotifyCreate('Wrong quantity', 'red', 'top')
-        } else {
-          state.data.push(dataTable(Object.assign(
-              val.searches.art1,
-              val.searches,
-          )))
-        let x = 0
-        for(const i of state.data){
-            x += Number(i.price)
-        }
-        state.searches.amount = x.toString()+'.000'
-        state.searches.art1 = ''
-        state.searches.qty = ''
-        if(state.data.length !== 0){
+      if (val.searches.art1 !== '' && val.searches.qty !== '') {
+        if (!isNaN(val.searches.qty)){
+          if(Number(val.searches.qty) == 0){
+            NotifyCreate('Wrong quantity', 'red', 'top')
+          } else {
+            let art = []
+            for(const i of state.data){
+              art.push(i.artNumber)
+            }
+            if (art.includes(val.articel)) {
+              NotifyCreate('Article already, Change the quantity instead', 'red', 'top')
+            } else {
+              state.data.push(dataTable(Object.assign(
+                val.searches.art1,
+                val.searches,
+              )))
+              if (state.data.length !== 0) {
+                state.searches.disableTransform = false
+              } else {
+                state.searches.disableTransform = true
+              }
+            }
+          let x = 0
+          for(const i of state.data){
+              x += Number(i.price)
+          }
+          state.searches.art1 = ''
+          state.searches.qty = ''
+          state.searches.price = '0'
+          state.searches.amount = '0'
+          if(state.data.length !== 0){
             state.hide_bottom = true
-        }
+          }
+          }
+        } else {
+          NotifyCreate('Quantity Not Number', 'red', 'top')
         }
       } else {
-        NotifyCreate('Quantity Not Number', 'red', 'top')
+        NotifyCreate('Please fill in Articel Number / Quantiy', 'red', 'top')
       }
-    } else {
-      NotifyCreate('please fill in Articel Number / Quantiy', 'red', 'top')
-    }
     };
 
     const transformIN = () => {
@@ -177,19 +193,43 @@ export default defineComponent({
     }
 
     const blurQTY = (val) => {
-      state.qtyModify = null
-      val.qty = state.qty
+      if (
+      !isNaN(val.qty) 
+      && val.qty !== '' 
+      && Number(val.qty) !== 0) 
+      {
+        if (Number(val.qty) <= Number(val.stock)) {
+          state.qtyModify = null
+        } else {
+          NotifyCreate('Wrong quantity', 'red', 'top')
+        }
+      } else {
+        val.qty = ''
+        NotifyCreate('Wrong quantity', 'red', 'top')
+      }
+    }
+
+    const blurQTYY = (val) => {
+      if (!isNaN(val.qty)) {
+        if (Number(val.qty) <= Number(val.stock)) {
+          val.amount = formatterMoney(Number(val.qty) * val.price.replace(/,/g, ''))
+        } else {
+          NotifyCreate('Wrong quantity', 'red', 'top')
+        }
+      } else {
+        val.qty = ''
+        NotifyCreate('Wrong quantity', 'red', 'top')
+      }
     }
     const onClickEdit = (dataRow) => {
       state.qtyModify = dataRow.pageIndex
-      state.qty = dataRow.row.qty
     }
     const deleteDataRow = (dataRow) => {
       state.data = state.data.filter((x, i) => {
          return x.artNumber !== dataRow.artNumber
       })
       if(state.data.length == 0){
-          state.hide_bottom = false
+        state.hide_bottom = false
       }
     }
 
@@ -222,6 +262,7 @@ export default defineComponent({
       onClickEdit,
       deleteDataRow,
       blurQTY,
+      blurQTYY,
       pagination: {
         rowsPerPage: 0,
       },

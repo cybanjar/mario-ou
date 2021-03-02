@@ -1,0 +1,103 @@
+<template>
+  <div>
+    <q-drawer :value="true" side="left" bordered :width="235" persistent>
+    <SearchOpenedMasterbill @onSearch="onSearch"/>
+    </q-drawer>
+    <div class="q-pa-lg">
+      <div class="q-mb-md">
+        <q-btn flat round class="q-mr-lg">
+          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
+        </q-btn>
+        <q-btn flat round class="q-mr-lg">
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
+        </q-btn>
+      </div>
+      <STable
+        :loading="isFetching"
+        :columns="tableHeaders"
+        :data="data"
+        :rows-per-page-options="[0]"
+        :pagination.sync="pagination"
+        :hide-bottom="hide_bottom"
+        class="table-accounting-date"
+      >
+        <template v-slot:header="props">
+            <q-tr style="height: 40px" :props="props">
+                <q-th
+                :props="props"
+                v-for="col in props.cols"
+                :key="col.name"
+                :style="col.style"
+                >
+                    {{col.label}}
+                </q-th>
+            </q-tr>
+        </template>
+        <template v-slot:body="props">
+          <q-tr :props="props" @click="onRowClick(props.row)" >
+           <q-td 
+           :key="col.name" 
+           :props="props" 
+           v-for="col in props.cols">
+              {{col.value}} 
+           </q-td>
+          </q-tr>
+        </template>
+      </STable>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import {
+  defineComponent,
+  onMounted,
+  toRefs,
+  reactive,
+  ref,
+  watch
+} from '@vue/composition-api';
+import {tableHeaders} from './Tables/OpenedMasterbill.table'
+
+export default defineComponent({
+    setup(_ , {root: {$api}}){
+        const state = reactive({
+            isFetching: false,
+            hide_bottom: false,
+            data: [],
+        })
+
+        const onRowClick = () => {
+            alert()
+        }
+
+        const FETCH_API = async (api, body?) => {
+          const GET_DATA = await $api.incomeaudit.FetchAPINA(api, body)
+          state.data = GET_DATA.cList['c-list']
+          if (state.data.length !== 0) {
+            state.hide_bottom = true
+          }
+        }
+
+        onMounted(() => {
+          FETCH_API('checkMbill')
+        })
+
+        const onSearch = (date) => {
+          console.log('sukses', date);
+        }
+
+        return {
+            pagination: {
+              rowsPerPage: 10,
+            },
+            tableHeaders,
+            ...toRefs(state),
+            onSearch
+        }
+    },
+    components: {
+        SearchOpenedMasterbill: () => import('./components/SearchOpenedMasterBill.vue')
+    }
+})
+</script>

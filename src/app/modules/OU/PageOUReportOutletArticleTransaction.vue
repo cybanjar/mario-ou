@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
     </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         @row-click="onRowClick"
         :rows-per-page-options="[10, 13, 16]"
@@ -49,6 +50,8 @@ import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { mapOU3Label } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
+import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -86,20 +89,20 @@ export default defineComponent({
             sortable: false,
             align: "left",
         },{
-            label: "TbNo", 
+            label: "Table Number", 
             field: "tabelno",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
-            label: "Bill-No", 
+            label: "Bill Number", 
             field: "billno",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
-            label: "ArtNo", 
+            label: "Article Number", 
             field: "artno",
             sortable: false,
-            align: "right",
+            align: "left",
         }, {
             label: "Description", 
             field: "descr",
@@ -111,30 +114,32 @@ export default defineComponent({
             sortable: false,
             align: "left",
         }, {
-            label: "Qty", 
+            label: "Quantity", 
             field: "qty",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         },  {
             label: "Amount", 
             field: "amount",
             sortable: false,
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Time", 
             field: "zeit",
             sortable: false,
-            align: "center",
+            align: "left",
         }, {
-            label: "id", 
+            label: "Posting ID", 
             field: "id",
             sortable: false,
-            align: "center",
+            align: "left",
         }, {
             label: "Guest Name", 
             field: "gname",
             sortable: false,
-            align: "center",
+            align: "left",
         }, { 
             name: 'actions',
             field: 'actions' 
@@ -166,7 +171,7 @@ export default defineComponent({
           }
 
           const artList = responseDataArt.tHArtikel['t-h-artikel'];
-
+          
           const fromArtList = [] as any;
           const toArtList = [] as any;
 
@@ -351,6 +356,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Outlet Article Transaction');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -362,6 +373,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

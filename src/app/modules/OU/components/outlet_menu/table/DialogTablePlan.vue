@@ -37,6 +37,14 @@
               </template>
 
               <template v-slot:top-right>
+                <q-btn flat round class="q-mr-lg" @click="onDialogTableReservation(true)">
+                  <img :src="require('~/app/icons/OU/Icon-TableReservationPlan.svg')" height="30">
+                    <q-tooltip>
+                      Reservation
+                    </q-tooltip>
+                  </img>
+                </q-btn>
+
                 <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
                   <template v-slot:append>
                     <q-icon name="mdi-magnify" />
@@ -47,6 +55,8 @@
          </div>
 
             <dialogOpenTable :showDialogOpenTable="showDialogOpenTable" @onDialog="onDialog" @onResultOpenTable="onResultOpenTable" :dataTableSelected="dataTableSelected" />
+            <dialogTableReservation :dialogTableReservation="dialogTableReservation" @onDialogTableReservation="onDialogTableReservation" />
+
                 <!-- <dialogOpenMenu :dialogOpenMenu="dialogOpenMenu" :dataTableSelected="dataTableSelected" @onDialogMenu="onDialogMenu"/> -->            
         </q-card>
       </q-dialog>
@@ -70,6 +80,7 @@ interface State {
   showDialogOpenTable: Boolean,
   filter: String,
   currDept: any,
+  dialogTableReservation: Boolean,
 }
 
 export default defineComponent({
@@ -91,6 +102,7 @@ export default defineComponent({
       showDialogOpenTable: false,
       filter: '',
       currDept: 1,
+      dialogTableReservation: false
     });
   
     watch(
@@ -409,6 +421,10 @@ export default defineComponent({
         asyncCall();
     }
 
+    const onDialogTableReservation = (val) => {
+      state.dialogTableReservation = val;
+    }
+
     return {
       dataStoreLogin,
       ...toRefs(state),
@@ -419,6 +435,7 @@ export default defineComponent({
       onResultOpenTable,
       getCheckTable,
       getDataPrepareTable,
+      onDialogTableReservation,
       pagination: {
         rowsPerPage: 0,
       },
@@ -426,6 +443,7 @@ export default defineComponent({
   },
   components: {
     dialogOpenTable: () => import('./DialogOpenTable.vue'),
+    dialogTableReservation: () => import('../../TableReservationPlan.vue'),
   },
 })
 </script>

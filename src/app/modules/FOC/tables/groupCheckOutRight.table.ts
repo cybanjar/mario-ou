@@ -1,6 +1,6 @@
 import { TableHeader } from '~/components/VhpUI/typings';
 
-export const tableHeadersRight: TableHeader[] = [
+export const ResTableHeaders: TableHeader[] = [
   {
     label: 'Reservation Number',
     field: 'resnr',

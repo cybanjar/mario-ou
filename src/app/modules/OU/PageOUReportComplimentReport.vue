@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
     </div>
@@ -19,6 +19,7 @@
         dense
         :data="build"
         :columns="tableHeaders"
+        id="printMe"
         separator="cell"
         @row-click="onRowClick"
         :rows-per-page-options="[10, 13, 16]"
@@ -54,6 +55,7 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   setup(_, { root: { $api } }) {
@@ -104,7 +106,7 @@ export default defineComponent({
             sortable: false,
             align: "left",
         }, {
-            label: "BillNo", 
+            label: "Bill Number", 
             field: "rechnr",
             sortable: false,
             align: "right",
@@ -117,7 +119,7 @@ export default defineComponent({
               return val.name != '' ? 'color:red;' : 'color:white;'
             },
         },{
-            label: "P-Art", 
+            label: "Payment Article", 
             field: "p-artnr",
             sortable: false,
             align: "right",
@@ -384,6 +386,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Compliment Report');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -394,6 +402,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

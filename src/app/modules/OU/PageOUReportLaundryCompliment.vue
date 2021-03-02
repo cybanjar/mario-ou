@@ -9,7 +9,7 @@
         <q-btn flat round class="q-mr-lg">
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
         </q-btn>
-        <q-btn flat round>
+        <q-btn flat round @click="doPrint">
           <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
         </q-btn>
     </div>
@@ -17,6 +17,7 @@
     <STable
        :loading="isFetching"
         :columns="tableHeaders"
+        id="printMe"
         :data="build"
         :rows-per-page-options="[0]"
         :pagination.sync="pagination"
@@ -49,6 +50,7 @@
 import { defineComponent, onMounted, toRefs, reactive, } from '@vue/composition-api';
 import { mapOU } from '~/app/helpers/mapSelectItems.helpers';
 import { date, Notify } from 'quasar';
+import { PrintJs} from '~/app/helpers/PrintJs';
 
 export default defineComponent({
   
@@ -62,7 +64,7 @@ export default defineComponent({
       dataSelected: {},
       dataPrepare:{},
       searches: {
-        date: {start: new Date(), end: new Date()},
+        inputDate: {start: new Date(), end: new Date()},
         optionSortType: '2',
       },
       dialog: false,
@@ -75,7 +77,7 @@ export default defineComponent({
             sortable: false,
             align: "left",
         },{
-            label: "Bill-No", 
+            label: "Bill Number", 
             field: "rechnr",
             sortable: false,
             align: "right",
@@ -85,7 +87,7 @@ export default defineComponent({
             sortable: false,
             align: "left",
         }, {
-            label: "P-Art", 
+            label: "Payment Article", 
             field: "p-artnr",
             sortable: false,
             align: "right",
@@ -95,7 +97,7 @@ export default defineComponent({
             sortable: false,
             align: "left",
         },  {
-            label: "Bill-Amount", 
+            label: "Bill Amount", 
             field: "betrag",
             sortable: false,
             align: "right",
@@ -136,8 +138,8 @@ export default defineComponent({
 
         const fdate = new Date(responsePrepare.billdate);
         const billDate = date.addToDate(fdate, {days: -1});
-        state.searches.date.start = billDate;
-        state.searches.date.end = billDate;
+        state.searches.inputDate.start = billDate;
+        state.searches.inputDate.end = billDate;
         state.isFetching = false;
       } else {
         Notify.create({
@@ -157,7 +159,7 @@ export default defineComponent({
       if (!val && flagSave) {
         async function asyncCall() {
           const state2 = {
-            date: state.searches.date,
+            date: state.searches.inputDate,
             optionSortType: state.searches.optionSortType
           // eslint-disable-next-line @typescript-eslint/ban-types
           } as {};
@@ -231,8 +233,8 @@ export default defineComponent({
           $api.outlet.getOUTableList('loundryCompBtnGo', {
             foreignNr: state.dataPrepare['foreignNr'], 
             sorttype: state2.optionSortType,
-            fromDate: date.formatDate(state2.date.start, 'MM/DD/YYYY'),
-            toDate: date.formatDate(state2.date.end, 'MM/DD/YYYY'),
+            fromDate: date.formatDate(state2.inputDate.start, 'MM/DD/YYYY'),
+            toDate: date.formatDate(state2.inputDate.end, 'MM/DD/YYYY'),
             fromDept: state.dataPrepare['fromDept'],
             toDept: state.dataPrepare['fromDept'],
             billdate: date.formatDate(state.dataPrepare['billdate'], 'MM/DD/YYYY'),
@@ -276,6 +278,12 @@ export default defineComponent({
       asyncCall();
     };
 
+    function doPrint() {
+      if (state.build.length !== 0) {  
+        PrintJs(state.build, tableHeaders, 'Report Laundry Compliment');
+      }
+    }
+
     return {
       ...toRefs(state),
       tableHeaders,
@@ -286,6 +294,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 10,
       },
+      doPrint
     };
   },
   components: {

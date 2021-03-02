@@ -9,7 +9,7 @@ export const tableHeaders: TableHeader[] = [
     sortable: false,
   },
   {
-    label: 'St',
+    label: 'Store',
     field: 'bezeich',
     name: 'bezeich',
     align: 'left',

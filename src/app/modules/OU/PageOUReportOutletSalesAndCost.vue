@@ -47,7 +47,8 @@ export default defineComponent({
         fromDeptVal: null,
         toDept: [],
         toDeptVal: null,
-        date: {start: (new Date()), end: (new Date())},
+        // date: {start: (new Date()), end: (new Date())},
+        date: {start: new Date(), end: new Date()},
         categoryList: [{
             'label': 'All',
             'value': 4
@@ -180,7 +181,7 @@ export default defineComponent({
             width: 150,
             divider: true
         },{
-            label: "Qty", 
+            label: "Quantity", 
             field: "qty",
             sortable: false,
             align: "right",
@@ -201,7 +202,7 @@ export default defineComponent({
             width: 150, 
             divider: true
         },{
-            label: "Qty ", 
+            label: "Quantity", 
             field: "qty2",
             sortable: false,
             align: "right",
@@ -215,7 +216,7 @@ export default defineComponent({
             width: 150,
             divider: true
         },{
-            label: "Total - Cost", 
+            label: "Total Cost", 
             field: "t-cost",
             sortable: false,
             align: "right",
@@ -229,12 +230,12 @@ export default defineComponent({
             width: 150,
             divider: true
         },  {
-            label: "MTD - Qty", 
+            label: "Month to Date - Quantity", 
             field: "m-qty",
             sortable: false,
             align: "right",
         },  {
-            label: "MTD - Sales", 
+            label: "Month to Date - Sales", 
             field: "m-sales",
             sortable: false,
             align: "right",
@@ -244,7 +245,7 @@ export default defineComponent({
             sortable: false,
             align: "right",
         },  {
-            label: "MTD - Qty", 
+            label: "Month to Date - Quantity", 
             field: "m-qty2",
             sortable: false,
             align: "right",
@@ -254,7 +255,7 @@ export default defineComponent({
             sortable: false,
             align: "right",
         }, {
-            label: "Total-Cost", 
+            label: "Total Cost", 
             field: "t-cost2",
             sortable: false,
             align: "right",

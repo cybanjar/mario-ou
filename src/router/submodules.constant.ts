@@ -8,26 +8,60 @@ type Pages = {
 };
 
 export const SUBMODULES: Pages = {
-  // FOC: [
-  //   'Guest Folio',
-  //   'Nonguest Folio',
-  //   'Master Folio',
-  //   'Closed Folio',
-  //   'Reservation Deposit',
-  //   'Individual Check Out',
-  //   'Group Check Out',
-  //   'Quick Posting To Guest Folio',
-  //   'Money Change Posting',
-  //   'Foreign Currency Exchange Rate',
-  //   'Report Fo Transaction',
-  //   'Report Booking Journal By User',
-  //   'Report Payment Journal By User',
-  //   'Report Fo Cancellation',
-  //   'Report Outstanding Folio',
-  //   'Report Today Departed Guest',
-  //   'Report Over Credit Limit',
-  //   'Report Departed Unbalance Guest',
-  // ],
+  FOC: {
+    routes: [
+      { name: 'Guest Folio', pathParent: '/' },
+      { name: 'Master Folio', pathParent: '/' },
+      { name: 'Nonguest Folio', pathParent: '/foc/guest-folio' },
+      { name: 'Closed Folio', pathParent: '/foc/guest-folio' },
+      { name: 'Deposit', pathParent: '/foc/guest-folio' },
+      { name: 'Group Check Out', pathParent: '/foc/guest-folio' },
+      { name: 'Individual Check Out', pathParent: '/foc/guest-folio' },
+    ],
+    title: 'Front Office Cashier',
+    reports: [
+      {
+        name: 'Booking Journal By User',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Departed Unbalance Guest',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Fo Cancellation',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Fo Transaction',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Outstanding Folio',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Over Credit Limit',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Payment Journal By User',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+      {
+        name: 'Today Departed Guest',
+        keyword: 'Front-Office-Cashier',
+        pathParent: '/foc/guest-folio',
+      },
+    ],
+  },
   GL: {
     routes: [
       {
@@ -67,7 +101,10 @@ export const SUBMODULES: Pages = {
       { name: 'Rooming List', pathParent: '/hk/overview' },
       { name: 'Discrepancy', pathParent: '/hk/overview' },
       { name: 'Lost And Found', pathParent: '/hk/overview' },
-      { name: 'Guest Preference List', pathParent: '/hk/overview' },
+      {
+        name: 'Guest Preference List',
+        pathParent: '/hk/guest-preference-list',
+      },
       { name: 'Trace', pathParent: '/hk/overview' },
     ],
     title: 'Housekeeping',
@@ -246,9 +283,50 @@ export const SUBMODULES: Pages = {
       { name: 'Room Plan', pathParent: '/fr/reservation' },
       { name: 'Floor Plan', pathParent: '/fr/reservation' },
       { name: 'Group Check-in', pathParent: '/fr/reservation' },
+      { name: 'Confirmation Letter', pathParent: '/fr/reservation' },
+      { name: 'Memo Room Number', pathParent: '/fr/reservation' },
+      { name: 'Guest Preference', pathParent: '/fr/reservation' },
+      { name: 'Reservation Deposit', pathParent: '/fr/reservation' },
+      { name: 'Room Revenue Breakdown', pathParent: '/fr/reservation' },
+      { name: 'Individual Check-out', pathParent: '/fr/reservation' },
+      { name: 'Group Check-out', pathParent: '/fr/reservation' },
+      { name: 'Discrepancy', pathParent: '/fr/reservation' },
+      { name: 'Trace', pathParent: '/fr/reservation' },
+      {
+        name: 'Telephone Operator In-house Guest',
+        pathParent: '/fr/reservation',
+      },
     ],
     title: 'Front Office Reception',
-    reports: [],
+    reports: [
+      {
+        name: 'Available Room',
+        keyword: 'FO Reception',
+        pathParent: '/fr/reservation',
+      },
+    ],
+    extraPages: [
+      {
+        name: 'Guest Profile - View Rates',
+        appendPath: '/:id',
+        pathParent: '/fr/guest-profile',
+      },
+      {
+        name: 'Manage Reservation',
+        appendPath: '/:id',
+        pathParent: '/fr/guest-profile',
+      },
+      {
+        name: 'Guest Profile - History',
+        appendPath: '/:id',
+        pathParent: '/fr/guest-profile',
+      },
+      {
+        name: 'View Allotment',
+        appendPath: '/:id',
+        pathParent: '/fr/guest-profile',
+      },
+    ],
   },
   FA: {
     routes: [
@@ -383,14 +461,14 @@ export const SUBMODULES: Pages = {
         name: 'TO Telephone Operator',
         keyword: 'Telephone Operator',
         pathParent: '/',
-      }
+      },
     ],
   },
   INV: {
     routes: [
       {
         name: 'Reorg-SOH',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Journal',
@@ -402,90 +480,194 @@ export const SUBMODULES: Pages = {
       },
       {
         name: 'Incoming Journalizing',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Outgoing Journalizing',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Outlet Compliment Journalizing',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Store Requisition',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Recipe',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Stock Item',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
-        name: 'Stored withPO',
-        pathParent: '/'
+        name: 'Stored With PO',
+        pathParent: '/',
       },
       {
         name: 'Incoming Stock',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
-        name: 'Stored with outPO',
-        pathParent: '/'
+        name: 'Stored Without PO',
+        pathParent: '/',
       },
       {
-        name: 'Incoming StockoutPO',
-        pathParent: '/'
+        name: 'Incoming Stockout PO',
+        pathParent: '/',
       },
       {
-        name: 'Issued withPO',
-        pathParent: '/'
+        name: 'Issued With PO',
+        pathParent: '/',
       },
       {
-        name: 'Issued withoutPO',
-        pathParent: '/'
+        name: 'Issued Without PO',
+        pathParent: '/',
       },
       {
         name: 'Incoming StockIssuedwithoutPO',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
-        name: 'Stored withDML',
-        pathParent: '/'
+        name: 'Stored With DML',
+        pathParent: '/',
       },
       {
-        name: 'Issued withDML',
-        pathParent: '/'
+        name: 'Issued With DML',
+        pathParent: '/',
       },
       {
         name: 'Inter Kitchen Transfer',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Stock Item Transform',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Inter Store Transfer',
-        pathParent: '/'
+        pathParent: '/',
       },
       {
         name: 'Issuing',
-        pathParent: '/'
+        pathParent: '/',
       },
-
     ],
-    title: 'Reorg-SOH',
+    title: 'Inventory',
     reports: [
       {
-        name: 'INV Inventory',
+        name: 'Stock On Hand',
         keyword: 'Inventory',
-        pathParent: '/'
-      }
-    ]
+        pathParent: '/',
+      },
+      {
+        name: 'Slow Moving Stock On Hand',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Incoming',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Cancelled Incoming',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Monthly Incoming',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Yearly Issuing',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Yearly Incoming',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Meal Coupon',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'FB Outlet Flash',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'FB Reconciliation',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Material Reconciliation',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Adjustment Result',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Minimum Stock On Hand',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Maximum Stock On Hand',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Incoming Price Discrepancy',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Moving Stock',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'FB Flash',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'FB Outlet Reconciliation',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Monthly Inter-store Transfer',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Detail Moving Stock',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Cancelled Issuing',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+      {
+        name: 'Incoming Return',
+        keyword: 'Inventory',
+        pathParent: '/inv/report/stock-on-hand',
+      },
+    ],
   },
   GC: {
     routes: [
@@ -518,6 +700,128 @@ export const SUBMODULES: Pages = {
         name: 'Summary Cashier',
         keyword: 'General-Cashier',
         pathParent: '/',
+      },
+    ],
+  },
+  IA: {
+    routes: [],
+    title: 'Income Audit Report',
+    reports: [
+      {
+        name: 'Outstanding Folio',
+        keyword: 'Income Audit',
+        pathParent: '/',
+      },
+      {
+        name: 'Fo Transaction',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'FO Transaction Per User',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'FO Payment Per User',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'FO Cancellation',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Outlet Turnover',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Cashier Summary',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Guest Ledger',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Today Departed Guest',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Over Credit Limit',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Departed Unbalance Guest',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Daily Report',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+      {
+        name: 'Room Revenue Breakdown',
+        keyword: 'Income Audit',
+        pathParent: '/ia/report/outstanding-folio',
+      },
+    ],
+  },
+  NA: {
+    routes: [],
+    title: 'Night Audit',
+    reports: [
+      {
+        name: 'Night Audit',
+        keyword: 'Night Audit',
+        pathParent: '/',
+      },
+      {
+        name: 'Fo Transaction',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Outstanding Folio',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Breakfast',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Occupied Table',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Outlet Turnover',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Opened Master bill',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Check In-house Guest Profile',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
+      },
+      {
+        name: 'Competitor Statistic Entry',
+        keyword: 'Night Audit',
+        pathParent: '/na/report/night-audit',
       },
     ],
   },
@@ -606,12 +910,12 @@ export const SUBMODULES: Pages = {
         pathParent: '/ou/menu',
       },
       {
-        name: 'Article Transaction',
+        name: 'Actual And Recipe Cost',
         keyword: 'Outlet',
         pathParent: '/ou/menu',
       },
       {
-        name: 'Actual And RecipeCost',
+        name: 'Outlet Sales And Cost',
         keyword: 'Outlet',
         pathParent: '/ou/menu',
       },
@@ -626,6 +930,134 @@ export const SUBMODULES: Pages = {
         pathParent: '/ou/menu',
       },
     ],
-    
+  },
+  ST: {
+    routes: [
+      {
+        name: 'Daily Report Setup',
+        pathParent: '/',
+      },
+      {
+        name: 'Banquet',
+        pathParent: '/',
+      },
+    ],
+    title: 'System Setting',
+    reports: [
+      {
+        name: 'Room Meeting Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Table Style Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Room Table Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Source Of Booking Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Departement Instruction Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Default Intruction Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Masterplan Status Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Masterplan Type Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Market Segment Group Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Market Segment Code Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Reservation Type Setup',
+        keyword: 'System Setting',
+        pathParent: '/st/banquet',
+      },
+      {
+        name: 'Catering Setup',
+        keyword: 'System Setting',
+        pathParent: '/daily-report-setup',
+      },
+      {
+        name: 'Event Package Setup',
+        keyword: 'System Setting',
+        pathParent: '/daily-report-setup',
+      },
+    ],
+  },
+  SC: {
+    routes: [
+      {
+        name: 'Master Plan',
+        pathParent: '/',
+      },
+      {
+        name: 'Sales Activity',
+        pathParent: '/',
+      },
+      {
+        name: 'Banquet Plan',
+        pathParent: '/',
+      },
+    ],
+    title: 'Banquet Report',
+    reports: [
+      {
+        name: 'Close Masterplan',
+        keyword: 'Banquet Report',
+        pathParent: '/',
+      },
+      {
+        name: 'Cancel Masterplan',
+        keyword: 'Banquet Report',
+        pathParent: '/',
+      },
+      {
+        name: 'Forecast By Revenue',
+        keyword: 'Banquet Report',
+        pathParent: '/test',
+      },
+      {
+        name: 'Forecast By Event Type',
+        keyword: 'Banquet Report',
+        pathParent: '/test',
+      },
+      {
+        name: 'Banquet Deposit List',
+        keyword: 'Banquet Report',
+        pathParent: '/test',
+      },
+      {
+        name: 'Close Activity List',
+        keyword: 'Banquet Report',
+        pathParent: '/test',
+      },
+    ],
   },
 };

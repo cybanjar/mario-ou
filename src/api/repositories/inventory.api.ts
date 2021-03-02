@@ -6,7 +6,8 @@ const VHP_AR = 'vhpAR'
 export interface InventoryEndpoint {
     FetchAPIINV: any,
     FetchCommon: any,
-    FetchAPIAR: any
+    FetchAPIAR: any,
+    addRecipePrepare: any,
 }
 
 export default (doFetch: DoRequest): InventoryEndpoint => ({
@@ -20,6 +21,10 @@ export default (doFetch: DoRequest): InventoryEndpoint => ({
     ),
     FetchAPIAR: (api, body) =>
     doFetch({ url: `${VHP_AR}/${api}`, body }).then(
+        ([, res]) => res
+    ),
+    addRecipePrepare: () =>
+    doFetch({ url: `${INV_URL}/addRecipePrepare`}).then(
         ([, res]) => res
     ),
 

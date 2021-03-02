@@ -10,7 +10,7 @@
       <div>
         <STable
           :loading="table.isFetching"
-          :columns="tableHeaders"
+          :columns="ResTableHeaders"
           :data="table.data"
           :rows-per-page-options="[10, 13, 16]"
           :pagination.sync="table.pagination"
@@ -29,7 +29,7 @@ import {
   toRefs,
   onMounted,
 } from '@vue/composition-api';
-import { tableHeaders } from './tables/reportDepartedUnbalanceGuest.table';
+import { ResTableHeaders } from './tables/Report/reportDepartedUnbalanceGuest.table';
 
 export default defineComponent({
   setup(props, { root: { $api } }) {
@@ -57,7 +57,7 @@ export default defineComponent({
     });
 
     return {
-      tableHeaders,
+      ResTableHeaders,
       ...toRefs(state),
     };
   },

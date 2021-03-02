@@ -2,16 +2,23 @@ import { TableHeader } from '~/components/VhpUI/typings';
 import {fromStore, articelNumber} from '../utils/Params.InterStoreTf'
 export const tableHeaders: TableHeader[] = [
     {
-      label: 'St',
-      field: 'st',
-      name: 'st',
+      label: 'From Store',
+      field: 'fs',
+      name: 'fs',
+      align: 'left',
+      sortable: false,
+    },
+    {
+      label: 'To Store',
+      field: 'ts',
+      name: 'ts',
       align: 'left',
       sortable: false,
     },
     {
       label: 'Articel Number',
-      field: 'artNumber',
-      name: 'artNumber',
+      field: 'artNumbers',
+      name: 'artNumbers',
       align: 'left',
       sortable: false,
     },
@@ -75,24 +82,27 @@ export const use_input = [
       right: '20px',
       value: '',
       disable: true,
-  },
-  {
+    },
+    {
       name: 'From Store',
       width: '145px',
       right: '20px',
       value: '',
       option: fromStore,
-      onClikc: '1'
-  },
-  {
+      onClikc: '1',
+      disable: false,
+    },
+    {
       name: 'To Store',
       width: '145px',
       right: '20px',
       option: fromStore,
-      value: ''
+      value: '',
+      disable: true,
+      onClikc: '3'
   },
   {
-      name: 'Articel Name',
+      name: 'Articles Name',
       width: '145px',
       right: '20px',
       value: '',

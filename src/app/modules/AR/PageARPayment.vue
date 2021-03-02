@@ -2,54 +2,62 @@
   <q-page>
     <q-drawer :value="true" side="left" bordered :width="250" persistent>
       <SearchPayment
-        @onSearch="onSearch"
-        @onRemark="showDialogRemarkComment"
-        :selected-remark="selectedRemark"
-        :selected-row="selectedRow"
+        :payment="paymentSelected"
+        :total-balance="totalBalance"
+        @search="onSearch"
+        @remark="dialogRemark.show"
       ></SearchPayment>
     </q-drawer>
     <div class="q-pa-lg">
-      <div class="q-mb-md">
-        <q-btn flat round class="q-mr-lg" @click="getData">
-          <img :src="require('~/app/icons/Icon-Refresh.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round class="q-mr-lg">
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="30" />
-        </q-btn>
-        <q-btn flat round class="q-mr-lg" @click="showAddPaymentDialog(true)">
-          <img :src="require('~/app/icons/Icon-Pay.svg')" height="30" />
-        </q-btn>
-      </div>
+      <SharedModuleActions
+        :actions="[
+          {
+            name: 'Pay',
+          },
+        ]"
+        @onActions="mapActions"
+      />
       <TablePayment
-        :payment-list="paymentList"
-        :is-fetching="isFetching"
-        @onRowClick="onRowClick"
-        @onSelection="onSelection"
+        :data="tablePrep.result"
+        :loading="tablePrep.data.isLoading"
+        @update:selected="selectData"
       />
     </div>
-    <DialogRemarkDebt
-      :show="isUpdateComment"
-      :remark="selectedRemark"
-      @submit="remarkComment"
-      @hide="showDialogRemarkComment(false)"
-    ></DialogRemarkDebt>
+    <template v-if="paymentSelected.length > 0">
+      <DialogRemarkDebt
+        :value="dialogRemark.status"
+        :payment="paymentSelected"
+        @submit="remarkComment"
+        @hide="dialogRemark.hide"
+      ></DialogRemarkDebt>
+    </template>
     <DialogAddPayment
-      :v-if="isAddPayment"
-      :show="isAddPayment"
-      :select-depts="[paymentList[0]]"
-      @hide="isAddPayment(false)"
+      :data-selected="paymentSelected"
+      :debit-article="requestData.artnr"
+      :value="dialogPayment.status"
+      :total-balance="totalBalance"
+      @hide="dialogPayment.hide"
     ></DialogAddPayment>
   </q-page>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from '@vue/composition-api';
 import {
-  ResPaymentDebtPayList,
-  ReqPaymentDebtPayList,
-} from './models/payment.model';
+  defineComponent,
+  reactive,
+  toRefs,
+  ref,
+  computed,
+} from '@vue/composition-api';
+import { ResPaymentDebtPayList } from './models/payment.model';
 import { ResDebitor } from './models/debitor.model';
+import { usePrepare } from '~/app/shared/compositions/use-prepare.composition';
+import { reformPaymentData } from './utils/reformData';
+import { useDialog } from '~/app/shared/compositions/use-dialog.composition';
 export default defineComponent({
   setup(_, { root: { $api, $q } }) {
+    const dialogRemark = useDialog();
+    const dialogPayment = useDialog();
+    const paymentSelected = ref([]);
     const state = reactive({
       isFetching: false,
       paymentList: [] as (ResPaymentDebtPayList & { key: number })[],
@@ -57,58 +65,56 @@ export default defineComponent({
       selectedRow: [] as ResPaymentDebtPayList[],
     });
 
+    const { result: isDisable } = usePrepare(
+      true,
+      () =>
+        $api.common.checkPermission({
+          arrayNr: '15',
+          expectedNr: '2',
+        }),
+      (tempData) => {
+        if (tempData.zugriff !== 'true') {
+          $q.notify({
+            type: 'negative',
+            message: tempData.messStr,
+          });
+        }
+      },
+      (tempData) => tempData.zugriff !== 'true',
+      true
+    );
+
     const isUpdateComment = ref(false);
-    const isAddPayment = ref(false);
+    const requestData = ref({
+      artnr: undefined,
+    });
 
-    let requestData: ReqPaymentDebtPayList;
+    const totalBalance = computed(() =>
+      paymentSelected.value.reduce((t, s) => (t += s.balanceOri), 0)
+    );
 
-    async function getData() {
-      if (requestData) {
-        state.isFetching = true;
-        const data = await $api.accountReceivable.getPaymentDebtPayList(
-          requestData
-        );
-        state.paymentList = data.map((item, index) => {
-          const itemWithKey: ResPaymentDebtPayList & { key: number } = {
-            key: index,
-            ...item,
-          };
-          return itemWithKey;
-        });
+    const tablePrep = usePrepare(
+      false && !isDisable.value,
+      (requestData) =>
+        $api.accountReceivable.getPaymentDebtPayList(requestData),
+      undefined,
+      (tempData) => reformPaymentData(tempData),
+      []
+    );
 
-        state.selectedRemark = '';
-        state.isFetching = false;
+    function onSearch(param) {
+      requestData.value = param;
+      fetchData();
+    }
+
+    function fetchData() {
+      if (requestData.value) {
+        tablePrep.refetch(requestData.value);
       }
     }
 
-    function onSearch({
-      article,
-      balance,
-      billingNumber,
-      billingReceiver,
-      byDate,
-    }) {
-      requestData = {
-        artSelected: 0,
-        artnr: article,
-        billNr: billingNumber,
-        tempArt2: article,
-        billDate: byDate,
-        billName: ' ',
-        toName: billingReceiver,
-        billSaldo: balance,
-      };
-
-      getData();
-    }
-
-    function showDialogRemarkComment(status, remark) {
-      state.selectedRemark = remark;
-      isUpdateComment.value = status;
-    }
-
     async function remarkComment(remark: string) {
-      const selectDept = state.selectedRow[0];
+      const selectDept: ResPaymentDebtPayList = paymentSelected.value[0];
       const debitor = await $api.accountReceivable.getReadDebitor({
         caseType: '7',
         artNo: selectDept['ar-recid'],
@@ -116,6 +122,8 @@ export default defineComponent({
 
       const updateData: ResDebitor = {
         ...debitor,
+        'tb-recid': selectDept.recid,
+        rechnr: selectDept.referenceNumber,
         vesrcod: remark,
       };
 
@@ -125,13 +133,15 @@ export default defineComponent({
       });
 
       if (response.outputOkFlag === true && response.successFlag === true) {
-        showDialogRemarkComment(false, remark);
         $q.notify({
-          type: 'warning',
+          type: 'positive',
           message: 'Remark Has Been Updated',
           timeout: 2000,
+          onDismiss: () => {
+            dialogRemark.hide();
+            tablePrep.refetch();
+          },
         });
-        getData();
       } else {
         $q.notify({
           type: 'negative',
@@ -145,34 +155,48 @@ export default defineComponent({
     }
 
     function onSelection(selectedRow: ResPaymentDebtPayList[]) {
-      state.selectedRow = selectedRow.map(({ selected, ...rest }) => ({
-        selected: true,
-        ...rest,
-      }));
+      state.selectedRow = selectedRow;
     }
 
-    function showAddPaymentDialog(status) {
-      if (state.selectedRow.length < 1) {
-        $q.notify({
-          type: 'negative',
-          message: 'Please Select a Row',
-        });
-        return;
+    function selectData({ selected }) {
+      paymentSelected.value = selected;
+    }
+
+    function mapActions(name) {
+      switch (name) {
+        case 'onRefresh':
+          tablePrep.refetch();
+          break;
+        case 'onPay':
+          if (0 >= totalBalance.value) {
+            $q.notify({
+              type: 'warning',
+              message: 'Select data to add Payment',
+            });
+          } else {
+            dialogPayment.show();
+          }
+          break;
+        default:
+          break;
       }
-      isAddPayment.value = status;
     }
 
     return {
       ...toRefs(state),
-      getData,
-      showAddPaymentDialog,
       isUpdateComment,
-      showDialogRemarkComment,
       onSearch,
       onRowClick,
+      tablePrep,
       onSelection,
       remarkComment,
-      isAddPayment,
+      selectData,
+      dialogRemark,
+      requestData,
+      dialogPayment,
+      paymentSelected,
+      mapActions,
+      totalBalance,
     };
   },
   components: {
@@ -180,6 +204,8 @@ export default defineComponent({
     TablePayment: () => import('./components/TablePayment.vue'),
     DialogRemarkDebt: () => import('./components/DialogRemarkDebt.vue'),
     DialogAddPayment: () => import('./components/DialogAddPayment.vue'),
+    SharedModuleActions: () =>
+      import('../../shared/components/SharedModuleActions.vue'),
   },
 });
 </script>

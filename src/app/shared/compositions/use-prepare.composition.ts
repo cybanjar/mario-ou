@@ -5,29 +5,30 @@ export function usePrepare<T = any, K = any>(
   request: (...args) => Promise<T>,
   callback?: (data: UnwrapRef<T>) => void,
   transform?: (data: UnwrapRef<T>) => K,
-  initResult?: T
+  initResult?: K extends undefined ? T : K
 ) {
   const data = reactive({
     raw: initResult,
-    isLoading: first,
+    isLoading: false,
+    isFetch: false,
     isError: false,
     errorMsg: '',
   });
 
   const result = computed(() =>
     transform && !(data.isLoading || data.isError)
-      ? transform(data.raw)
+      ? transform(data.raw as UnwrapRef<T>)
       : data.raw
   );
 
   function requestIn(...args) {
-    data.raw = initResult as UnwrapRef<T>;
+    data.raw = initResult as UnwrapRef<K extends undefined ? T : K>;
     data.isLoading = true;
-    request(...args)
+    return request(...args)
       .then((response) => {
         data.isLoading = false;
-        data.raw = response as UnwrapRef<T>;
-        callback && callback(data.raw);
+        data.raw = response as UnwrapRef<K extends undefined ? T : K>;
+        callback && callback(data.raw as UnwrapRef<T>);
         data.isError = false;
       })
       .catch((e) => {

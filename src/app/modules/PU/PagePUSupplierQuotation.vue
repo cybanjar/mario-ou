@@ -1,61 +1,140 @@
 <template>
-  <SModulePage @onActions="onActions">
+  <SModulePage
+    @onActions="onActions"
+    :actions="[{ name: 'Add', position: 'prefix' }]"
+  >
     <template #filters>
       <SearchPUSupplierQuotation
-        :suppliers="suppliers"
-        :is-fetching="isFetching"
+        :filters="filterOptions"
+        :is-preparing="isPreparing"
+        @search="onSearch"
       />
     </template>
 
     <template #table>
-      <!-- <TableGLChartOfAccounts
-        :is-fetching="isFetching"
-        :rows="tableColumns"
-        :filters="filters"
-        @onRowClick="onRowClick"
-        @onShowBudget="onShowBudget"
-      /> -->
+      <TablePUSupplierQuotation
+        :is-searching="isSearching"
+        :rows="tableRows"
+        @modified="onModified"
+        @delete="onDelete"
+      />
     </template>
 
-    <!-- <DialogGLChartOfAccounts
+    <!-- <DialogPUSupplierQuotation
       :dialog="dialog"
-      @onDialog="onDialog"
-      :account-id="accountId"
     /> -->
   </SModulePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-import { usePagePUSupplierQuotation } from './functions/usePagePUSupplierQuotation';
+import { defineComponent, toRefs, reactive, ref } from '@vue/composition-api';
+import { date } from 'quasar';
 
 export default defineComponent({
   components: {
     SearchPUSupplierQuotation: () =>
       import('./components/SearchPUSupplierQuotation.vue'),
+    TablePUSupplierQuotation: () =>
+      import('./components/TablePUSupplierQuotation.vue'),
   },
   setup(_, { root: { $api } }) {
-    // Fetch columns
-    // async function fetchColumns() {
-    //   state.isFetching = true;
+    function onActions(actions) {
+      switch (actions) {
+        case 'onAdd':
+        // onAddNewPO();
+        case 'onRefresh':
+          fetchSQ();
+          break;
+        case 'onPrint':
+          // TODO: put print logic here
+          break;
+        default:
+          break;
+      }
+    }
 
-    //   const [resChart, resMain, resTypes, resDepart] = await Promise.all([
-    //     $api.generalLedger.getChartOfAccount(),
-    //     $api.generalLedger.getGLMainAccount(),
-    //     $api.generalLedger.getGLFSType(),
-    //     $api.generalLedger.getGLDeptAccount(),
-    //   ]);
-    //   state.tableColumns = resChart;
-    //   state.filterOptions.mains = mapWithBezeich(resMain, 'code');
-    //   state.filterOptions.categories = mapWithBezeich(resTypes, 'nr');
-    //   state.filterOptions.departments = mapWithBezeich(resDepart, 'nr');
+    const state = reactive({
+      isPreparing: true,
+      isSearching: false,
+      filterOptions: {
+        suppliers: [],
+        articles: [],
+      },
+      tableRows: [],
+    });
 
-    //   state.isFetching = false;
-    // }
-    // fetchColumns();
+    (async function () {
+      const [resSupp, resArt] = await Promise.all([
+        $api.common.selectSupplier(),
+        $api.common.getAllArtikel(),
+      ]);
+
+      state.filterOptions.suppliers = [
+        { value: 'all', label: 'All' },
+        ...resSupp.map((supplier) => {
+          return {
+            label: supplier.firma,
+            value: supplier['lief-nr'],
+          };
+        }),
+      ];
+
+      state.filterOptions.articles = resArt;
+
+      state.isPreparing = false;
+    })();
+
+    const searches = ref<any>({});
+
+    function onSearch(filters) {
+      searches.value = filters;
+      fetchSQ();
+    }
+
+    async function fetchSQ() {
+      state.isSearching = true;
+
+      const supplier = searches.value.supplier.value;
+
+      const requestData = {
+        artNo: searches.value.article.artnr,
+        supNo: supplier === 'all' ? '' : supplier,
+        docuNr: searches.value.docNum,
+      };
+
+      state.tableRows = await $api.purchasing.quoteListPrepare(requestData);
+
+      state.isSearching = false;
+    }
+
+    function onModified({ item, selectedIdx }) {
+      const newItem = {
+        ...item,
+        activeFlag: item.activeflag,
+        ['from-date']: date.formatDate(
+          date.extractDate(item['from-date'], 'YY/MM/DD'),
+          'YYYY-MM-DD'
+        ),
+        ['to-Date']: date.formatDate(
+          date.extractDate(item['to-date'], 'YY/MM/DD'),
+          'YYYY-MM-DD'
+        ),
+      };
+      state.tableRows.splice(selectedIdx, 1, {
+        ...newItem,
+      });
+    }
+
+    function onDelete(idx) {
+      state.tableRows.splice(idx, 1);
+    }
 
     return {
-      ...usePagePUSupplierQuotation($api),
+      ...toRefs(state),
+      onActions,
+      onSearch,
+      onModified,
+      onDelete,
     };
   },
 });

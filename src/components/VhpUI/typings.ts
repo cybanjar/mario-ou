@@ -2,10 +2,11 @@ export type TableHeader<Base = any> = {
   [Key in keyof Base]: {
     name?: string;
     label?: string;
-    field: Key | ((row: Base) => void);
+    field?: Key | ((row: Base) => void);
     required?: boolean;
     align?: 'left' | 'right' | 'center' | 'justify';
     sortable?: boolean;
+    group?: string;
     sort?: (a: Base[Key], b: Base[Key], rowA: Base, rowB: Base) => number;
     format?: (val: Base[Key], row: Base) => void;
     style?: string;

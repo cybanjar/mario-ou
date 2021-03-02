@@ -7,19 +7,14 @@
           multiple
           use-chips
           stack-label
-          label-text="User Name"/>
-        <v-date-picker 
-          v-model="search.date"  
-          :popover="{ visibility: 'click' }">
-          <SInput
-          label-text="Billing Date"
-          slot-scope="{ inputProps }"
-          readonly
-          v-bind="inputProps"
-          clearable
-          placeholder="Select Date"
+          label-text="User Name"
         />
-        </v-date-picker>
+
+        <DateInput
+          label-text="Billing Date"
+          v-model="search.date"
+        />
+
         <SSelect :options="oprtions" v-model="Shift" label-text="Shift"/>
         <q-checkbox 
           style="marginLeft: -8px" 
@@ -49,12 +44,17 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from '@vue/composition-api';
-import { DatePicker } from 'v-calendar';
+import DateInput from '~/app/modules/FR/components/common/DateInput.vue';
 
 export default defineComponent({
+  components: {
+    DateInput,
+  },
+
   props: {
     search: {} as any
   },
+
   setup(_, {emit}){
       const state = reactive({
           cretedid: [],
@@ -98,9 +98,6 @@ export default defineComponent({
           onSearch,
           Summary
       }
-  },
-  components: {
-    'v-date-picker': DatePicker,
   },
 })
 </script>

@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="dialogModel">
-    <q-card style="width: 500px;">
+    <q-card style="min-width: 1100px;">
       <q-toolbar>
         <q-toolbar-title class="text-white text-weight-medium">{{title}}</q-toolbar-title>
       </q-toolbar>
@@ -79,7 +79,7 @@ export default defineComponent({
                 return false;
               }
               state.dataDetail = [];
-              const charts = tempdata.hjBuff['hj-buff'];
+              const charts = tempdata.hjBuff['hj-buff'];              
 
               for (let i=0; i<charts.length; i++) {
                   // dataTablechartsDetail[i]["epreis"] = this.formatterMoney(dataTableDetail[i]["epreis"]);
@@ -120,13 +120,14 @@ export default defineComponent({
 
     const tableHeaders = [
       {
-            label: "ArtNo",
+            label: "Article Number",
             field: "artnr",
             align: "right",
         },{
-            label: "Qty", 
+            label: "Quantity", 
             field: "anzahl",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Description", 
             field: "bezeich",
@@ -135,12 +136,14 @@ export default defineComponent({
             label: "Price", 
             field: "epreis",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
         }, {
             label: "Balance", 
             field: "betrag",
             align: "right",
+            format: (val) => (val == 0) ? '' : formatThousands(val),
             },{
-            label: "No", 
+            label: "Number", 
             field: "waehrungsnr",
             align: "center",
         }, {

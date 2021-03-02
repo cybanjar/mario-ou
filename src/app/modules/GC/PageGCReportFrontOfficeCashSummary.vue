@@ -12,7 +12,7 @@
           <img :src="require('~/app/icons/Icon-Refresh.svg')" height="25" />
         </q-btn>
         <q-btn flat round>
-          <img :src="require('~/app/icons/Icon-Print.svg')" height="25" />
+          <img :src="require('~/app/icons/Icon-Print.svg')" height="25" @click="doPrint" />
         </q-btn>
       </div>
       <STable
@@ -23,6 +23,7 @@
         class="table-accounting-date"
         flat bordered
         :hide-bottom="hide_bottom"
+        id="printMe"
       />
       <STable
         v-else
@@ -47,6 +48,8 @@ import {
 import {tableHeaders, columns}  from './tables/ReportFrontOfficeCashSummary.table'
 import {data_map, data_table} from './utils/params.reportFrontOffice'
 import {date} from 'quasar'
+import {PrintJs} from '~/app/helpers/PrintJs'
+
 export default defineComponent({
     setup(_, {root: {$api}}){
       let fromDate, summary1, cashArt
@@ -181,12 +184,19 @@ export default defineComponent({
           })
         }
       }
+
+    function doPrint() {
+      if (state.data.length !== 0) {
+        PrintJs(state.data, tableHeaders, 'Front Office Cash Summary')
+      }
+    }
       return {
         ...toRefs(state),
           tableHeaders,
           onSearch,
           Summary,
-          columns
+          columns,
+          doPrint
       }
     },
     components: {

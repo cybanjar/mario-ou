@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="show" @hide="hide">
+  <q-dialog v-bind="$attrs" v-on="$listeners">
     <div class="dialog">
       <q-form @submit="submit">
         <div class="dialog__header">
@@ -25,24 +25,27 @@
   </q-dialog>
 </template>
 <script lang="ts">
-import { defineComponent, toRef } from '@vue/composition-api';
+import { defineComponent, ref } from '@vue/composition-api';
+import { ResPaymentDebtPayList } from '../models/payment.model';
 export default defineComponent({
+  inheritAttrs: true,
   props: {
-    show: { type: Boolean, required: true },
-    remark: { type: String },
+    payment: {
+      type: Array as () => Array<ResPaymentDebtPayList>,
+      required: true,
+    },
   },
-  setup(props, { emit }) {
-    const hide = () => emit('hide');
-    const fieldComment = toRef(props, 'remark');
+  setup(props, { emit, listeners }) {
+    const fieldComment = ref(props.payment[0].remark);
 
     function submit() {
       emit('submit', fieldComment.value);
+      // listeners?.hide();
     }
 
     return {
       fieldComment,
       submit,
-      hide,
     };
   },
 });

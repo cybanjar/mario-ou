@@ -1,0 +1,14 @@
+/* Styling for Disabled Checkbox */
+.q-checkbox.disabled {
+  .q-checkbox__inner {
+    color: #c4c4c4;
+  }
+
+  .q-checkbox__bg {
+    background: currentColor;
+  }
+
+  .q-checkbox__svg {
+    color: #c4c4c4;
+  }
+}

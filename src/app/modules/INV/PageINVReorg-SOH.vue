@@ -1,43 +1,55 @@
 <template>
     <div>
-    <q-dialog
-      v-model="small"
-      persistent
-    >
-      <q-card style="width: 300px; height: 220px">
-        <q-card-section>
-          <div>Type of Inventory Main Group</div>
-        </q-card-section>
+        <q-dialog v-model="alert" persistent>
+          <q-card>
+            <q-card-section style="marginTop: 20px" class="q-pt-none">
+              This program will reorganize current inventory onhands. Press OK-button to confirm Or Press cancel-button to cancel
+            </q-card-section>
+            <q-separator/>  
+            <q-card-actions align="right">
+              <q-btn @click="cancel" outline size="sm" style="height: 25px" label="CANCEL" v-close-popup color="primary" />
+              <q-btn @click="onClickParrent" size="sm" style="height: 25px" label="OK" color="primary" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+        <q-dialog
+          v-model="small"
+          persistent
+        >
+          <q-card style="width: 300px; height: 220px">
+            <q-card-section>
+              <div>Type of Inventory Main Group</div>
+            </q-card-section>
 
-        <q-card-section class="q-pt-none">
-            <q-card flat bordered class="my-card">
-                <q-option-group
-                v-model="group"
-                :options="options"
-                color="primary"
-                size="sm"
-                />
-            </q-card>
+            <q-card-section class="q-pt-none">
+                <q-card flat bordered class="my-card">
+                    <q-option-group
+                    v-model="group"
+                    :options="options"
+                    color="primary"
+                    size="sm"
+                    />
+                </q-card>
 
-        </q-card-section>
+            </q-card-section>
 
-        <q-separator/>
+            <q-separator/>
 
-        <q-card-actions align="right" class="bg-white text-teal">
-          <q-btn @click="cancel" outline size="sm" style="height: 25px" label="CANCEL" v-close-popup color="primary" />
-          <q-btn @click="onClick" size="sm" style="height: 25px" label="OK" color="primary" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="loading">
-        <div class="container">
-            <div class="loading-br">
-                <div class="percentage" :style="{'width' : percentage + '%' }">
+            <q-card-actions align="right" class="bg-white text-teal">
+              <q-btn @click="cancel" outline size="sm" style="height: 25px" label="CANCEL" v-close-popup color="primary" />
+              <q-btn @click="onClick" size="sm" style="height: 25px" label="OK" color="primary" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+        <q-dialog v-model="loading">
+            <div class="container">
+                <div class="loading-br">
+                    <div class="percentage" :style="{'width' : percentage + '%' }">
+                    </div>
                 </div>
             </div>
-        </div>
-        <h5 class="number" :style="{'color' : colorNumber}">{{percentage+'%'}}</h5>
-    </q-dialog>
+            <h5 class="number" :style="{'color' : colorNumber}">{{percentage+'%'}}</h5>
+        </q-dialog>
     </div>
 </template>
 
@@ -47,10 +59,11 @@ import { paramsReorg } from './utils/params.inv'
 import { Notify } from 'quasar';
 
 export default defineComponent({
-    setup(_, { root: { $api } }) {
+    setup(_, { root: { $api }, root }) {
         const state = reactive({
-            small: true,
+            small: false,
             loading: false,
+            alert: true,
             group: 1,
             percentage: 0,
             data: '',
@@ -70,6 +83,12 @@ export default defineComponent({
                 }
             ]
         })
+
+    const NotifyCreate = (mess, col?, type?) => Notify
+      .create({
+          message: mess,
+          type: 'positive'
+    });
 
         // Fetch Api
         const FETCH_API = async (api) => {
@@ -136,17 +155,28 @@ export default defineComponent({
                             state.percentage += 1
                             if (state.percentage == 100) {
                                 FETCH_API('reorgMonhandUpdAverage')
-                                }
+                            }
                         } else {
                             clearInterval(interval)
                             state.small= false
                             state.loading = false
-                            window.history.back();
+                            // window.history.back();
+                            // root.$router.push('/inv/incoming-journalizing')
                         }
                     },100)
                 }
             } else {
                 alert('error')
+            }
+        })
+
+        watch(() => state.loading,
+        (loading) => {
+            if (!loading) {
+                NotifyCreate('Sukses')
+                setTimeout(() => {
+                    root.$router.push('/inv/incoming-journalizing')
+                },200)
             }
         })
 
@@ -156,15 +186,22 @@ export default defineComponent({
         FETCH_API('reorgMonhandInit')
         }
         const cancel = () => {
-            window.history.back();
+            // window.history.back();
+            root.$router.push('/inv/incoming-journalizing')
             state.small= false
             state.loading = false
+            state.alert = false
+        }
+        const onClickParrent = () => {
+            state.small = true
+            state.alert = false
         }
 
     return {
     ...toRefs(state),
     onClick,
-    cancel
+    cancel,
+    onClickParrent
     }
     }
 })

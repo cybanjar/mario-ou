@@ -4,40 +4,23 @@
     row-key="key"
     :columns="columns"
     v-on="$listeners"
-    :pagination="{ rowsPerPage: 10 }"
-    :rows-per-page-options="[10]"
+    virtual-scroll
+    :pagination.sync="pagination"
+    :rows-per-page-options="[0]"
+    fixed-header
   >
     <template v-slot:header="props">
-      <q-tr :props="props">
+      <q-tr :props="props" v-for="(space, index) in shape" :key="index">
         <q-th
-          v-for="col in props.cols.slice(0, 4)"
+          v-for="col in space"
           :key="col.name"
-          :rowspan="2"
-          :props="props"
-        >
-          {{ col.label }}
-        </q-th>
-        <th :colspan="3">Before</th>
-        <th :colspan="2">After</th>
-        <q-th
-          v-for="col in props.cols.slice(9, 11)"
-          :key="col.name"
-          :rowspan="2"
-          :props="props"
+          :rowspan="col.height"
+          :colspan="col.width"
+          :props="getProp(props.cols, col.name, props)"
         >
           {{ col.label }}
         </q-th>
       </q-tr>
-      <tr>
-        <q-th
-          v-for="col in props.cols.slice(4, 9)"
-          :key="col.name"
-          :rowspan="2"
-          :props="props"
-        >
-          {{ col.label }}
-        </q-th>
-      </tr>
     </template>
     <template #body-cell-actions="props">
       <q-td :props="props" class="fixed-col right">
@@ -55,34 +38,39 @@
   </STable>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from '@vue/composition-api';
-import { journalTransColumns } from '../table/journal-transaction.table';
+import { defineComponent, ref } from '@vue/composition-api';
 
 export default defineComponent({
   inheritAttrs: true,
   props: {
-    isFixed: { type: Boolean, required: false, default: false },
+    columns: { type: Array, required: false, default: [] },
+    shape: { type: Array, required: false, default: [] },
   },
   setup(prop, { emit }) {
-    const columns = computed(() => {
-      if (!prop.isFixed) {
-        return [
-          ...journalTransColumns,
-          {
-            field: 'actions',
-            name: 'actions',
-          },
-        ];
-      }
-      return journalTransColumns;
-    });
-
+    const pagination = ref();
     function emitDelete(data) {
       emit('delete', data);
     }
+
+    function getProp(params: any[], as, asa) {
+      const hasField = params.findIndex((a) => a.name === as);
+      return !!~hasField ? asa : undefined;
+    }
+
+    function findHeader(params: any, col: any[], selector: string) {
+      const item = col.find((s) => s.name === params);
+
+      return item !== undefined
+        ? item[selector]
+          ? item[selector]
+          : undefined
+        : params;
+    }
     return {
-      columns,
       emitDelete,
+      findHeader,
+      pagination,
+      getProp,
     };
   },
 });

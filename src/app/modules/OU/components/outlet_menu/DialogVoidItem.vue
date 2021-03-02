@@ -232,6 +232,7 @@ export default defineComponent({
           if (zuggrifval == "true") {
             props.dataSelectedVoidItem['prepareArticle']['betrag'] = props.dataSelectedVoidItem['betrag']
             props.dataSelectedVoidItem['prepareArticle']['qty'] = state.qty
+            state.data.dataPayment = state.qty;
             // emit('onDialogVoidItem', false, 'ok', props.dataSelectedVoidItem['prepareArticle']);
             emit('onDialogVoidItem', false, 'ok', state.data.dataPayment);
           } else {
@@ -386,10 +387,17 @@ export default defineComponent({
 
     // -- On Click Listener
     const onOkDialog = () => {
-      if (props.dataSelectedVoidItem['prepareArticle']['artart'] == 0) {
-        zuggriff(19, 2);
+      if (state.reason != '') {
+        if (props.dataSelectedVoidItem['prepareArticle']['artart'] == 0) {
+          zuggriff(19, 2);
+        } else {
+          zuggriff(20, 2);
+        }
       } else {
-        zuggriff(20, 2);
+        Notify.create({
+          message: 'Please select cancel reason',
+          color: 'red',
+        });
       }
     }
 
@@ -421,6 +429,7 @@ export default defineComponent({
       }
       props.dataSelectedVoidItem['prepareArticle']['cancelStr'] = dataRow['char1'];
       state.data.dataDetail = dataTable;
+      state.reason = dataRow['char1'];
     }
 
     const showKeyboardBill = (e) => {
@@ -430,7 +439,8 @@ export default defineComponent({
     }
 
     const checkQty = (qty) => {
-      // console.log(state.qty);
+      console.log(state.qty);
+      console.log(props.dataSelectedVoidItem['anzahl']);
       
       if (state.qty > props.dataSelectedVoidItem['anzahl']) {
         state.qty = 1;
@@ -475,7 +485,7 @@ export default defineComponent({
       }      
     }
 
-     const hideKeyboardBottom = () => {
+    const hideKeyboardBottom = () => {
       state.keyboardVisible = false;
     }
 

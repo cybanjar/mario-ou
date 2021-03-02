@@ -2,6 +2,8 @@
   <DialogJournalEdit
     v-bind="$attrs"
     v-on="$listeners"
+    :columns="columns"
+    :shape="shape"
     @setRecord="saveData"
     @delrecord="delRec"
   />
@@ -10,7 +12,8 @@
 import { defineComponent } from '@vue/composition-api';
 import { JournalTrans, TransTable } from '../../models/journal.model';
 import paramDataTrans from '../helpers/reformParam.helper';
-// import { reformSaveAddParam } from '../utils/reformParam';
+import { journalTransColumns, colShape } from '../tables/journal-edit.table';
+
 export default defineComponent({
   inheritAttrs: true,
   setup(_, { root: { $api, $q } }) {
@@ -64,6 +67,8 @@ export default defineComponent({
     return {
       saveData,
       delRec,
+      columns: journalTransColumns,
+      shape: colShape,
     };
   },
   components: {

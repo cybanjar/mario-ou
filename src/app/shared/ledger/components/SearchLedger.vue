@@ -1,33 +1,26 @@
 <template>
   <section class="mt-7">
-    <div v-if="loadingRef" class="q-pa-md text-center">
+    <div v-if="data.isLoading" class="q-pa-md text-center">
       <q-spinner color="primary" size="4em" :thickness="3" />
     </div>
 
     <template v-else>
       <div class="q-pa-md">
-        <SDateRange label-text="Date" v-model="form.date"></SDateRange>
-        <SSelect
-          emit-value
-          map-options
-          hide-bottom-space
+        <SDateRange :range.sync="range" />
+        <SelectFilter
+          option-value="value"
+          option-label="label"
           label-text="From"
           :options="actFromOptions"
-          v-model="form.from"
-          input-debounce="0"
-          @filter="actFromFilter"
+          v-model="from"
         />
 
-        <SSelect
-          emit-value
-          map-options
-          hide-bottom-space
+        <SelectFilter
+          option-value="value"
+          option-label="label"
           label-text="To"
           :options="actToOptions"
-          v-model="form.to"
-          use-input
-          input-debounce="0"
-          @filter="actToFilter"
+          v-model="to"
         />
       </div>
 
@@ -40,39 +33,32 @@
           hide-bottom-space
           label-text="Display"
           :options="searches.display"
-          v-model="form.display"
+          v-model="display"
         />
 
         <SSelect
           emit-value
           map-options
-          hide-bottom-space
           label-text="Dept"
-          v-if="form.display === Display.Dept"
+          v-if="display === Display.Dept"
           :options="deptOptions"
-          v-model="form.deptAccount"
-          use-input
-          input-debounce="0"
-          @filter="deptFilter"
+          v-model="deptAccount"
         />
 
         <SSelect
           emit-value
           map-options
-          hide-bottom-space
           label-text="Main"
-          v-if="form.display === Display.Main"
+          v-if="display === Display.Main"
           :options="mainOptions"
-          v-model="form.mainAccount"
-          use-input
-          input-debounce="0"
-          @filter="mainFilter"
+          v-model="mainAccount"
         />
 
         <SInput
           label-text="Number"
-          v-if="form.display === Display.RN"
-          v-model="form.number"
+          placeholder="Enter Reference Number"
+          v-if="display === Display.RN"
+          v-model="number"
         />
 
         <q-btn-toggle
@@ -90,15 +76,15 @@
 
         <q-checkbox
           v-if="hasModuleName([ModuleAbbr.GL])"
-          v-model="form.numberexcludeOther"
-          label="Exclude Other Dept"
+          v-model="excludeOther"
+          label="Exclude Other Department"
         />
         <q-checkbox
           v-if="hasModuleName([ModuleAbbr.AR, ModuleAbbr.AP])"
-          v-model="form.includeOther"
-          label="Include Other Dept"
+          v-model="includeOther"
+          label="Include Other Department"
         />
-        <q-checkbox v-model="form.summaryPerDate" label="Summary Per Date" />
+        <q-checkbox v-model="summaryPerDate" label="Summary Per Date" />
 
         <q-btn
           dense
@@ -129,19 +115,16 @@ import {
   defineComponent,
   toRefs,
   watch,
-  toRaw,
   ref,
+  reactive,
+  computed,
 } from '@vue/composition-api';
-import { formatThousands } from '~/app/helpers/numberFormat.helpers';
 import { ModuleAbbr } from '../../../constants/module.constant';
-import {
-  useLedgerParams,
-  LedgerParamType,
-} from '../compositions/use-ledger-params.composition';
 import { usePrepare } from '../../compositions/use-prepare.composition';
-import { useOption } from '../../compositions/use-option.composition';
 import { SortType } from '../tables/ledger.tables';
 import { formatterMoney } from '../../../helpers/formatterMoney.helper';
+import { mapWithBezeich } from '~/app/helpers/mapSelectItems.helpers';
+import { date } from 'quasar';
 
 enum Display {
   All = 2,
@@ -150,57 +133,108 @@ enum Display {
   RN = 4,
 }
 
+enum LedgerParamType {
+  GL = 'gl',
+  NonGL = 'non-gl',
+}
+
+type State = {
+  date: {
+    before?: Date;
+    after?: Date;
+  };
+  from?: string;
+  to?: string;
+  display: number;
+  excludeOther: boolean;
+  includeOther: boolean;
+  mainAccount?: number;
+  deptAccount?: number;
+  sortType: number;
+  number?: number;
+  closeYear: string;
+  currYr: string;
+  summaryPerDate: boolean;
+};
+
 export default defineComponent({
   props: {
     module: { type: String as () => ModuleAbbr, required: true },
+    journalType: { type: Number, required: true },
     credit: { type: Number, required: true },
     debit: { type: Number, required: true },
   },
 
-  setup(params, { root: { $api }, emit }) {
+  setup(props, { root: { $api }, emit }) {
     const moduleName =
-      params.module === ModuleAbbr.GL
+      props.module === ModuleAbbr.GL
         ? LedgerParamType.GL
         : LedgerParamType.NonGL;
-    const {
-      state,
-      disableRef: loadingRef,
-      enable,
-      paramsRef,
-    } = useLedgerParams(moduleName);
-    const { options: mainOptions, filter: mainFilter } = useOption('code');
-    const { options: deptOptions, filter: deptFilter } = useOption('nr');
-    const { options: actFromOptions, filter: actFromFilter } = useOption(
-      'fibukonto'
-    );
-    const { options: actToOptions, filter: actToFilter } = useOption(
-      'fibukonto'
-    );
-    const tableSortType = ref(SortType.DESC);
+    const filter = reactive<State>({
+      date: {
+        before: new Date(),
+        after: new Date(),
+      },
+      display: 2,
+      excludeOther: false,
+      includeOther: false,
+      sortType: 2,
+      currYr: '',
+      closeYear: '2017',
+      summaryPerDate: false,
+      from: undefined,
+      to: undefined,
+      mainAccount: undefined,
+      deptAccount: undefined,
+      number: undefined,
+    });
+    const actFromOptions = ref([]);
+    const actToOptions = ref([]);
+    const mainOptions = ref([]);
+    const deptOptions = ref([]);
+    const tableSortType = ref(SortType.REMARK);
 
     const mainAccount = usePrepare(
       false,
       () => $api.common.getGLMainAccount(),
       (data) => {
-        mainOptions.value = data;
+        mainOptions.value = mapWithBezeich(data, 'code');
       }
     );
     const deptAccount = usePrepare(
       false,
       () => $api.common.getGLDeptAccount(),
       (data) => {
-        deptOptions.value = data;
+        deptOptions.value = mapWithBezeich(data, 'nr');
       }
     );
+
+    const range = computed({
+      get: () => {
+        const { before, after } = filter.date;
+        const startDate = date.formatDate(before, 'DD/MM/YY');
+        const endDate = date.formatDate(after, 'DD/MM/YY');
+        return {
+          startDate,
+          endDate,
+          dateInput: `${startDate} - ${endDate}`,
+        };
+      },
+      set: ({ startDate, endDate }) => {
+        filter.date.after = date.extractDate(startDate, 'DD/MM/YY');
+        filter.date.before = date.extractDate(endDate, 'DD/MM/YY');
+      },
+    });
 
     watch(
       () => tableSortType.value,
       (value) => {
         emit('update:sort', value);
-      }
+      },
+      { immediate: false, flush: 'post' }
     );
 
-    usePrepare(
+    const { data } = usePrepare(
       true,
       () =>
         Promise.all([
@@ -208,15 +242,14 @@ export default defineComponent({
           $api.accountReceivable.getPrepareSelectGLAcct(),
         ]),
       ([config, data]) => {
-        actFromOptions.value = data;
-        actToOptions.value = data;
+        const options = mapWithBezeich(data, 'fibukonto');
+        actFromOptions.value = options;
+        actToOptions.value = options;
 
-        state.form.closeYear = config.closeYear;
-        state.form.date.before = new Date(config.fromDate);
-        state.form.date.after = new Date(config.toDate);
-        state.form.currYr = config.currYr + '';
-
-        enable();
+        filter.closeYear = config.closeYear;
+        filter.date.after = new Date('2019-01-14');
+        filter.date.before = new Date(config.toDate);
+        filter.currYr = config.currYr + '';
       }
     );
 
@@ -230,7 +263,7 @@ export default defineComponent({
     };
 
     watch(
-      () => state.form.display,
+      () => filter.display,
       (value) => {
         if (value === Display.Main) {
           mainAccount.refetch();
@@ -238,34 +271,70 @@ export default defineComponent({
         if (value === Display.Dept) {
           deptAccount.refetch();
         }
+
+        // reset on switch
+        filter.mainAccount = undefined;
+        filter.deptAccount = undefined;
+        filter.number = undefined;
       }
     );
 
     function handleSearch() {
-      emit('search', toRaw(paramsRef.value));
+      const dateFormatToBL = 'MM/DD/YY';
+      const dateFormatFromBL = 'YYYY-MM-DD';
+      const closeYear = date.extractDate(filter.closeYear, dateFormatFromBL);
+      const baseParams = {
+        fromDate: date.formatDate(filter.date.after, dateFormatToBL),
+        toDate: date.formatDate(filter.date.before, dateFormatToBL),
+        last2Yr: parseInt(filter.currYr) - 2,
+        closeYear: date.formatDate(closeYear, dateFormatToBL),
+        journaltype: props.journalType,
+        summDate: filter.summaryPerDate ? 'yes' : 'no',
+        fromFibu:
+          filter.from === undefined || filter.from === ''
+            ? '00000000'
+            : filter.from.replace(/-/g, ''),
+        toFibu:
+          filter.to === undefined || filter.to === ''
+            ? '99999999'
+            : filter.to.replace(/-/g, ''),
+        sorttype: filter.sortType,
+        fromDept: filter.deptAccount === undefined ? '' : filter.deptAccount,
+        journaltype1: 99,
+        cashflow: 'no',
+      };
+      // debugger;
+      switch (moduleName) {
+        case LedgerParamType.GL:
+          emit('search', {
+            ...baseParams,
+            exclOther: filter.excludeOther ? 'yes' : 'no',
+          });
+        case LedgerParamType.NonGL:
+          emit('search', {
+            ...baseParams,
+            otherDept: filter.includeOther ? 'yes' : 'no',
+          });
+      }
     }
 
     function hasModuleName(modules: ModuleAbbr[]) {
-      return modules.includes(params.module);
+      return modules.includes(props.module);
     }
 
     return {
-      ...toRefs(state),
-      formatThousands,
+      ...toRefs(filter),
       searches,
-      loadingRef,
+      data,
       handleSearch,
       ModuleAbbr,
       hasModuleName,
       mainOptions,
-      mainFilter,
+      range,
       tableSortType,
       deptOptions,
-      deptFilter,
       actFromOptions,
-      actFromFilter,
       actToOptions,
-      actToFilter,
       Display,
       SortType,
       formatterMoney,

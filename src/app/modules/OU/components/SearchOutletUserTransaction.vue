@@ -14,16 +14,11 @@
         </template>
       </SSelect>
 
-      <v-date-picker mode="range" v-model="date" :columns="2" :popover="{ visibility: 'click' }">
-        <SInput
-          label-text="Date"
-          slot-scope="{ inputProps }"
-          placeholder="From - Until"
-          readonly
-          v-bind="inputProps"
-          @clear="date = null"
-        />
-      </v-date-picker>
+      <DateRangeInput
+        label-text="Date"
+        :position-fixed="true"
+        v-model="date"
+      />
 
       <q-checkbox v-model="showAllUser" label="Show as Summary by Article" />
 
@@ -34,15 +29,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs } from '@vue/composition-api';
-import { setupCalendar, DatePicker } from 'v-calendar';
+import DateRangeInput from '~/app/modules/FR/components/common/DateRangeInput.vue';
 import { watch } from 'fs';
-import { date } from 'quasar';
-
-setupCalendar({
-  firstDayOfWeek: 2,
-});
 
 export default defineComponent({
+  components: {
+    DateRangeInput,
+  },
+
   props: {
     searches: { type: Object, required: true },
   },
@@ -64,9 +58,6 @@ export default defineComponent({
       onSearch,
     };
   },
-  components: {
-    'v-date-picker': DatePicker,
-  }
 });
 </script>
 
